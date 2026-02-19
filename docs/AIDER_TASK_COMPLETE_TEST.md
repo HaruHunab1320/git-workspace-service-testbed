@@ -2,6 +2,8 @@
 
 Nonce: nonce-1771538710-fb868e42
 
+Agent: Aider
+
 # *SEARCH/REPLACE block* Rules:
 
 Every *SEARCH/REPLACE block* must use this format:
