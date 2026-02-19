@@ -1,3 +1,6 @@
+# Aider Task Completion Test
+
+
 # *SEARCH/REPLACE block* Rules:
 
 Every *SEARCH/REPLACE block* must use this format:
