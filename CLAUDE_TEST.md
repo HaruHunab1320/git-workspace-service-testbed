@@ -1,1 +1,1 @@
-Hello! This is a test file created by Claude Code.
+Test nonce: CLAUDE-BA71B479FCBC
