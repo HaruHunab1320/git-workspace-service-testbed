@@ -97,15 +97,15 @@ ITEMS: dict[str, Item] = {
         seasonal_bonus={Season.SPRING: 1.4, Season.SUMMER: 1.2},
     ),
     "cinnamon_roll": Item(
-        "Cinnamon Roll", ItemCategory.BAKED_GOOD, 2.75, shelf_life=3,
+        "Cinnamon Roll", ItemCategory.BAKED_GOOD, 2.75, shelf_life=4,
         seasonal_bonus={Season.WINTER: 1.6},
     ),
     "lavender_scone": Item(
-        "Lavender Scone", ItemCategory.BAKED_GOOD, 3.25, shelf_life=3,
+        "Lavender Scone", ItemCategory.BAKED_GOOD, 4.50, shelf_life=3,
         seasonal_bonus={Season.SPRING: 1.5, Season.SUMMER: 1.3},
     ),
     "berry_tart": Item(
-        "Berry Tart", ItemCategory.BAKED_GOOD, 4.00, shelf_life=2,
+        "Berry Tart", ItemCategory.BAKED_GOOD, 5.50, shelf_life=3,
         seasonal_bonus={Season.SUMMER: 1.7},
     ),
     "healing_potion": Item(
@@ -117,11 +117,11 @@ ITEMS: dict[str, Item] = {
         seasonal_bonus={Season.SUMMER: 1.3, Season.AUTUMN: 1.2},
     ),
     "sleep_draught": Item(
-        "Sleep Draught", ItemCategory.POTION, 8.50, shelf_life=0,
+        "Sleep Draught", ItemCategory.POTION, 9.50, shelf_life=0,
         seasonal_bonus={Season.WINTER: 1.4},
     ),
     "frost_tonic": Item(
-        "Frost Tonic", ItemCategory.POTION, 15.00, shelf_life=0,
+        "Frost Tonic", ItemCategory.POTION, 13.50, shelf_life=0,
         seasonal_bonus={Season.WINTER: 1.8, Season.AUTUMN: 1.3},
     ),
     "sunshine_brew": Item(
@@ -225,11 +225,13 @@ class Villager:
 
     # --- inventory helpers ---------------------------------------------------
 
-    def add_item(self, item_key: str, quantity: int = 1) -> None:
+    def add_item(self, item_key: str, quantity: int = 1, age_days: int = 0) -> None:
         if item_key in self.inventory:
-            self.inventory[item_key].quantity += quantity
+            slot = self.inventory[item_key]
+            slot.age_days = max(slot.age_days, age_days)
+            slot.quantity += quantity
         else:
-            self.inventory[item_key] = InventorySlot(ITEMS[item_key], quantity)
+            self.inventory[item_key] = InventorySlot(ITEMS[item_key], quantity, age_days)
 
     def remove_item(self, item_key: str, quantity: int = 1) -> bool:
         slot = self.inventory.get(item_key)
@@ -309,7 +311,7 @@ class Villager:
 # Trade result
 # ---------------------------------------------------------------------------
 
-@dataclass
+@dataclass(frozen=True)
 class TradeResult:
     success: bool
     message: str
@@ -381,11 +383,12 @@ class Market:
         return round(seasonal * noise, 2)
 
     def sell_price(self, item_key: str, seller: Villager) -> float:
-        """Price a seller receives (after tax)."""
+        """Estimated per-unit revenue after tax. Seller reputation reduces
+        the effective tax rate (up to 80% reduction at max reputation)."""
         base = self.current_price(item_key)
-        after_tax = base * (1 - self.TAX_RATE)
-        rep_bonus = min(seller.reputation * 0.01, self.REPUTATION_DISCOUNT_CAP)
-        return round(after_tax * (1 + rep_bonus), 2)
+        rep_tax_relief = min(seller.reputation * 0.08, 0.80)
+        effective_tax = self.TAX_RATE * (1 - rep_tax_relief)
+        return round(base * (1 - effective_tax), 2)
 
     def buy_price(self, item_key: str, buyer: Villager) -> float:
         """Price a buyer pays (reputation gives a discount)."""
@@ -433,11 +436,16 @@ class Market:
                 buyer.name, seller.name, item.name, quantity, total,
             )
 
-        # execute the trade
+        # execute the trade — transfer items with their current age
+        item_age = slot.age_days
         seller.remove_item(item_key, quantity)
-        buyer.add_item(item_key, quantity)
+        buyer.add_item(item_key, quantity, age_days=item_age)
         buyer.coins = round(buyer.coins - total, 2)
-        seller_revenue = round(self.sell_price(item_key, seller) * quantity, 2)
+        # seller revenue derived from buyer payment minus tax (no coin creation)
+        rep_tax_relief = min(seller.reputation * 0.08, 0.80)
+        effective_tax = self.TAX_RATE * (1 - rep_tax_relief)
+        tax = round(total * effective_tax, 2)
+        seller_revenue = round(total - tax, 2)
         seller.coins = round(seller.coins + seller_revenue, 2)
 
         # reputation
@@ -501,11 +509,13 @@ class IngredientShop:
     def __init__(self, season: Season = Season.SPRING) -> None:
         self.season = season
         self._seasonal_modifiers: dict[str, dict[Season, float]] = {
-            "lavender": {Season.SPRING: 0.7, Season.SUMMER: 0.8},
-            "sunfruit": {Season.SUMMER: 0.6},
-            "frost_mint": {Season.WINTER: 0.7},
-            "moonpetal": {Season.AUTUMN: 0.8, Season.WINTER: 0.9},
-            "ember_root": {Season.WINTER: 0.75},
+            "lavender": {Season.SPRING: 0.7, Season.SUMMER: 0.8, Season.WINTER: 1.4},
+            "sunfruit": {Season.SUMMER: 0.6, Season.WINTER: 1.5},
+            "frost_mint": {Season.WINTER: 0.7, Season.SUMMER: 1.4},
+            "moonpetal": {Season.AUTUMN: 0.8, Season.WINTER: 0.9, Season.SUMMER: 1.3},
+            "ember_root": {Season.WINTER: 0.75, Season.SPRING: 1.3},
+            "honey": {Season.SPRING: 0.8, Season.WINTER: 1.3},
+            "butter": {Season.WINTER: 1.2},
         }
 
     def price(self, ingredient_name: str) -> Optional[float]:
