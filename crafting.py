@@ -299,8 +299,15 @@ def _compute_quality(crafter: Crafter, recipe: Recipe) -> QualityTier:
     )
     base_score += rarity_avg
 
-    if crafter.equipped_tool and crafter.equipped_tool.recipe.category == ItemCategory.TOOL:
-        base_score += crafter.equipped_tool.tool_speed_bonus * 0.5
+    if crafter.equipped_tool:
+        tool_quality_bonus = {
+            QualityTier.ROUGH: -0.05,
+            QualityTier.STANDARD: 0.0,
+            QualityTier.FINE: 0.03,
+            QualityTier.MASTERWORK: 0.07,
+            QualityTier.LEGENDARY: 0.12,
+        }[crafter.equipped_tool.quality]
+        base_score += tool_quality_bonus
 
     roll = random.random() * 0.20
     final = min(base_score + roll, 1.0)
@@ -513,6 +520,24 @@ STARDUST = Material(
     seasons=(Season.WINTER,),
     description="Shimmering dust that falls on the coldest nights.",
 )
+WOOL = Material(
+    "Wool", MaterialRarity.COMMON,
+    seasons=(Season.AUTUMN, Season.WINTER),
+    description="Warm fleece from village sheep.",
+)
+STONE = Material(
+    "Stone", MaterialRarity.COMMON,
+    description="Grey stone from the quarry.",
+)
+SILVER_ORE = Material(
+    "Silver Ore", MaterialRarity.UNCOMMON,
+    description="Lustrous ore with a pale sheen.",
+)
+ENCHANTED_VINE = Material(
+    "Enchanted Vine", MaterialRarity.RARE,
+    seasons=(Season.SPRING,),
+    description="A vine that hums softly with magic.",
+)
 
 # -- Tool recipes --
 
@@ -552,6 +577,32 @@ RECIPE_COPPER_TONGS = Recipe(
     base_craft_time=1.0,
     skill_requirement=3,
     description="Useful for handling hot materials at the kiln.",
+)
+
+RECIPE_STONE_CHISEL = Recipe(
+    name="Stone Chisel",
+    category=ItemCategory.TOOL,
+    ingredients=(
+        RecipeIngredient(STONE, 2),
+        RecipeIngredient(IRON_ORE, 1),
+    ),
+    workstation=Workstation.WORKBENCH,
+    base_craft_time=0.75,
+    skill_requirement=2,
+    description="A pointed chisel for detail work in stone and clay.",
+)
+
+RECIPE_WEAVING_NEEDLE = Recipe(
+    name="Weaving Needle",
+    category=ItemCategory.TOOL,
+    ingredients=(
+        RecipeIngredient(IRON_ORE, 2),
+        RecipeIngredient(COTTON, 1),
+    ),
+    workstation=Workstation.LOOM,
+    base_craft_time=0.75,
+    skill_requirement=4,
+    description="A fine needle that makes loom work effortless.",
 )
 
 # -- Furniture recipes --
@@ -659,22 +710,118 @@ RECIPE_STARDUST_BED = Recipe(
     unlocked_by_default=False,
 )
 
+RECIPE_PINE_SHELF = Recipe(
+    name="Pine Shelf",
+    category=ItemCategory.FURNITURE,
+    ingredients=(
+        RecipeIngredient(PINE_WOOD, 3),
+        RecipeIngredient(IRON_ORE, 1),
+    ),
+    workstation=Workstation.WORKBENCH,
+    base_craft_time=1.0,
+    skill_requirement=2,
+    comfort_score=7,
+    description="A small shelf for trinkets and jars.",
+)
+
+RECIPE_COTTON_PILLOW = Recipe(
+    name="Cotton Pillow",
+    category=ItemCategory.FURNITURE,
+    ingredients=(
+        RecipeIngredient(COTTON, 4),
+        RecipeIngredient(WOOL, 2),
+    ),
+    workstation=Workstation.LOOM,
+    base_craft_time=1.0,
+    skill_requirement=3,
+    comfort_score=6,
+    description="A plump pillow stuffed with wool.",
+)
+
+RECIPE_WOOL_RUG = Recipe(
+    name="Wool Rug",
+    category=ItemCategory.FURNITURE,
+    ingredients=(
+        RecipeIngredient(WOOL, 6),
+        RecipeIngredient(COTTON, 2),
+    ),
+    workstation=Workstation.LOOM,
+    base_craft_time=2.0,
+    skill_requirement=5,
+    comfort_score=14,
+    description="A thick woven rug that warms cold floors.",
+)
+
+RECIPE_SILVER_MIRROR = Recipe(
+    name="Silver Mirror",
+    category=ItemCategory.FURNITURE,
+    ingredients=(
+        RecipeIngredient(SILVER_ORE, 3),
+        RecipeIngredient(OAK_WOOD, 2),
+    ),
+    workstation=Workstation.FORGE,
+    base_craft_time=2.5,
+    skill_requirement=7,
+    comfort_score=15,
+    description="A polished mirror in a carved wooden frame.",
+)
+
+RECIPE_STONE_FIREPLACE = Recipe(
+    name="Stone Fireplace",
+    category=ItemCategory.FURNITURE,
+    ingredients=(
+        RecipeIngredient(STONE, 8),
+        RecipeIngredient(IRON_ORE, 2),
+        RecipeIngredient(CLAY, 1),
+    ),
+    workstation=Workstation.FORGE,
+    base_craft_time=4.0,
+    skill_requirement=8,
+    comfort_score=22,
+    description="A grand fireplace that warms the whole house.",
+)
+
+RECIPE_ENCHANTED_PLANTER = Recipe(
+    name="Enchanted Planter",
+    category=ItemCategory.FURNITURE,
+    ingredients=(
+        RecipeIngredient(ENCHANTED_VINE, 2),
+        RecipeIngredient(CLAY, 3),
+        RecipeIngredient(MOONSTONE, 1),
+    ),
+    workstation=Workstation.ENCHANTING_TABLE,
+    base_craft_time=4.0,
+    skill_requirement=15,
+    comfort_score=28,
+    description="Flowers planted here bloom in every season.",
+    unlocked_by_default=False,
+)
+
 ALL_RECIPES: tuple[Recipe, ...] = (
     RECIPE_WOODEN_HAMMER,
     RECIPE_IRON_HAMMER,
     RECIPE_COPPER_TONGS,
+    RECIPE_STONE_CHISEL,
+    RECIPE_WEAVING_NEEDLE,
     RECIPE_OAK_CHAIR,
     RECIPE_PINE_TABLE,
+    RECIPE_PINE_SHELF,
     RECIPE_COTTON_CURTAINS,
+    RECIPE_COTTON_PILLOW,
     RECIPE_CLAY_FLOWER_POT,
+    RECIPE_WOOL_RUG,
+    RECIPE_SILVER_MIRROR,
+    RECIPE_STONE_FIREPLACE,
     RECIPE_MOONSTONE_LAMP,
     RECIPE_AMBER_BOOKSHELF,
+    RECIPE_ENCHANTED_PLANTER,
     RECIPE_STARDUST_BED,
 )
 
 ALL_MATERIALS: tuple[Material, ...] = (
     OAK_WOOD, PINE_WOOD, IRON_ORE, COPPER_ORE,
-    COTTON, CLAY, MOONSTONE, GOLDEN_AMBER, STARDUST,
+    COTTON, CLAY, WOOL, STONE, SILVER_ORE,
+    MOONSTONE, GOLDEN_AMBER, ENCHANTED_VINE, STARDUST,
 )
 
 

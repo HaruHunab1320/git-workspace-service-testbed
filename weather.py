@@ -97,6 +97,30 @@ class MagicalEvent(enum.Enum):
     SUNDOG_HALO = "sundog halo"
 
 
+class WindDirection(enum.Enum):
+    """Compass direction the wind blows from."""
+    NORTH = "north"
+    NORTHEAST = "northeast"
+    EAST = "east"
+    SOUTHEAST = "southeast"
+    SOUTH = "south"
+    SOUTHWEST = "southwest"
+    WEST = "west"
+    NORTHWEST = "northwest"
+
+
+_WIND_DIRECTIONS = list(WindDirection)
+
+# Seasonal prevailing-wind weights — index matches _WIND_DIRECTIONS order.
+# Higher weight = more likely the wind blows from that direction.
+_SEASONAL_WIND_BIAS: dict[Season, list[float]] = {
+    Season.SPRING: [1, 1, 2, 3, 3, 2, 1, 1],  # prevailing southerlies
+    Season.SUMMER: [1, 1, 1, 2, 3, 3, 2, 1],  # south-southwest
+    Season.AUTUMN: [2, 2, 1, 1, 1, 1, 2, 3],  # northwest / north
+    Season.WINTER: [3, 3, 2, 1, 1, 1, 2, 2],  # prevailing northerlies
+}
+
+
 # Which magical events are most likely in which seasons.
 _SEASONAL_MAGIC: dict[Season, list[tuple[MagicalEvent, float]]] = {
     Season.SPRING: [
@@ -130,6 +154,14 @@ _SEASONAL_MAGIC: dict[Season, list[tuple[MagicalEvent, float]]] = {
 # Forecast snapshot — one moment in the village sky
 # ---------------------------------------------------------------------------
 
+_SKY_SEVERITY: dict[Sky, float] = {
+    Sky.CLEAR: 0.0, Sky.PARTLY_CLOUDY: 0.05, Sky.OVERCAST: 0.1,
+    Sky.DRIZZLE: 0.15, Sky.FOG: 0.2, Sky.RAIN: 0.35,
+    Sky.SNOW: 0.3, Sky.HAIL: 0.6, Sky.THUNDERSTORM: 0.7,
+    Sky.BLIZZARD: 0.9,
+}
+
+
 @dataclass(frozen=True)
 class Forecast:
     """An immutable snapshot of the village weather at a single point in time."""
@@ -139,12 +171,37 @@ class Forecast:
     temperature_c: float
     humidity: float          # 0.0 – 1.0
     wind_speed_kph: float
+    wind_direction: WindDirection
     magical_event: MagicalEvent
     description: str
 
     @property
     def temperature_f(self) -> float:
         return self.temperature_c * 9.0 / 5.0 + 32.0
+
+    @property
+    def feels_like_c(self) -> float:
+        """Perceived temperature accounting for wind chill and humidity."""
+        t = self.temperature_c
+        v = self.wind_speed_kph
+        h = self.humidity
+        # Wind chill (Environment Canada formula)
+        if t <= 10.0 and v > 4.8:
+            return round(
+                13.12 + 0.6215 * t - 11.37 * v**0.16 + 0.3965 * t * v**0.16,
+                1,
+            )
+        # Humidity heat bump
+        if t >= 27.0 and h >= 0.40:
+            return round(t + 5.0 * (h - 0.40), 1)
+        return self.temperature_c
+
+    @property
+    def severity(self) -> float:
+        """Weather severity from 0.0 (calm) to 1.0 (extreme)."""
+        base = _SKY_SEVERITY.get(self.sky, 0.2)
+        wind_factor = min(0.2, self.wind_speed_kph / 250.0)
+        return min(1.0, round(base + wind_factor, 2))
 
     @property
     def is_magical(self) -> bool:
@@ -155,8 +212,10 @@ class Forecast:
         magic = f" ✦ {self.magical_event.value}!" if self.is_magical else ""
         return (
             f"Day {self.day} | {self.season.value.capitalize()} | "
-            f"{self.sky.value} | {self.temperature_c:+.1f}°C | "
-            f"wind {self.wind_speed_kph:.0f} km/h{magic}"
+            f"{self.sky.value} | {self.temperature_c:+.1f}°C "
+            f"(feels {self.feels_like_c:+.1f}°C) | "
+            f"wind {self.wind_direction.value} {self.wind_speed_kph:.0f} km/h"
+            f"{magic}"
         )
 
 
@@ -286,7 +345,7 @@ _BASE_TRANSITIONS: dict[Sky, list[tuple[Sky, float]]] = {
     ],
     Sky.OVERCAST: [
         (Sky.PARTLY_CLOUDY, 2), (Sky.OVERCAST, 3), (Sky.DRIZZLE, 2),
-        (Sky.RAIN, 1), (Sky.FOG, 1),
+        (Sky.RAIN, 1), (Sky.FOG, 1), (Sky.SNOW, 0.5),
     ],
     Sky.DRIZZLE: [
         (Sky.OVERCAST, 2), (Sky.DRIZZLE, 3), (Sky.RAIN, 2),
@@ -397,7 +456,10 @@ class WeatherEngine:
 
     def peek(self) -> Forecast:
         """Return a forecast for the current day without advancing time."""
-        return self._make_forecast(self.day, self._sky)
+        state = self._rng.getstate()
+        forecast = self._make_forecast(self.day, self._sky)
+        self._rng.setstate(state)
+        return forecast
 
     def forecast_ahead(self, days: int) -> list[Forecast]:
         """
@@ -407,7 +469,6 @@ class WeatherEngine:
         Uses a cloned RNG so the real timeline is unaffected.
         """
         clone = WeatherEngine(seed=None, day=self.day, _sky=self._sky)
-        clone._rng = random.Random()
         clone._rng.setstate(self._rng.getstate())
         return [clone.advance() for _ in range(days)]
 
@@ -439,6 +500,7 @@ class WeatherEngine:
         temp = self._jittered_temp(day)
         humidity = self._compute_humidity(sky)
         wind = self._compute_wind(sky)
+        wind_dir = self._compute_wind_direction(season)
         event = self._roll_magic(day, season)
         desc = _build_description(sky, event, self._rng)
         return Forecast(
@@ -448,6 +510,7 @@ class WeatherEngine:
             temperature_c=round(temp, 1),
             humidity=round(humidity, 2),
             wind_speed_kph=round(wind, 1),
+            wind_direction=wind_dir,
             magical_event=event,
             description=desc,
         )
@@ -475,11 +538,22 @@ class WeatherEngine:
         }
         return max(0.0, base_map.get(sky, 8.0) + self._rng.gauss(0, 3.0))
 
+    def _compute_wind_direction(self, season: Season) -> WindDirection:
+        weights = _SEASONAL_WIND_BIAS.get(season, [1] * 8)
+        total = sum(weights)
+        r = self._rng.random() * total
+        cumulative = 0.0
+        for direction, w in zip(_WIND_DIRECTIONS, weights):
+            cumulative += w
+            if r <= cumulative:
+                return direction
+        return _WIND_DIRECTIONS[-1]
+
     def _roll_magic(self, day: int, season: Season) -> MagicalEvent:
         chance = _MAGIC_BASE_CHANCE
         mid = DAYS_PER_SEASON // 2
         dist = abs(day_within_season(day) - mid)
-        if dist < DAYS_PER_SEASON // 6:
+        if dist < DAYS_PER_SEASON / 6:  # float division for true middle third
             chance += _MAGIC_PEAK_BONUS
 
         if self._rng.random() > chance:
@@ -547,6 +621,24 @@ def compute_village_mood(recent: list[Forecast], window: int = 5) -> VillageMood
     if avg_score >= 0.20:
         return VillageMood.MELANCHOLY
     return VillageMood.RESTLESS
+
+
+def detect_weather_streak(history: list[Forecast]) -> tuple[Sky, int]:
+    """Return the current sky state and how many consecutive days it has lasted.
+
+    Useful for triggering streak-based events or dialogue (e.g. villagers
+    complaining about a week of rain).
+    """
+    if not history:
+        return Sky.CLEAR, 0
+    current = history[-1].sky
+    streak = 0
+    for fc in reversed(history):
+        if fc.sky == current:
+            streak += 1
+        else:
+            break
+    return current, streak
 
 
 # ---------------------------------------------------------------------------
@@ -652,13 +744,16 @@ def _demo() -> None:
         fc = engine.advance()
         history.append(fc)
         fests = eligible_festivals(fc)
-        fest_str = f"  🎉 Festivals: {', '.join(fests)}" if fests else ""
-        print(f"  {fc.short_summary()}{fest_str}")
+        fest_str = f"  Festivals: {', '.join(fests)}" if fests else ""
+        severity_bar = "#" * int(fc.severity * 10)
+        print(f"  {fc.short_summary()}  [{severity_bar:<10}]{fest_str}")
         if fc.is_magical:
-            print(f"    → {fc.description}")
+            print(f"    -> {fc.description}")
     print()
     mood = compute_village_mood(history)
+    sky, streak = detect_weather_streak(history)
     print(f"After a full year, the village mood is: {mood.value}")
+    print(f"Current weather streak: {streak} day(s) of {sky.value}")
 
 
 if __name__ == "__main__":
