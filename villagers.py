@@ -216,6 +216,7 @@ PERSONALITY_MOOD_WEIGHTS: dict[Personality, dict[Mood, float]] = {
 
 # Dialogue snippets keyed by (Personality, Mood)
 DIALOGUE_TEMPLATES: dict[tuple[Personality, Mood], list[str]] = {
+    # --- Cheerful ---
     (Personality.CHEERFUL, Mood.JOYFUL): [
         "What a beautiful day! I could dance in the meadow!",
         "Everything just feels *right* today, don't you think?",
@@ -224,22 +225,61 @@ DIALOGUE_TEMPLATES: dict[tuple[Personality, Mood], list[str]] = {
         "Hey there, neighbour! Need anything from the market?",
         "I baked extra scones this morning — want one?",
     ],
+    (Personality.CHEERFUL, Mood.NEUTRAL): [
+        "Oh hello! Just taking things easy today.",
+        "Not the most exciting day, but the flowers are pretty!",
+    ],
+    (Personality.CHEERFUL, Mood.LONELY): [
+        "I wish there were more people around to chat with...",
+        "It's awfully quiet today. Want to take a walk together?",
+    ],
+    (Personality.CHEERFUL, Mood.UPSET): [
+        "I'm trying to stay positive, but today is rough.",
+        "Even I have bad days sometimes... sorry if I seem off.",
+    ],
+    # --- Grumpy ---
+    (Personality.GRUMPY, Mood.JOYFUL): [
+        "Don't say a word. I am NOT smiling. ...Okay, maybe a little.",
+        "Fine. I'll admit it. Today isn't terrible.",
+    ],
+    (Personality.GRUMPY, Mood.CONTENT): [
+        "The fence is holding up. That's good enough for me.",
+        "At least nobody's bothered me yet today.",
+    ],
     (Personality.GRUMPY, Mood.NEUTRAL): [
         "Hmph. At least the weather's tolerable.",
         "You again? ...Fine, I suppose you can stay.",
+    ],
+    (Personality.GRUMPY, Mood.LONELY): [
+        "I don't need company. ...But you can sit there if you want.",
+        "It's not like I'm lonely. The silence is just... loud.",
     ],
     (Personality.GRUMPY, Mood.UPSET): [
         "Don't talk to me. Just — don't.",
         "Everything is awful and my turnips are wilting.",
     ],
-    (Personality.SHY, Mood.LONELY): [
-        "Oh... hi. I was just... sitting here. Alone.",
-        "Do you... want to maybe hang out? It's okay if not.",
+    # --- Shy ---
+    (Personality.SHY, Mood.JOYFUL): [
+        "I... I actually feel really happy today! Is that weird?",
+        "Look what I made! ...Sorry, I don't usually show people.",
     ],
     (Personality.SHY, Mood.CONTENT): [
         "I finished a new pressed-flower bookmark today!",
         "It's nice here, isn't it? Quiet...",
     ],
+    (Personality.SHY, Mood.NEUTRAL): [
+        "Oh, um... hi. I didn't see you there.",
+        "I was just... thinking. About things.",
+    ],
+    (Personality.SHY, Mood.LONELY): [
+        "Oh... hi. I was just... sitting here. Alone.",
+        "Do you... want to maybe hang out? It's okay if not.",
+    ],
+    (Personality.SHY, Mood.UPSET): [
+        "I'd rather not talk about it... please.",
+        "Sorry, I just need some space right now...",
+    ],
+    # --- Adventurous ---
     (Personality.ADVENTUROUS, Mood.JOYFUL): [
         "I found a hidden trail up the mountain — wanna come?!",
         "Today I'm mapping the caves past the old bridge!",
@@ -247,6 +287,23 @@ DIALOGUE_TEMPLATES: dict[tuple[Personality, Mood], list[str]] = {
     (Personality.ADVENTUROUS, Mood.CONTENT): [
         "I collected some neat rocks on my hike. Look!",
         "The view from the ridge at dawn was incredible.",
+    ],
+    (Personality.ADVENTUROUS, Mood.NEUTRAL): [
+        "Just planning my next route. Nothing special yet.",
+        "The weather could go either way — I'll head out anyway.",
+    ],
+    (Personality.ADVENTUROUS, Mood.LONELY): [
+        "Adventures are more fun with a partner... want to join?",
+        "The trails feel longer when you walk them alone.",
+    ],
+    (Personality.ADVENTUROUS, Mood.UPSET): [
+        "My compass broke and I got completely turned around yesterday.",
+        "Some days the mountain wins. Today was one of those days.",
+    ],
+    # --- Scholarly ---
+    (Personality.SCHOLARLY, Mood.JOYFUL): [
+        "I just made a breakthrough in my research! Let me explain—",
+        "The library received a rare manuscript today! I could sing!",
     ],
     (Personality.SCHOLARLY, Mood.CONTENT): [
         "I just finished a fascinating chapter on soil composition.",
@@ -256,6 +313,15 @@ DIALOGUE_TEMPLATES: dict[tuple[Personality, Mood], list[str]] = {
         "Hmm? Oh, sorry, I was deep in thought.",
         "I need to reorganize the library's mythology section...",
     ],
+    (Personality.SCHOLARLY, Mood.LONELY): [
+        "Knowledge is wonderful, but it's nice to share it with someone.",
+        "The library feels cavernous when I'm the only one here.",
+    ],
+    (Personality.SCHOLARLY, Mood.UPSET): [
+        "My notes got water-damaged. Months of work, just gone.",
+        "I can't concentrate on anything today. Very frustrating.",
+    ],
+    # --- Nurturing ---
     (Personality.NURTURING, Mood.JOYFUL): [
         "The new seedlings in the garden are sprouting! Come see!",
         "I made soup for everyone — grab a bowl, dear!",
@@ -263,6 +329,18 @@ DIALOGUE_TEMPLATES: dict[tuple[Personality, Mood], list[str]] = {
     (Personality.NURTURING, Mood.CONTENT): [
         "How are you feeling today? You look a little tired.",
         "Remember to eat well and rest, okay?",
+    ],
+    (Personality.NURTURING, Mood.NEUTRAL): [
+        "Just checking in on everyone. Need anything?",
+        "The pantry's stocked. We'll be fine.",
+    ],
+    (Personality.NURTURING, Mood.LONELY): [
+        "I keep cooking for two, even when it's just me...",
+        "I hope everyone's doing all right out there.",
+    ],
+    (Personality.NURTURING, Mood.UPSET): [
+        "I tried so hard, and it still wasn't enough today.",
+        "Sometimes taking care of everyone else means I forget about me.",
     ],
 }
 
@@ -300,6 +378,13 @@ class Villager:
         self.friendships: dict[str, FriendshipRecord] = {}
         self.memories: list[MemoryEntry] = []
         self._activity: str = "resting at home"
+        self._is_birthday_today: bool = False
+
+    # Outdoor location types where villagers are exposed to weather
+    _OUTDOOR_LOCATIONS = {
+        LocationType.PLAZA, LocationType.FARM, LocationType.FOREST,
+        LocationType.BEACH, LocationType.GARDEN,
+    }
 
     # -- Schedule -----------------------------------------------------------
 
@@ -314,7 +399,9 @@ class Villager:
                 return entry
         return None
 
-    def advance_to(self, season: Season, time: TimeOfDay) -> str:
+    def advance_to(
+        self, season: Season, time: TimeOfDay, *, bad_weather: bool = False
+    ) -> str:
         """Move the villager according to their schedule and return a description."""
         entry = self.get_current_schedule_entry(season, time)
         if entry:
@@ -324,11 +411,20 @@ class Villager:
             # Default: go home if no schedule entry
             self.current_location = self.home
             self._activity = "resting at home"
+        # During storms/blizzards, villagers at outdoor locations head indoors
+        if bad_weather and self.current_location.location_type in self._OUTDOOR_LOCATIONS:
+            self.current_location = self.home
+            self._activity = "sheltering from the storm"
         # Drain energy over the day, recover at night
         if time == TimeOfDay.NIGHT:
             self.energy = min(100, self.energy + 40)
         else:
             self.energy = max(0, self.energy - random.randint(5, 15))
+        # Exhausted villagers go home to rest instead of following schedule
+        if self.energy <= 10 and time != TimeOfDay.NIGHT:
+            self.current_location = self.home
+            self._activity = "resting (exhausted)"
+            self.adjust_mood(-1)
         return f"{self.name} is {self._activity} ({self.current_location})."
 
     # -- Mood ---------------------------------------------------------------
@@ -364,6 +460,11 @@ class Villager:
         if record.conversations_today >= 3:
             return f"{other.name} seems tired of chatting with {self.name} for now."
 
+        # Exhausted villagers don't feel like chatting
+        if self.energy <= 10 or other.energy <= 10:
+            tired_one = self if self.energy <= other.energy else other
+            return f"{tired_one.name} is too tired to chat right now."
+
         # Base points from conversation
         base = 2
         # Bonus if compatible personalities
@@ -374,11 +475,18 @@ class Villager:
             base += 1
         if other.mood == Mood.UPSET:
             base -= 1
+        # Low energy makes conversations less rewarding
+        if self.energy < 30 or other.energy < 30:
+            base = max(1, base - 1)
 
         record.add_points(base)
         record.conversations_today += 1
         other_record.add_points(base)
         other_record.conversations_today += 1
+
+        # Conversations cost a bit of energy
+        self.energy = max(0, self.energy - 3)
+        other.energy = max(0, other.energy - 3)
 
         self.memories.append(MemoryEntry(day, f"Chatted with {other.name}", 1))
         other.memories.append(MemoryEntry(day, f"Chatted with {self.name}", 1))
@@ -408,7 +516,9 @@ class Villager:
         else:
             reaction = f"{self.name} frowns: \"Um... this isn't really my thing.\""
 
-        # Birthday bonus
+        # Birthday bonus — gifts on a villager's birthday are extra meaningful
+        if self._is_birthday_today:
+            points = max(points, 1) * 2
         points = max(points, -5)  # floor to prevent too-negative gifts
         record.add_points(points)
         record.record_gift(gift.name)
@@ -458,14 +568,14 @@ class Villager:
     # -- Day lifecycle ------------------------------------------------------
 
     def start_new_day(self) -> None:
-        self.roll_daily_mood()
-        self.energy = 100
-        for record in self.friendships.values():
-            record.new_day()
-        # Slight natural decay on friendships each day to encourage interaction
+        # Decay friendships based on *yesterday's* interactions before resetting
         for record in self.friendships.values():
             if record.points > 0 and record.conversations_today == 0:
                 record.points = max(0, record.points - 1)
+        for record in self.friendships.values():
+            record.new_day()
+        self.roll_daily_mood()
+        self.energy = 100
 
     def __repr__(self) -> str:
         return (
@@ -489,6 +599,11 @@ class Village:
         self.season: Season = Season.SPRING
         self.time_of_day: TimeOfDay = TimeOfDay.DAWN
         self.event_log: list[str] = []
+        self.bad_weather: bool = False
+
+    def set_weather(self, bad_weather: bool) -> None:
+        """Update weather state. Pass True during storms/blizzards to drive villagers indoors."""
+        self.bad_weather = bad_weather
 
     # -- Registration -------------------------------------------------------
 
@@ -531,7 +646,9 @@ class Village:
         # Move all villagers
         summaries = []
         for v in self.villagers.values():
-            summaries.append(v.advance_to(self.season, self.time_of_day))
+            summaries.append(
+                v.advance_to(self.season, self.time_of_day, bad_weather=self.bad_weather)
+            )
 
         self._trigger_random_encounters()
         header = f"--- Day {self.day}, {self.season.value.title()}, {self.time_of_day.value} ---"
@@ -539,10 +656,29 @@ class Village:
 
     def _on_new_day(self) -> None:
         for v in self.villagers.values():
+            v._is_birthday_today = v.is_birthday(self.season, self.day)
             v.start_new_day()
-            if v.is_birthday(self.season, self.day):
+            if v._is_birthday_today:
                 msg = f"Today is {v.name}'s birthday!"
                 self.event_log.append(msg)
+                self._birthday_gifts(v)
+
+    def _birthday_gifts(self, birthday_villager: Villager) -> None:
+        """Friends give the birthday villager a small spontaneous gift."""
+        for v in self.villagers.values():
+            if v.villager_id == birthday_villager.villager_id:
+                continue
+            record = v.get_friendship(birthday_villager.villager_id)
+            if record.tier in (FriendshipTier.FRIEND, FriendshipTier.CLOSE_FRIEND,
+                               FriendshipTier.BEST_FRIEND):
+                gift = Gift("Birthday Cupcake", GiftCategory.FOOD, quality=2)
+                reaction, pts = birthday_villager.give_gift(
+                    gift, v.villager_id, self.day
+                )
+                self.event_log.append(
+                    f"[Day {self.day}] {v.name} gave {birthday_villager.name} "
+                    f"a birthday cupcake! {reaction} ({pts:+d}pts)"
+                )
 
     def _trigger_random_encounters(self) -> None:
         """If two villagers are at the same location, they might chat."""
@@ -614,8 +750,10 @@ class Village:
 
     def simulate_day(self) -> list[str]:
         """Run through an entire day (all time slots) and return event log entries."""
+        # Advance to the end of the current day first if mid-day
         day_events: list[str] = []
-        for _ in self._TIME_ORDER:
+        remaining = len(self._TIME_ORDER) - self._TIME_ORDER.index(self.time_of_day)
+        for _ in range(remaining):
             summary = self.advance_time()
             day_events.append(summary)
         day_events.extend(self.event_log[-20:])
@@ -669,6 +807,8 @@ def create_default_locations() -> list[Location]:
         Location("Maple House", LocationType.HOME),
         Location("Ivy Cabin", LocationType.HOME),
         Location("Stonehearth Lodge", LocationType.HOME),
+        Location("Hearthside Bungalow", LocationType.HOME),
+        Location("Clover Den", LocationType.HOME),
         Location("The Dusty Tome", LocationType.LIBRARY),
         Location("Blossom Cafe", LocationType.CAFE),
         Location("Town Plaza", LocationType.PLAZA, capacity=30),
@@ -709,6 +849,20 @@ def create_sample_village() -> Village:
         ScheduleEntry(TimeOfDay.EVENING, loc_map["Blossom Cafe"], "enjoying iced lemonade"),
         ScheduleEntry(TimeOfDay.NIGHT, loc_map["Rosewood Cottage"], "sleeping"),
     ])
+    lily.set_schedule(Season.AUTUMN, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Community Garden"], "harvesting late blooms"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Town Plaza"], "selling dried flower wreaths"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["The Dusty Tome"], "pressing autumn leaves"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Blossom Cafe"], "sipping warm cider"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Rosewood Cottage"], "sleeping"),
+    ])
+    lily.set_schedule(Season.WINTER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Rosewood Cottage"], "tending indoor seedlings"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Blossom Cafe"], "decorating with holly"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Town Plaza"], "building a snow garden"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Rosewood Cottage"], "crafting potpourri"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Rosewood Cottage"], "sleeping"),
+    ])
 
     gruff = Villager(
         "gruff", "Gruff", Personality.GRUMPY,
@@ -721,6 +875,27 @@ def create_sample_village() -> Village:
         ScheduleEntry(TimeOfDay.MORNING, loc_map["Tinker's Workshop"], "repairing fences"),
         ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Whispering Woods"], "foraging mushrooms"),
         ScheduleEntry(TimeOfDay.EVENING, loc_map["Stonehearth Lodge"], "whittling by the fire"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Stonehearth Lodge"], "sleeping"),
+    ])
+    gruff.set_schedule(Season.SUMMER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Sunrise Farm"], "mending the barn roof"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Tinker's Workshop"], "sharpening tools"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Whispering Woods"], "checking animal traps"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Tidal Beach"], "fishing alone at the pier"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Stonehearth Lodge"], "sleeping"),
+    ])
+    gruff.set_schedule(Season.AUTUMN, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Whispering Woods"], "gathering firewood stores"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Tinker's Workshop"], "winterizing equipment"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Sunrise Farm"], "helping with the harvest"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Stonehearth Lodge"], "smoking fish for winter"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Stonehearth Lodge"], "sleeping"),
+    ])
+    gruff.set_schedule(Season.WINTER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Stonehearth Lodge"], "stoking the hearth fire"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Tinker's Workshop"], "carving wooden figures"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Blossom Cafe"], "warming up with black coffee"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Stonehearth Lodge"], "reading by the fireplace"),
         ScheduleEntry(TimeOfDay.NIGHT, loc_map["Stonehearth Lodge"], "sleeping"),
     ])
 
@@ -737,6 +912,27 @@ def create_sample_village() -> Village:
         ScheduleEntry(TimeOfDay.EVENING, loc_map["Ivy Cabin"], "making bookmarks"),
         ScheduleEntry(TimeOfDay.NIGHT, loc_map["Ivy Cabin"], "sleeping"),
     ])
+    fern.set_schedule(Season.SUMMER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Community Garden"], "painting watercolours"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Whispering Woods"], "sketching butterflies"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Tidal Beach"], "collecting sea glass"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Ivy Cabin"], "assembling a scrapbook"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Ivy Cabin"], "sleeping"),
+    ])
+    fern.set_schedule(Season.AUTUMN, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Ivy Cabin"], "journaling by candlelight"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Whispering Woods"], "photographing fall colours"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["The Dusty Tome"], "reading mystery novels"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Blossom Cafe"], "knitting quietly in the corner"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Ivy Cabin"], "sleeping"),
+    ])
+    fern.set_schedule(Season.WINTER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Ivy Cabin"], "wrapping small handmade gifts"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["The Dusty Tome"], "reading by the radiator"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Blossom Cafe"], "drinking hot cocoa alone"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Ivy Cabin"], "embroidering a cushion"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Ivy Cabin"], "sleeping"),
+    ])
 
     ridge = Villager(
         "ridge", "Ridge", Personality.ADVENTUROUS,
@@ -751,10 +947,31 @@ def create_sample_village() -> Village:
         ScheduleEntry(TimeOfDay.EVENING, loc_map["Blossom Cafe"], "telling adventure stories"),
         ScheduleEntry(TimeOfDay.NIGHT, loc_map["Maple House"], "sleeping"),
     ])
+    ridge.set_schedule(Season.SUMMER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Tidal Beach"], "surfing the morning waves"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Whispering Woods"], "mapping hidden trails"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Whispering Woods"], "climbing the old oak"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Town Plaza"], "organizing a bonfire"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Maple House"], "sleeping"),
+    ])
+    ridge.set_schedule(Season.AUTUMN, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Whispering Woods"], "foraging wild berries"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Sunrise Farm"], "helping with apple picking"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Tidal Beach"], "exploring tide pools"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Blossom Cafe"], "planning the next expedition"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Maple House"], "sleeping"),
+    ])
+    ridge.set_schedule(Season.WINTER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Whispering Woods"], "tracking animal prints in snow"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Tinker's Workshop"], "maintaining climbing gear"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Town Plaza"], "building snow forts"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Blossom Cafe"], "swapping stories by the stove"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Maple House"], "sleeping"),
+    ])
 
     sage = Villager(
         "sage", "Sage", Personality.SCHOLARLY,
-        loc_map["Ivy Cabin"],
+        loc_map["Clover Den"],
         birthday_season=Season.AUTUMN, birthday_day=10,
         favourite_gift=Gift("Rare First Edition", GiftCategory.BOOK, 5),
     )
@@ -763,12 +980,33 @@ def create_sample_village() -> Village:
         ScheduleEntry(TimeOfDay.MORNING, loc_map["The Dusty Tome"], "researching local history"),
         ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Community Garden"], "studying plant species"),
         ScheduleEntry(TimeOfDay.EVENING, loc_map["Blossom Cafe"], "writing field notes"),
-        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Ivy Cabin"], "sleeping"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Clover Den"], "sleeping"),
+    ])
+    sage.set_schedule(Season.SUMMER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Community Garden"], "cataloguing insect species"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["The Dusty Tome"], "translating old manuscripts"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Tidal Beach"], "collecting geological samples"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Clover Den"], "organizing research notes"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Clover Den"], "sleeping"),
+    ])
+    sage.set_schedule(Season.AUTUMN, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Whispering Woods"], "observing bird migrations"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["The Dusty Tome"], "writing a seasonal almanac"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["The Dusty Tome"], "hosting a reading group"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Blossom Cafe"], "debating philosophy"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Clover Den"], "sleeping"),
+    ])
+    sage.set_schedule(Season.WINTER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Clover Den"], "reviewing journal submissions"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["The Dusty Tome"], "teaching a winter seminar"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["The Dusty Tome"], "archiving village records"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Blossom Cafe"], "discussing the year's discoveries"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Clover Den"], "sleeping"),
     ])
 
     hazel = Villager(
         "hazel", "Hazel", Personality.NURTURING,
-        loc_map["Rosewood Cottage"],
+        loc_map["Hearthside Bungalow"],
         birthday_season=Season.SPRING, birthday_day=28,
         favourite_gift=Gift("Heirloom Seed Packet", GiftCategory.FORAGED, 3),
     )
@@ -777,7 +1015,28 @@ def create_sample_village() -> Village:
         ScheduleEntry(TimeOfDay.MORNING, loc_map["Community Garden"], "planting herbs"),
         ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Blossom Cafe"], "baking pies for neighbours"),
         ScheduleEntry(TimeOfDay.EVENING, loc_map["Town Plaza"], "handing out warm bread"),
-        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Rosewood Cottage"], "sleeping"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Hearthside Bungalow"], "sleeping"),
+    ])
+    hazel.set_schedule(Season.SUMMER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Sunrise Farm"], "collecting fresh eggs"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Community Garden"], "watering herb beds"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Town Plaza"], "running a lemonade stand"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Tidal Beach"], "watching the sunset with friends"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Hearthside Bungalow"], "sleeping"),
+    ])
+    hazel.set_schedule(Season.AUTUMN, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Sunrise Farm"], "preserving jams and pickles"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Community Garden"], "composting fallen leaves"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Blossom Cafe"], "baking pumpkin bread"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Town Plaza"], "organizing the harvest festival"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Hearthside Bungalow"], "sleeping"),
+    ])
+    hazel.set_schedule(Season.WINTER, [
+        ScheduleEntry(TimeOfDay.DAWN, loc_map["Hearthside Bungalow"], "making breakfast for visitors"),
+        ScheduleEntry(TimeOfDay.MORNING, loc_map["Blossom Cafe"], "teaching a baking class"),
+        ScheduleEntry(TimeOfDay.AFTERNOON, loc_map["Town Plaza"], "delivering soup to neighbours"),
+        ScheduleEntry(TimeOfDay.EVENING, loc_map["Hearthside Bungalow"], "knitting blankets"),
+        ScheduleEntry(TimeOfDay.NIGHT, loc_map["Hearthside Bungalow"], "sleeping"),
     ])
 
     for v in [lily, gruff, fern, ridge, sage, hazel]:
