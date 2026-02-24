@@ -1,0 +1,80 @@
+.event-log {
+  position: sticky;
+  top: 80px;
+}
+
+.event-log .card-title {
+  position: sticky;
+  top: 0;
+  background: var(--white);
+  padding-bottom: 8px;
+  z-index: 1;
+}
+
+.event-log-scroll {
+  max-height: calc(100vh - 240px);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.event-log-empty {
+  color: var(--brown-light);
+  font-style: italic;
+  padding: 20px 0;
+  text-align: center;
+}
+
+.event-day {
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  border-left: 3px solid var(--sage-light);
+}
+
+.event-day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+.event-day-season {
+  font-size: 0.75rem;
+  color: var(--brown-light);
+  font-weight: 600;
+}
+
+.event-day-weather {
+  font-size: 0.8rem;
+  color: var(--brown-light);
+  margin-bottom: 4px;
+}
+
+.event-magical {
+  color: #8e44ad;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.event-festival {
+  color: var(--rose);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.event-line {
+  font-size: 0.8rem;
+  padding: 1px 0;
+  color: var(--brown);
+}
+
+.event-harvest {
+  color: var(--sage-dark);
+  font-weight: 600;
+}
+
+.event-found {
+  color: #8e44ad;
+}

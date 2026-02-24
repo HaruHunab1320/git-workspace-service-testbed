@@ -1,0 +1,17 @@
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  background: var(--white);
+  border-top: 1px solid var(--tan-light);
+  padding: 12px 24px;
+  box-shadow: 0 -2px 8px var(--shadow);
+  z-index: 50;
+}
+
+.action-bar-inner {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
