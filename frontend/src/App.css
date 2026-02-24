@@ -1,0 +1,369 @@
+/* ============================================================
+   Cozy Village Simulator — Global Theme
+   ============================================================ */
+
+:root {
+  --cream: #faf6f0;
+  --sage: #7a9e7e;
+  --sage-light: #a8c5ab;
+  --sage-dark: #5a7e5e;
+  --tan: #d4b896;
+  --tan-light: #e8d5be;
+  --rose: #c8848a;
+  --rose-light: #e0b0b4;
+  --brown: #4a3728;
+  --brown-light: #6b5545;
+  --white: #ffffff;
+  --shadow: rgba(74, 55, 40, 0.1);
+  --shadow-md: rgba(74, 55, 40, 0.15);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--cream);
+  color: var(--brown);
+  line-height: 1.5;
+  transition: background 0.6s ease;
+}
+
+body.season-spring { background: #f0f7e8; }
+body.season-summer { background: #faf6e0; }
+body.season-autumn { background: #f7efe0; }
+body.season-winter { background: #e8eef5; }
+
+/* ---- Layout ---- */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  padding: 16px;
+  gap: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.panel-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+/* ---- Tabs ---- */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--tan-light);
+  color: var(--brown-light);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  background: var(--tan);
+  color: var(--brown);
+}
+
+.tab-btn.active {
+  background: var(--white);
+  color: var(--sage-dark);
+  box-shadow: 0 -2px 0 var(--sage) inset;
+}
+
+/* ---- Cards ---- */
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 2px 8px var(--shadow);
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--sage-dark);
+}
+
+/* ---- Buttons ---- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--sage);
+  color: var(--white);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--sage-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--tan-light);
+  color: var(--brown);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--tan);
+}
+
+.btn-rose {
+  background: var(--rose);
+  color: var(--white);
+}
+
+.btn-rose:hover:not(:disabled) {
+  background: #b87078;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+
+/* ---- Badges ---- */
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badge-cheerful { background: #ffeaa7; color: #6b5b00; }
+.badge-grumpy { background: #dfe6e9; color: #555; }
+.badge-shy { background: #e0c3fc; color: #5b3a8a; }
+.badge-adventurous { background: #ffecd2; color: #8b5e00; }
+.badge-scholarly { background: #c8e6ff; color: #1a5276; }
+.badge-nurturing { background: #d4edda; color: #2d6a3f; }
+
+/* ---- Progress bars ---- */
+
+.progress-bar {
+  height: 8px;
+  background: var(--tan-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.progress-fill.sage { background: var(--sage); }
+.progress-fill.rose { background: var(--rose); }
+.progress-fill.tan { background: var(--tan); }
+
+/* ---- Modal ---- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  min-width: 360px;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+  color: var(--sage-dark);
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+/* ---- Forms ---- */
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid var(--tan-light);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--white);
+  color: var(--brown);
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: var(--sage);
+}
+
+/* ---- Grid helpers ---- */
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+/* ---- Loading ---- */
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--brown-light);
+  font-size: 1.2rem;
+}
+
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--tan-light);
+  border-top-color: var(--sage);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Pulse animation for harvestable crops ---- */
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.harvestable {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ---- Magical glow ---- */
+
+.magical-glow {
+  box-shadow: 0 0 12px rgba(180, 140, 255, 0.5), 0 2px 8px var(--shadow);
+}
+
+/* ---- Rarity colors ---- */
+
+.rarity-common { color: var(--brown-light); }
+.rarity-uncommon { color: #2980b9; }
+.rarity-rare { color: #8e44ad; }
+
+/* ---- Mood emoji helpers ---- */
+
+.mood-joyful { color: #f1c40f; }
+.mood-content { color: var(--sage); }
+.mood-neutral { color: var(--brown-light); }
+.mood-lonely { color: #3498db; }
+.mood-upset { color: var(--rose); }
+
+/* ---- Scrollbar ---- */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tan);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brown-light);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px) {
+  .main-content {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+  }
+}

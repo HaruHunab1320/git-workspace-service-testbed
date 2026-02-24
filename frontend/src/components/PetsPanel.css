@@ -1,0 +1,106 @@
+.pet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.pet-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pet-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--shadow-md);
+}
+
+.pet-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pet-species-emoji {
+  font-size: 2.5rem;
+}
+
+.pet-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.pet-subtitle {
+  font-size: 0.85rem;
+  color: var(--brown-light);
+  text-transform: capitalize;
+}
+
+.pet-mood {
+  font-size: 1.5rem;
+  margin-left: auto;
+}
+
+.pet-stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+
+.pet-stat-label {
+  width: 100px;
+  font-weight: 600;
+  text-transform: capitalize;
+  flex-shrink: 0;
+}
+
+.pet-stat .progress-bar {
+  flex: 1;
+}
+
+.pet-stat-val {
+  width: 60px;
+  text-align: right;
+  color: var(--brown-light);
+  font-size: 0.8rem;
+}
+
+.pet-detail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  text-transform: capitalize;
+}
+
+.pet-items {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+.pet-items-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.pet-item {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--cream);
+}
+
+.pet-item.rarity-common { background: #f0f0f0; }
+.pet-item.rarity-uncommon { background: #d6eaff; color: #2980b9; }
+.pet-item.rarity-rare { background: #efe0ff; color: #8e44ad; }
+
+.pet-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}

@@ -1,0 +1,55 @@
+.villager-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+.villager-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.villager-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--shadow-md);
+}
+
+.villager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.villager-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.villager-mood {
+  font-size: 1.5rem;
+}
+
+.villager-detail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.friendship-label {
+  text-transform: capitalize;
+  color: var(--brown-light);
+}
+
+.villager-dialogue {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--brown);
+  border-left: 3px solid var(--sage-light);
+}

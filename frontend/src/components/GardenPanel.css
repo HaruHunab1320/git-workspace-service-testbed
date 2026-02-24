@@ -1,0 +1,75 @@
+.garden-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--brown-light);
+}
+
+.garden-grid {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.garden-plot {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  position: relative;
+  transition: all 0.2s;
+  min-height: 70px;
+}
+
+.garden-plot.empty {
+  cursor: pointer;
+  border: 2px dashed var(--tan-light);
+  background: transparent;
+}
+
+.garden-plot.empty:hover {
+  border-color: var(--sage);
+  background: rgba(122, 158, 126, 0.08);
+}
+
+.garden-plot.planted {
+  border: 2px solid var(--sage-light);
+  background: #f0f7e8;
+}
+
+.plot-emoji {
+  font-size: 1.8rem;
+}
+
+.plot-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--brown-light);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.plot-watered {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.7rem;
+}
+
+.garden-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--brown-light);
+  flex-wrap: wrap;
+}
