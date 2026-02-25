@@ -24,7 +24,7 @@ from animals import (
     Species, PetPersonality, BondTier, PetMood, PetActivity,
     create_adoptable_pets,
 )
-from weather import MagicalEvent
+from weather import MagicalEvent, eligible_festivals, compute_village_mood, detect_weather_streak
 
 # ---------------------------------------------------------------------------
 # App setup
@@ -77,10 +77,10 @@ class JournalEntryRequest(BaseModel):
 # Serialization helpers
 # ---------------------------------------------------------------------------
 
-def _serialize_forecast(f):
+def _serialize_forecast(f, include_festivals=False):
     if f is None:
         return None
-    return {
+    data = {
         "day": f.day,
         "season": f.season.value,
         "sky": f.sky.value,
@@ -96,6 +96,9 @@ def _serialize_forecast(f):
         "summary": f.short_summary(),
         "severity": round(f.severity, 2),
     }
+    if include_festivals:
+        data["festivals"] = eligible_festivals(f)
+    return data
 
 
 def _serialize_villager(v):
@@ -264,7 +267,12 @@ def _sync_market():
 @app.get("/api/status")
 def get_status():
     _sync_market()
-    weather = _serialize_forecast(game.current_weather)
+    weather = _serialize_forecast(game.current_weather, include_festivals=True)
+    if weather is not None:
+        mood = compute_village_mood(game._weather_history)
+        weather["village_mood"] = mood.value
+        sky, streak = detect_weather_streak(game._weather_history)
+        weather["weather_streak"] = {"sky": sky.value, "days": streak}
     villagers = {
         vid: _serialize_villager(v)
         for vid, v in game.village.villagers.items()
@@ -315,13 +323,19 @@ def new_game(seed: int = Query(default=42)):
 
 @app.get("/api/weather")
 def get_weather():
-    return _serialize_forecast(game.current_weather)
+    forecast = _serialize_forecast(game.current_weather, include_festivals=True)
+    if forecast is not None:
+        mood = compute_village_mood(game._weather_history)
+        forecast["village_mood"] = mood.value
+        sky, streak = detect_weather_streak(game._weather_history)
+        forecast["weather_streak"] = {"sky": sky.value, "days": streak}
+    return forecast
 
 
 @app.get("/api/weather/forecast")
 def get_forecast(days: int = Query(default=5, ge=1, le=14)):
     forecasts = game.weather.forecast_ahead(days)
-    return [_serialize_forecast(f) for f in forecasts]
+    return [_serialize_forecast(f, include_festivals=True) for f in forecasts]
 
 
 # -- Villagers --------------------------------------------------------------

@@ -1,5 +1,49 @@
+/* ============================================================
+   WeatherPanel — Cozy Seasonal Styling
+   ============================================================ */
+
+/* Seasonal theme accents */
+.season-theme-spring .weather-current { border-top: 3px solid #d4a7c8; }
+.season-theme-summer .weather-current { border-top: 3px solid #e8c547; }
+.season-theme-autumn .weather-current { border-top: 3px solid #c87941; }
+.season-theme-winter .weather-current { border-top: 3px solid #7eadd4; }
+
+/* ---- Current Weather Card ---- */
+
 .weather-current {
   margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.weather-season-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.season-theme-spring .weather-season-badge {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+.season-theme-summer .weather-season-badge {
+  background: #fff8e1;
+  color: #f57f17;
+}
+.season-theme-autumn .weather-season-badge {
+  background: #fbe9e7;
+  color: #bf360c;
+}
+.season-theme-winter .weather-season-badge {
+  background: #e3f2fd;
+  color: #1565c0;
 }
 
 .weather-main {
@@ -11,6 +55,8 @@
 
 .weather-big-emoji {
   font-size: 4rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .weather-temp {
@@ -31,9 +77,11 @@
   text-transform: capitalize;
 }
 
+/* ---- Detail chips ---- */
+
 .weather-details {
   display: flex;
-  gap: 20px;
+  gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 12px;
 }
@@ -42,27 +90,75 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  background: var(--cream);
+  border-radius: 16px;
+  color: var(--brown-light);
+}
+
+.detail-icon {
   font-size: 0.9rem;
 }
+
+/* ---- Atmospheric description ---- */
 
 .weather-desc {
   color: var(--brown-light);
   font-style: italic;
   font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 10px 0;
+  border-top: 1px solid var(--tan-light);
 }
+
+/* ---- Weather streak ---- */
+
+.weather-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--brown-light);
+  background: var(--cream);
+  margin-bottom: 8px;
+  text-transform: capitalize;
+}
+
+/* ---- Magical event card ---- */
 
 .weather-magical-card {
   display: flex;
   align-items: center;
   gap: 14px;
   margin-top: 12px;
-  padding: 12px;
+  padding: 14px;
   background: linear-gradient(135deg, #f0e6ff, #e6f0ff);
   border-radius: var(--radius-sm);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 .magical-icon {
   font-size: 2.5rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.weather-magical-card strong {
+  text-transform: capitalize;
+  color: var(--brown);
 }
 
 .weather-magical-card p {
@@ -71,7 +167,85 @@
   margin-top: 2px;
 }
 
-/* Forecast grid */
+/* ---- Festival announcements ---- */
+
+.weather-festivals {
+  margin-top: 12px;
+  padding: 14px;
+  background: linear-gradient(135deg, #fff8e1, #ffecb3);
+  border-radius: var(--radius-sm);
+  border: 1px solid #ffe082;
+}
+
+.festival-header {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #e65100;
+  margin-bottom: 8px;
+}
+
+.festival-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.festival-icon {
+  font-size: 1.4rem;
+}
+
+.festival-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--brown);
+}
+
+/* ---- Village mood ---- */
+
+.weather-mood {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.mood-icon {
+  font-size: 1.3rem;
+}
+
+.weather-mood.mood-joyful {
+  background: #fff9c4;
+  color: #6d4c00;
+}
+.weather-mood.mood-content {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.weather-mood.mood-melancholy {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.weather-mood.mood-cozy {
+  background: #efebe9;
+  color: #4e342e;
+}
+.weather-mood.mood-enchanted {
+  background: linear-gradient(135deg, #f3e5f5, #e8eaf6);
+  color: #6a1b9a;
+}
+.weather-mood.mood-restless {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+/* ============================================================
+   Forecast Grid
+   ============================================================ */
 
 .forecast-grid {
   display: grid;
@@ -84,6 +258,12 @@
   padding: 12px 8px;
   background: var(--cream);
   border-radius: var(--radius-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.forecast-day:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .forecast-day-num {
@@ -114,8 +294,26 @@
   font-size: 1.2rem;
 }
 
+.forecast-festival {
+  margin-top: 2px;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
 @media (max-width: 600px) {
   .forecast-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .weather-details {
+    gap: 8px;
+  }
+
+  .weather-detail {
+    font-size: 0.8rem;
+    padding: 3px 8px;
   }
 }
