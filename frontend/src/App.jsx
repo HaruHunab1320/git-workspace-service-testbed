@@ -8,6 +8,7 @@ import VillagersPanel from './components/VillagersPanel';
 import GardenPanel from './components/GardenPanel';
 import PetsPanel from './components/PetsPanel';
 import EconomyPanel from './components/EconomyPanel';
+import LofiPlayer from './components/LofiPlayer';
 
 const TABS = [
   { id: 'weather', label: 'Weather', emoji: '☀️' },
@@ -162,6 +163,8 @@ export default function App() {
         onAdvanceWeek={advanceWeek}
         onNewGame={newGame}
       />
+
+      <LofiPlayer />
 
       {toast && (
         <div style={{

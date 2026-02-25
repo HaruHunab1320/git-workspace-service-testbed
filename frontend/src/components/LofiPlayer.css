@@ -1,0 +1,346 @@
+/* ============================================================
+   Lo-fi Radio Player
+   ============================================================ */
+
+.lofi-player {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 90;
+  font-family: inherit;
+}
+
+/* ---- Floating Action Button (collapsed) ---- */
+
+.lofi-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--sage), var(--sage-dark));
+  color: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(74, 55, 40, 0.25);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: visible;
+}
+
+.lofi-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(74, 55, 40, 0.35);
+}
+
+.lofi-fab.playing {
+  background: linear-gradient(135deg, var(--rose), #b87078);
+}
+
+.lofi-fab-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.lofi-fab-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--rose-light);
+  animation: lofi-pulse-ring 1.8s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes lofi-pulse-ring {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* ---- Expanded Panel ---- */
+
+.lofi-panel {
+  width: 260px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(74, 55, 40, 0.18);
+  overflow: hidden;
+  animation: lofi-slide-up 0.3s ease;
+}
+
+@keyframes lofi-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.lofi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+}
+
+.lofi-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--brown-light);
+}
+
+.lofi-collapse-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: var(--tan-light);
+  color: var(--brown-light);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.lofi-collapse-btn:hover {
+  background: var(--tan);
+  color: var(--brown);
+}
+
+/* ---- Visualizer ---- */
+
+.lofi-visualizer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 16px 12px;
+}
+
+.lofi-vinyl-area {
+  flex-shrink: 0;
+}
+
+.lofi-vinyl {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    var(--brown) 18%,
+    var(--brown-light) 19%,
+    var(--brown-light) 22%,
+    #3a2a1c 23%,
+    #3a2a1c 44%,
+    var(--brown-light) 45%,
+    var(--brown-light) 46%,
+    #3a2a1c 47%,
+    #3a2a1c 68%,
+    var(--brown-light) 69%,
+    var(--brown-light) 70%,
+    var(--brown) 71%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(74, 55, 40, 0.2);
+  transition: box-shadow 0.3s;
+}
+
+.lofi-vinyl.spinning {
+  animation: lofi-spin 4s linear infinite;
+  box-shadow: 0 2px 12px rgba(74, 55, 40, 0.3);
+}
+
+@keyframes lofi-spin {
+  to { transform: rotate(360deg); }
+}
+
+.lofi-vinyl-label {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.lofi-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 36px;
+}
+
+.lofi-bar {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--sage);
+  animation: lofi-bounce 1.2s ease-in-out infinite alternate;
+}
+
+.lofi-bar:nth-child(1) { height: 30%; }
+.lofi-bar:nth-child(2) { height: 60%; }
+.lofi-bar:nth-child(3) { height: 45%; }
+.lofi-bar:nth-child(4) { height: 70%; }
+.lofi-bar:nth-child(5) { height: 35%; }
+
+@keyframes lofi-bounce {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1); }
+}
+
+/* ---- Station Info ---- */
+
+.lofi-station-info {
+  text-align: center;
+  padding: 0 16px 8px;
+}
+
+.lofi-station-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--brown);
+}
+
+.lofi-error {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--rose);
+  margin-top: 2px;
+}
+
+/* ---- Controls ---- */
+
+.lofi-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px 16px 8px;
+}
+
+.lofi-ctrl-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--tan-light);
+  color: var(--brown);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.lofi-ctrl-btn:hover {
+  background: var(--tan);
+  transform: scale(1.05);
+}
+
+.lofi-play-btn {
+  width: 44px;
+  height: 44px;
+  background: var(--sage);
+  color: var(--white);
+  font-size: 1rem;
+}
+
+.lofi-play-btn:hover {
+  background: var(--sage-dark);
+}
+
+/* ---- Volume ---- */
+
+.lofi-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 10px;
+}
+
+.lofi-volume-icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.lofi-volume-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--tan-light);
+  outline: none;
+  cursor: pointer;
+}
+
+.lofi-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--sage);
+  border: 2px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.lofi-volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.lofi-volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--sage);
+  border: 2px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+/* ---- Station List ---- */
+
+.lofi-station-list {
+  border-top: 1px solid var(--tan-light);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lofi-station-btn {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--brown-light);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.lofi-station-btn:hover {
+  background: var(--tan-light);
+  color: var(--brown);
+}
+
+.lofi-station-btn.active {
+  background: var(--sage);
+  color: var(--white);
+}
