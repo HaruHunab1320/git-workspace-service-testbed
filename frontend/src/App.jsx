@@ -10,6 +10,8 @@ import PetsPanel from './components/PetsPanel';
 import EconomyPanel from './components/EconomyPanel';
 import JournalPanel from './components/JournalPanel';
 import LofiPlayer from './components/LofiPlayer';
+import AmbientSounds from './components/AmbientSounds';
+import useAmbientSounds from './hooks/useAmbientSounds';
 
 const TABS = [
   { id: 'weather', label: 'Weather', emoji: '☀️' },
@@ -28,6 +30,7 @@ export default function App() {
   const [forecast, setForecast] = useState([]);
   const [journalEntries, setJournalEntries] = useState([]);
   const [toast, setToast] = useState(null);
+  const sounds = useAmbientSounds();
 
   const fetchStatus = useCallback(async () => {
     try {
@@ -68,11 +71,13 @@ export default function App() {
 
   const showToast = (msg) => {
     setToast(msg);
+    sounds.notify();
     setTimeout(() => setToast(null), 3000);
   };
 
   const advanceDay = async () => {
     setAdvancing(true);
+    sounds.dayAdvance();
     try {
       await api.advanceDay();
       await fetchStatus();
@@ -85,6 +90,7 @@ export default function App() {
 
   const advanceWeek = async () => {
     setAdvancing(true);
+    sounds.windChime();
     try {
       for (let i = 0; i < 7; i++) {
         await api.advanceDay();
@@ -99,11 +105,13 @@ export default function App() {
 
   const newGame = async () => {
     setLoading(true);
+    sounds.windChime();
     try {
       const seed = Math.floor(Math.random() * 10000);
       await api.newGame(seed);
       await fetchStatus();
       await fetchForecast();
+      sounds.success();
     } catch (err) {
       showToast('Failed to start new game');
     }
@@ -159,7 +167,10 @@ export default function App() {
               <button
                 key={tab.id}
                 className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  if (tab.id !== activeTab) sounds.tabSwitch();
+                  setActiveTab(tab.id);
+                }}
               >
                 {tab.emoji} {tab.label}
               </button>
@@ -181,6 +192,7 @@ export default function App() {
       />
 
       <LofiPlayer />
+      <AmbientSounds sounds={sounds} weather={gameState.weather} season={gameState.season} />
 
       {toast && (
         <div style={{
