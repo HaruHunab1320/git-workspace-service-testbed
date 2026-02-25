@@ -46,4 +46,11 @@ export const api = {
 
   getPrices: () => request('/economy/prices'),
   getEconomySummary: () => request('/economy/summary'),
+
+  getJournal: () => request('/journal'),
+  addJournalEntry: (text) => request('/journal', {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  }),
+  deleteJournalEntry: (id) => request(`/journal/${id}`, { method: 'DELETE' }),
 };

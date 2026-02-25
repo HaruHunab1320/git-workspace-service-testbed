@@ -42,6 +42,10 @@ app.add_middleware(
 # Single in-memory game instance
 game: CozyVillageGame = CozyVillageGame.create_default(seed=42)
 
+# In-memory journal storage
+_journal_entries: list[dict] = []
+_journal_next_id: int = 1
+
 
 # ---------------------------------------------------------------------------
 # Pydantic request bodies
@@ -63,6 +67,10 @@ class AdoptRequest(BaseModel):
     name: str
     species: str
     personality: str
+
+
+class JournalEntryRequest(BaseModel):
+    text: str
 
 
 # ---------------------------------------------------------------------------
@@ -294,9 +302,11 @@ def advance_day():
 
 @app.post("/api/new-game")
 def new_game(seed: int = Query(default=42)):
-    global game, _market
+    global game, _market, _journal_entries, _journal_next_id
     game = CozyVillageGame.create_default(seed=seed)
     _market = EconomyMarket()
+    _journal_entries = []
+    _journal_next_id = 1
     _sync_market()
     return get_status()
 
@@ -468,3 +478,37 @@ def get_prices():
 def get_economy_summary():
     _sync_market()
     return _market.trade_summary()
+
+
+# -- Journal ----------------------------------------------------------------
+
+@app.get("/api/journal")
+def get_journal():
+    return _journal_entries
+
+
+@app.post("/api/journal")
+def add_journal_entry(req: JournalEntryRequest):
+    global _journal_next_id
+    text = req.text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Entry text cannot be empty")
+    entry = {
+        "id": _journal_next_id,
+        "day": game.day,
+        "season": game.season.value,
+        "text": text,
+    }
+    _journal_next_id += 1
+    _journal_entries.append(entry)
+    return entry
+
+
+@app.delete("/api/journal/{entry_id}")
+def delete_journal_entry(entry_id: int):
+    global _journal_entries
+    for i, entry in enumerate(_journal_entries):
+        if entry["id"] == entry_id:
+            _journal_entries.pop(i)
+            return {"deleted": entry_id}
+    raise HTTPException(status_code=404, detail="Journal entry not found")

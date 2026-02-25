@@ -8,6 +8,7 @@ import VillagersPanel from './components/VillagersPanel';
 import GardenPanel from './components/GardenPanel';
 import PetsPanel from './components/PetsPanel';
 import EconomyPanel from './components/EconomyPanel';
+import JournalPanel from './components/JournalPanel';
 import LofiPlayer from './components/LofiPlayer';
 
 const TABS = [
@@ -16,6 +17,7 @@ const TABS = [
   { id: 'garden', label: 'Garden', emoji: '🌱' },
   { id: 'pets', label: 'Pets', emoji: '🐾' },
   { id: 'economy', label: 'Economy', emoji: '💰' },
+  { id: 'journal', label: 'Journal', emoji: '📓' },
 ];
 
 export default function App() {
@@ -24,6 +26,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [advancing, setAdvancing] = useState(false);
   const [forecast, setForecast] = useState([]);
+  const [journalEntries, setJournalEntries] = useState([]);
   const [toast, setToast] = useState(null);
 
   const fetchStatus = useCallback(async () => {
@@ -45,13 +48,23 @@ export default function App() {
     }
   }, []);
 
+  const fetchJournal = useCallback(async () => {
+    try {
+      const data = await api.getJournal();
+      setJournalEntries(data);
+    } catch (err) {
+      console.error('Failed to fetch journal:', err);
+    }
+  }, []);
+
   useEffect(() => {
     (async () => {
       await fetchStatus();
       await fetchForecast();
+      await fetchJournal();
       setLoading(false);
     })();
-  }, [fetchStatus, fetchForecast]);
+  }, [fetchStatus, fetchForecast, fetchJournal]);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -100,6 +113,7 @@ export default function App() {
   const refresh = async () => {
     await fetchStatus();
     await fetchForecast();
+    await fetchJournal();
   };
 
   if (loading) {
@@ -122,6 +136,8 @@ export default function App() {
         return <PetsPanel pets={gameState.pets} onRefresh={refresh} showToast={showToast} />;
       case 'economy':
         return <EconomyPanel economy={gameState.economy} season={gameState.season} />;
+      case 'journal':
+        return <JournalPanel entries={journalEntries} day={gameState.day} season={gameState.season} onRefresh={fetchJournal} showToast={showToast} />;
       default:
         return null;
     }
