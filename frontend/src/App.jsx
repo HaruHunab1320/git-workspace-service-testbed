@@ -10,6 +10,7 @@ import PetsPanel from './components/PetsPanel';
 import EconomyPanel from './components/EconomyPanel';
 import JournalPanel from './components/JournalPanel';
 import LofiPlayer from './components/LofiPlayer';
+import FocusTimer from './components/FocusTimer';
 import AmbientSounds from './components/AmbientSounds';
 import useAmbientSounds from './hooks/useAmbientSounds';
 
@@ -192,6 +193,7 @@ export default function App() {
       />
 
       <LofiPlayer />
+      <FocusTimer />
       <AmbientSounds sounds={sounds} weather={gameState.weather} season={gameState.season} />
 
       {toast && (

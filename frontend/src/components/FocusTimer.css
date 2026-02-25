@@ -1,0 +1,324 @@
+/* ============================================================
+   Cozy Focus Timer
+   ============================================================ */
+
+.timer-widget {
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  z-index: 90;
+  font-family: inherit;
+}
+
+/* ---- Floating Action Button (collapsed) ---- */
+
+.timer-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #d4b0d4, #c8a2c8);
+  color: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(200, 162, 200, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: visible;
+}
+
+.timer-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(200, 162, 200, 0.45);
+}
+
+.timer-fab.active {
+  background: linear-gradient(135deg, #c8a2c8, #b490b4);
+}
+
+.timer-fab-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+  z-index: 2;
+}
+
+.timer-fab-ring {
+  position: absolute;
+  inset: -2px;
+  width: 56px;
+  height: 56px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.timer-fab-time {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--brown-light);
+  background: var(--white);
+  padding: 1px 6px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ---- Expanded Panel ---- */
+
+.timer-panel {
+  width: 240px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(74, 55, 40, 0.18);
+  overflow: hidden;
+  animation: timer-slide-up 0.3s ease;
+}
+
+@keyframes timer-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.timer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 4px;
+}
+
+.timer-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--brown-light);
+}
+
+.timer-collapse-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: var(--tan-light);
+  color: var(--brown-light);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.timer-collapse-btn:hover {
+  background: var(--tan);
+  color: var(--brown);
+}
+
+/* ---- Progress Ring ---- */
+
+.timer-ring-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 0 8px;
+}
+
+.timer-ring-svg {
+  display: block;
+}
+
+.timer-ring-progress {
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.timer-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.timer-time {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--brown);
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.timer-label {
+  font-size: 0.85rem;
+  color: var(--brown-light);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* ---- Presets ---- */
+
+.timer-presets {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 16px 8px;
+  animation: timer-fade-in 0.3s ease;
+}
+
+@keyframes timer-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.timer-preset-btn {
+  padding: 5px 12px;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: #f5eef5;
+  color: var(--brown-light);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timer-preset-btn:hover {
+  background: #ece0ec;
+  color: var(--brown);
+}
+
+.timer-preset-btn.active {
+  background: #c8a2c8;
+  color: var(--white);
+  border-color: #b490b4;
+}
+
+/* ---- Controls ---- */
+
+.timer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px 16px 8px;
+}
+
+.timer-ctrl-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--tan-light);
+  color: var(--brown);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.timer-ctrl-btn:hover {
+  background: var(--tan);
+  transform: scale(1.05);
+}
+
+.timer-play-btn {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #d4b0d4, #c8a2c8);
+  color: var(--white);
+  font-size: 1.1rem;
+  box-shadow: 0 3px 12px rgba(200, 162, 200, 0.35);
+}
+
+.timer-play-btn:hover {
+  background: linear-gradient(135deg, #c8a2c8, #b490b4);
+  box-shadow: 0 4px 16px rgba(200, 162, 200, 0.5);
+}
+
+.timer-play-btn.running {
+  background: linear-gradient(135deg, #e0b0b4, var(--rose-light));
+  box-shadow: 0 3px 12px rgba(200, 132, 138, 0.3);
+  animation: timer-breathe 3s ease-in-out infinite;
+}
+
+@keyframes timer-breathe {
+  0%, 100% { box-shadow: 0 3px 12px rgba(200, 132, 138, 0.3); }
+  50% { box-shadow: 0 3px 20px rgba(200, 132, 138, 0.5); }
+}
+
+.timer-reset-btn {
+  font-size: 1.15rem;
+}
+
+.timer-skip-btn {
+  font-size: 0.85rem;
+}
+
+/* ---- Sessions ---- */
+
+.timer-sessions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 16px 14px;
+  border-top: 1px solid #f5eef5;
+}
+
+.timer-session-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timer-session-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e0c3e0, #c8a2c8);
+  box-shadow: 0 1px 3px rgba(200, 162, 200, 0.3);
+  animation: timer-dot-pop 0.3s ease backwards;
+}
+
+.timer-session-dot:nth-child(1) { animation-delay: 0s; }
+.timer-session-dot:nth-child(2) { animation-delay: 0.05s; }
+.timer-session-dot:nth-child(3) { animation-delay: 0.1s; }
+.timer-session-dot:nth-child(4) { animation-delay: 0.15s; }
+.timer-session-dot:nth-child(5) { animation-delay: 0.2s; }
+.timer-session-dot:nth-child(6) { animation-delay: 0.25s; }
+.timer-session-dot:nth-child(7) { animation-delay: 0.3s; }
+.timer-session-dot:nth-child(8) { animation-delay: 0.35s; }
+
+@keyframes timer-dot-pop {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.timer-session-extra {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--brown-light);
+  margin-left: 2px;
+}
+
+.timer-session-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--brown-light);
+  letter-spacing: 0.5px;
+}
