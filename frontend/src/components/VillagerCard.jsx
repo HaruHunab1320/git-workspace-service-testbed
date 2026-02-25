@@ -44,9 +44,12 @@ export default function VillagerCard({ villager, onRefresh, showToast }) {
         </div>
       )}
 
-      <div className="villager-dialogue">
-        {villager.dialogue}
-      </div>
+      {villager.dialogue && (
+        <div className="chat-bubble">
+          <div className="chat-bubble-arrow" />
+          <span className="chat-bubble-text">{villager.dialogue}</span>
+        </div>
+      )}
 
       <div style={{ marginTop: 8 }}>
         <button className="btn btn-sm btn-primary" onClick={() => setShowGift(true)}>
