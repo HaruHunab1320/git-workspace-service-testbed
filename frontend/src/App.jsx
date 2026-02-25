@@ -11,6 +11,7 @@ import EconomyPanel from './components/EconomyPanel';
 import JournalPanel from './components/JournalPanel';
 import LofiPlayer from './components/LofiPlayer';
 import AmbientSounds from './components/AmbientSounds';
+import StarryNight from './components/StarryNight';
 import useAmbientSounds from './hooks/useAmbientSounds';
 
 const TABS = [
@@ -193,6 +194,7 @@ export default function App() {
 
       <LofiPlayer />
       <AmbientSounds sounds={sounds} weather={gameState.weather} season={gameState.season} />
+      <StarryNight />
 
       {toast && (
         <div style={{
