@@ -9,6 +9,7 @@ import GardenPanel from './components/GardenPanel';
 import PetsPanel from './components/PetsPanel';
 import EconomyPanel from './components/EconomyPanel';
 import JournalPanel from './components/JournalPanel';
+import TeaBrewingStation from './components/TeaBrewingStation';
 import LofiPlayer from './components/LofiPlayer';
 import FocusTimer from './components/FocusTimer';
 import AmbientSounds from './components/AmbientSounds';
@@ -22,6 +23,7 @@ const TABS = [
   { id: 'pets', label: 'Pets', emoji: '🐾' },
   { id: 'economy', label: 'Economy', emoji: '💰' },
   { id: 'journal', label: 'Journal', emoji: '📓' },
+  { id: 'tea', label: 'Tea', emoji: '🍵' },
 ];
 
 export default function App() {
@@ -148,6 +150,8 @@ export default function App() {
         return <EconomyPanel economy={gameState.economy} season={gameState.season} />;
       case 'journal':
         return <JournalPanel entries={journalEntries} day={gameState.day} season={gameState.season} onRefresh={fetchJournal} showToast={showToast} />;
+      case 'tea':
+        return <TeaBrewingStation showToast={showToast} />;
       default:
         return null;
     }
