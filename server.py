@@ -69,6 +69,11 @@ class AdoptRequest(BaseModel):
     personality: str
 
 
+class BuyRequest(BaseModel):
+    item_key: str
+    quantity: int = 1
+
+
 class JournalEntryRequest(BaseModel):
     text: str
 
@@ -245,6 +250,7 @@ def _full_status():
 from economy import Market as EconomyMarket
 
 _market = EconomyMarket()
+_player_coins: float = 100.0
 
 
 def _sync_market():
@@ -293,6 +299,7 @@ def get_status():
         "economy": {
             "prices": _market.price_board(),
             "summary": _market.trade_summary(),
+            "player_coins": round(_player_coins, 2),
         },
         "recent_reports": reports,
     }
@@ -310,11 +317,12 @@ def advance_day():
 
 @app.post("/api/new-game")
 def new_game(seed: int = Query(default=42)):
-    global game, _market, _journal_entries, _journal_next_id
+    global game, _market, _journal_entries, _journal_next_id, _player_coins
     game = CozyVillageGame.create_default(seed=seed)
     _market = EconomyMarket()
     _journal_entries = []
     _journal_next_id = 1
+    _player_coins = 100.0
     _sync_market()
     return get_status()
 
@@ -492,6 +500,33 @@ def get_prices():
 def get_economy_summary():
     _sync_market()
     return _market.trade_summary()
+
+
+@app.post("/api/economy/buy")
+def buy_item(req: BuyRequest):
+    global _player_coins
+    _sync_market()
+    from economy import ITEMS as EITEMS
+    if req.item_key not in EITEMS:
+        raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
+    if req.quantity < 1:
+        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
+    item = EITEMS[req.item_key]
+    unit_price = _market.current_price(req.item_key)
+    total = round(unit_price * req.quantity, 2)
+    if _player_coins < total:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough coins ({total} needed, you have {round(_player_coins, 2)})",
+        )
+    _player_coins = round(_player_coins - total, 2)
+    return {
+        "item_name": item.name,
+        "quantity": req.quantity,
+        "unit_price": unit_price,
+        "total": total,
+        "remaining_coins": _player_coins,
+    }
 
 
 # -- Journal ----------------------------------------------------------------
