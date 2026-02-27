@@ -46,13 +46,13 @@ export const api = {
 
   getPrices: () => request('/economy/prices'),
   getEconomySummary: () => request('/economy/summary'),
-
+  getWallet: () => request('/economy/wallet'),
   getInventory: () => request('/inventory'),
-  buyItem: (itemKey, quantity = 1) => request('/inventory/buy', {
+  buyItem: (itemKey, quantity = 1) => request('/economy/buy', {
     method: 'POST',
     body: JSON.stringify({ item_key: itemKey, quantity }),
   }),
-  sellItem: (itemKey, quantity = 1) => request('/inventory/sell', {
+  sellItem: (itemKey, quantity = 1) => request('/economy/sell', {
     method: 'POST',
     body: JSON.stringify({ item_key: itemKey, quantity }),
   }),
