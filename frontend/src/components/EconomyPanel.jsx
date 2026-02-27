@@ -3,8 +3,8 @@ import { api } from '../api';
 import './EconomyPanel.css';
 
 const CATEGORY_EMOJI = {
-  baked_good: '\u{1F35E}',
-  potion: '\u{1F9EA}',
+  baked_good: '🍞',
+  potion: '🧪',
 };
 
 function Sparkles({ active }) {
@@ -49,17 +49,17 @@ function Receipt({ purchase, onDone }) {
         </div>
         <div className="receipt-divider" />
         <div className="receipt-line">
-          <span>{purchase.item_name} x{purchase.quantity}</span>
-          <span>{purchase.total.toFixed(2)}</span>
+          <span>{purchase.item_name || purchase.message} x{purchase.quantity || 1}</span>
+          <span>{(purchase.total || 0).toFixed(2)}</span>
         </div>
         <div className="receipt-divider" />
         <div className="receipt-line receipt-total">
           <span>Total</span>
-          <span>{purchase.total.toFixed(2)} coins</span>
+          <span>{(purchase.total || 0).toFixed(2)} coins</span>
         </div>
         <div className="receipt-line receipt-remaining">
           <span>Wallet</span>
-          <span>{purchase.remaining_coins.toFixed(2)} coins</span>
+          <span>{(purchase.remaining_coins ?? purchase.coins ?? 0).toFixed(2)} coins</span>
         </div>
         <div className="receipt-footer">
           {'\u2728'} Thank you for shopping! {'\u2728'}
@@ -110,8 +110,10 @@ export default function EconomyPanel({ economy, season, onRefresh, showToast }) 
             <tr>
               <th>Item</th>
               <th>Category</th>
+              <th>Base</th>
               <th>Price</th>
               <th>Trend</th>
+              <th>Shelf Life</th>
               <th></th>
             </tr>
           </thead>
@@ -124,17 +126,19 @@ export default function EconomyPanel({ economy, season, onRefresh, showToast }) 
                 <tr key={item.key} className={sparkleKey === item.key ? 'row-purchased' : ''}>
                   <td>
                     <span className="item-emoji">
-                      {CATEGORY_EMOJI[item.category] || '\u{1F4E6}'}
+                      {CATEGORY_EMOJI[item.category] || '📦'}
                     </span>
                     {item.name}
                   </td>
                   <td className="cat-cell">{item.category.replace('_', ' ')}</td>
+                  <td>{item.base_price.toFixed(2)}</td>
                   <td className="price-cell">{item.price.toFixed(2)}</td>
                   <td>
                     <span className={`trend trend-${trend}`}>
-                      {trend === 'up' ? '\u2B06\uFE0F' : trend === 'down' ? '\u2B07\uFE0F' : '\u2796'}
+                      {trend === 'up' ? '⬆️' : trend === 'down' ? '⬇️' : '➖'}
                     </span>
                   </td>
+                  <td>{item.shelf_life === 'infinite' ? '∞' : `${item.shelf_life}d`}</td>
                   <td className="buy-cell">
                     <button
                       className={`btn-buy ${!canAfford ? 'btn-buy-disabled' : ''}`}
@@ -153,7 +157,7 @@ export default function EconomyPanel({ economy, season, onRefresh, showToast }) 
       </div>
 
       <div className="card">
-        <h3 className="card-title">{'\u{1F4CA}'} Trade Summary</h3>
+        <h3 className="card-title">📊 Trade Summary</h3>
         <div className="summary-grid">
           <div className="summary-stat">
             <div className="summary-val">{summary.total_trades || 0}</div>
