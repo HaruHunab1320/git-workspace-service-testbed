@@ -149,7 +149,7 @@ export default function App() {
       case 'pets':
         return <PetsPanel pets={gameState.pets} onRefresh={refresh} showToast={showToast} />;
       case 'economy':
-        return <EconomyPanel economy={gameState.economy} season={gameState.season} />;
+        return <EconomyPanel economy={gameState.economy} season={gameState.season} onRefresh={refresh} showToast={showToast} />;
       case 'journal':
         return <JournalPanel entries={journalEntries} day={gameState.day} season={gameState.season} onRefresh={fetchJournal} showToast={showToast} />;
       case 'tea':
