@@ -1,34 +1,38 @@
-/* Wallet card */
+/* ── Store header & wallet ─────────────────────────────────── */
 
-.wallet-card {
-  text-align: center;
-}
-
-.wallet-balance {
+.store-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 0;
+  justify-content: space-between;
+  margin-bottom: 4px;
 }
 
-.coin-icon {
-  font-size: 2rem;
+.store-header .card-title {
+  margin-bottom: 0;
 }
 
-.coin-amount {
-  font-size: 2rem;
-  font-weight: 800;
+.wallet-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, var(--cream), var(--tan-light));
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  font-weight: 700;
   color: var(--sage-dark);
+  font-size: 0.95rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-.coin-label {
-  font-size: 1rem;
-  color: var(--brown-light);
-  font-weight: 600;
+.wallet-icon {
+  font-size: 1.1rem;
 }
 
-/* Season label */
+.wallet-amount {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Season label ─────────────────────────────────────────── */
 
 .economy-season {
   font-size: 0.9rem;
@@ -37,7 +41,7 @@
   text-transform: capitalize;
 }
 
-/* Price / inventory table */
+/* ── Price table ──────────────────────────────────────────── */
 
 .price-table {
   width: 100%;
@@ -57,6 +61,7 @@
 .price-table td {
   padding: 8px 10px;
   border-bottom: 1px solid var(--cream);
+  transition: background 0.2s;
 }
 
 .price-table tr:hover td {
@@ -76,6 +81,7 @@
 .price-cell {
   font-weight: 700;
   color: var(--sage-dark);
+  font-variant-numeric: tabular-nums;
 }
 
 .trend {
@@ -86,100 +92,201 @@
 .trend-down { color: #e74c3c; }
 .trend-stable { color: var(--brown-light); }
 
-/* Quantity controls */
+/* ── Buy button ───────────────────────────────────────────── */
 
-.qty-control {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.buy-cell {
+  text-align: right;
 }
 
-.qty-btn {
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--tan-light);
-  border-radius: 4px;
-  background: var(--cream);
-  color: var(--brown);
-  font-weight: 700;
-  font-size: 0.85rem;
+.btn-buy {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--sage);
+  color: var(--white);
+  font-weight: 600;
+  font-size: 0.82rem;
   cursor: pointer;
+  transition: all 0.2s;
+  overflow: visible;
+}
+
+.btn-buy:hover:not(:disabled) {
+  background: var(--sage-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-buy:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-buy-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Row purchase flash ───────────────────────────────────── */
+
+.row-purchased td {
+  animation: row-flash 0.8s ease;
+}
+
+@keyframes row-flash {
+  0% { background: transparent; }
+  20% { background: rgba(166, 200, 130, 0.35); }
+  100% { background: transparent; }
+}
+
+/* ── Sparkle particles ────────────────────────────────────── */
+
+.sparkles-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.sparkle-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: hsl(var(--hue), 85%, 65%);
+  box-shadow: 0 0 4px hsl(var(--hue), 90%, 70%);
+  animation: sparkle-burst 0.75s ease-out var(--delay) forwards;
+  opacity: 0;
+}
+
+@keyframes sparkle-burst {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 1;
+  }
+  40% {
+    opacity: 1;
+    transform: translate(var(--dx), var(--dy)) scale(1);
+  }
+  100% {
+    transform: translate(
+      calc(var(--dx) * 1.3),
+      calc(var(--dy) * 1.3)
+    ) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ── Receipt overlay ──────────────────────────────────────── */
+
+.receipt-overlay {
+  position: fixed;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  z-index: 150;
+  pointer-events: none;
+  animation: receipt-bg-fade 2.4s ease forwards;
 }
 
-.qty-btn:disabled {
-  opacity: 0.4;
-  cursor: default;
+@keyframes receipt-bg-fade {
+  0% { background: rgba(0, 0, 0, 0); }
+  10% { background: rgba(0, 0, 0, 0.15); }
+  75% { background: rgba(0, 0, 0, 0.15); }
+  100% { background: rgba(0, 0, 0, 0); }
 }
 
-.qty-btn:not(:disabled):hover {
-  background: var(--tan-light);
+.receipt-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px 28px;
+  min-width: 240px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  animation: receipt-pop 2.4s ease forwards;
+  pointer-events: none;
 }
 
-.qty-value {
-  min-width: 20px;
-  text-align: center;
+@keyframes receipt-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.9);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.03);
+  }
+  20% {
+    transform: translateY(0) scale(1);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+  }
+}
+
+.receipt-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.receipt-icon {
+  font-size: 1.4rem;
+}
+
+.receipt-title {
   font-weight: 700;
-  font-size: 0.85rem;
+  color: var(--sage-dark);
+  font-size: 1rem;
 }
 
-/* Buy / Sell buttons */
-
-.buy-btn {
-  padding: 4px 10px;
+.receipt-divider {
   border: none;
-  border-radius: 4px;
-  background: var(--sage);
-  color: var(--white);
+  border-top: 1px dashed var(--tan-light);
+  height: 1px;
+  margin: 8px 0;
+}
+
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--brown);
+  padding: 3px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.receipt-total {
   font-weight: 700;
-  font-size: 0.8rem;
-  cursor: pointer;
-  white-space: nowrap;
+  color: var(--sage-dark);
+  font-size: 0.95rem;
 }
 
-.buy-btn:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-.buy-btn:not(:disabled):hover {
-  background: var(--sage-dark);
-}
-
-.sell-btn {
-  padding: 4px 10px;
-  border: none;
-  border-radius: 4px;
-  background: var(--brown);
-  color: var(--white);
-  font-weight: 700;
-  font-size: 0.8rem;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.sell-btn:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-.sell-btn:not(:disabled):hover {
-  background: var(--brown-light);
-}
-
-/* Empty inventory message */
-
-.empty-inventory {
+.receipt-remaining {
+  font-size: 0.82rem;
   color: var(--brown-light);
-  font-style: italic;
-  text-align: center;
-  padding: 16px 0;
 }
 
-/* Summary grid */
+.receipt-footer {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--brown-light);
+  letter-spacing: 0.03em;
+}
+
+/* ── Summary grid ─────────────────────────────────────────── */
 
 .summary-grid {
   display: grid;

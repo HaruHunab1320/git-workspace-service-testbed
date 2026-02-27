@@ -46,9 +46,9 @@ game: CozyVillageGame = CozyVillageGame.create_default(seed=42)
 _journal_entries: list[dict] = []
 _journal_next_id: int = 1
 
-# Player wallet & inventory
+# In-memory player inventory: item_key -> {quantity, age_days, purchased_day}
+_player_inventory: dict[str, dict] = {}
 _player_coins: float = 100.0
-_player_inventory: dict[str, int] = {}  # item_key -> quantity
 
 
 # ---------------------------------------------------------------------------
@@ -83,6 +83,16 @@ class BuyRequest(BaseModel):
 
 
 class SellRequest(BaseModel):
+    item_key: str
+    quantity: int = 1
+
+
+class InventoryBuyRequest(BaseModel):
+    item_key: str
+    quantity: int = 1
+
+
+class InventorySellRequest(BaseModel):
     item_key: str
     quantity: int = 1
 
@@ -307,18 +317,7 @@ def get_status():
         "economy": {
             "prices": _market.price_board(),
             "summary": _market.trade_summary(),
-            "wallet": {
-                "coins": round(_player_coins, 2),
-                "inventory": {
-                    k: {
-                        "name": ECONOMY_ITEMS[k].name,
-                        "category": ECONOMY_ITEMS[k].category.value,
-                        "quantity": v,
-                    }
-                    for k, v in _player_inventory.items()
-                    if v > 0
-                },
-            },
+            "player_coins": round(_player_coins, 2),
         },
         "recent_reports": reports,
     }
@@ -328,6 +327,15 @@ def get_status():
 def advance_day():
     report = game.advance_day()
     _sync_market()
+    # Age player inventory items and remove spoiled ones
+    spoiled_keys = []
+    for key, slot in _player_inventory.items():
+        slot["age_days"] += 1
+        item = ECONOMY_ITEMS.get(key)
+        if item and item.shelf_life > 0 and slot["age_days"] >= item.shelf_life:
+            spoiled_keys.append(key)
+    for key in spoiled_keys:
+        del _player_inventory[key]
     return {
         "report": _serialize_report(report),
         "status": get_status(),
@@ -524,88 +532,79 @@ def get_economy_summary():
 
 @app.get("/api/economy/wallet")
 def get_wallet():
+    _sync_market()
     return {
         "coins": round(_player_coins, 2),
-        "inventory": {
-            k: {
-                "name": ECONOMY_ITEMS[k].name,
-                "category": ECONOMY_ITEMS[k].category.value,
-                "quantity": v,
-            }
-            for k, v in _player_inventory.items()
-            if v > 0
-        },
+        "inventory": _serialize_inventory(),
     }
 
 
 @app.post("/api/economy/buy")
-def buy_item(req: BuyRequest):
+def economy_buy_item(req: BuyRequest):
+    """Quick-buy from the economy panel — also adds items to player inventory."""
     global _player_coins
     _sync_market()
-
+    if req.item_key not in ECONOMY_ITEMS:
+        raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
     if req.quantity < 1:
         raise HTTPException(status_code=400, detail="Quantity must be at least 1")
-
-    item = ECONOMY_ITEMS.get(req.item_key)
-    if item is None:
-        raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
-
+    item = ECONOMY_ITEMS[req.item_key]
     unit_price = _market.current_price(req.item_key)
     total = round(unit_price * req.quantity, 2)
-
     if _player_coins < total:
         raise HTTPException(
             status_code=400,
-            detail=f"Not enough coins. Need {total}, have {round(_player_coins, 2)}",
+            detail=f"Not enough coins ({total} needed, you have {round(_player_coins, 2)})",
         )
-
     _player_coins = round(_player_coins - total, 2)
-    _player_inventory[req.item_key] = _player_inventory.get(req.item_key, 0) + req.quantity
-
+    if req.item_key in _player_inventory:
+        _player_inventory[req.item_key]["quantity"] += req.quantity
+    else:
+        _player_inventory[req.item_key] = {
+            "quantity": req.quantity,
+            "age_days": 0,
+            "purchased_day": game.day,
+        }
     return {
-        "message": f"Bought {req.quantity} {item.name} for {total} coins",
-        "item": item.name,
+        "item_name": item.name,
         "quantity": req.quantity,
-        "total_cost": total,
-        "coins_remaining": _player_coins,
+        "unit_price": unit_price,
+        "total": total,
+        "remaining_coins": _player_coins,
     }
 
 
 @app.post("/api/economy/sell")
-def sell_item(req: SellRequest):
+def economy_sell_item(req: SellRequest):
+    """Sell items from the economy panel."""
     global _player_coins
     _sync_market()
-
     if req.quantity < 1:
         raise HTTPException(status_code=400, detail="Quantity must be at least 1")
-
     item = ECONOMY_ITEMS.get(req.item_key)
     if item is None:
         raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
-
-    owned = _player_inventory.get(req.item_key, 0)
-    if owned < req.quantity:
+    slot = _player_inventory.get(req.item_key)
+    if slot is None or slot["quantity"] < req.quantity:
+        available = slot["quantity"] if slot else 0
         raise HTTPException(
             status_code=400,
-            detail=f"You only have {owned} {item.name}",
+            detail=f"Not enough in inventory (have {available})",
         )
-
-    # Sell at 80% of current market price (market spread)
-    unit_price = round(_market.current_price(req.item_key) * 0.80, 2)
-    total = round(unit_price * req.quantity, 2)
-
-    _player_inventory[req.item_key] = owned - req.quantity
-    if _player_inventory[req.item_key] == 0:
+    unit_price = _market.current_price(req.item_key)
+    sell_total = round(unit_price * 0.70 * req.quantity, 2)
+    # Spoiled items sell for nothing
+    if item.shelf_life > 0 and slot["age_days"] >= item.shelf_life:
+        sell_total = 0
+    _player_coins = round(_player_coins + sell_total, 2)
+    slot["quantity"] -= req.quantity
+    if slot["quantity"] <= 0:
         del _player_inventory[req.item_key]
-
-    _player_coins = round(_player_coins + total, 2)
-
     return {
-        "message": f"Sold {req.quantity} {item.name} for {total} coins",
-        "item": item.name,
-        "quantity": req.quantity,
-        "total_earned": total,
-        "coins_remaining": _player_coins,
+        "message": f"Sold {req.quantity} {item.name} for {sell_total:.2f} coins",
+        "coins": round(_player_coins, 2),
+        "remaining_coins": round(_player_coins, 2),
+        "inventory": _serialize_inventory(),
     }
 
 
@@ -641,3 +640,106 @@ def delete_journal_entry(entry_id: int):
             _journal_entries.pop(i)
             return {"deleted": entry_id}
     raise HTTPException(status_code=404, detail="Journal entry not found")
+
+
+# -- Player Inventory (Cozy Shelf) -----------------------------------------
+
+def _serialize_inventory():
+    """Return the player inventory in a frontend-friendly format."""
+    items = []
+    for key, slot in _player_inventory.items():
+        item = ECONOMY_ITEMS.get(key)
+        if item is None:
+            continue
+        shelf_life = item.shelf_life
+        is_spoiled = shelf_life > 0 and slot["age_days"] >= shelf_life
+        freshness = 1.0
+        if shelf_life > 0:
+            freshness = max(0.0, 1.0 - slot["age_days"] / shelf_life)
+        items.append({
+            "key": key,
+            "name": item.name,
+            "category": item.category.value,
+            "quantity": slot["quantity"],
+            "age_days": slot["age_days"],
+            "shelf_life": shelf_life or "infinite",
+            "freshness": round(freshness, 2),
+            "is_spoiled": is_spoiled,
+            "purchased_day": slot["purchased_day"],
+        })
+    return items
+
+
+@app.get("/api/inventory")
+def get_inventory():
+    _sync_market()
+    return {
+        "coins": round(_player_coins, 2),
+        "items": _serialize_inventory(),
+    }
+
+
+@app.post("/api/inventory/buy")
+def inventory_buy_item(req: InventoryBuyRequest):
+    global _player_coins
+    _sync_market()
+    item = ECONOMY_ITEMS.get(req.item_key)
+    if item is None:
+        raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
+    if req.quantity < 1:
+        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
+    unit_price = _market.current_price(req.item_key)
+    total = round(unit_price * req.quantity, 2)
+    if _player_coins < total:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough coins ({_player_coins:.2f} available, {total:.2f} needed)",
+        )
+    _player_coins = round(_player_coins - total, 2)
+    if req.item_key in _player_inventory:
+        _player_inventory[req.item_key]["quantity"] += req.quantity
+    else:
+        _player_inventory[req.item_key] = {
+            "quantity": req.quantity,
+            "age_days": 0,
+            "purchased_day": game.day,
+        }
+    return {
+        "message": f"Bought {req.quantity} {item.name} for {total:.2f} coins",
+        "item_name": item.name,
+        "quantity": req.quantity,
+        "total": total,
+        "coins": round(_player_coins, 2),
+        "remaining_coins": round(_player_coins, 2),
+        "inventory": _serialize_inventory(),
+    }
+
+
+@app.post("/api/inventory/sell")
+def inventory_sell_item(req: InventorySellRequest):
+    global _player_coins
+    _sync_market()
+    slot = _player_inventory.get(req.item_key)
+    if slot is None or slot["quantity"] < req.quantity:
+        available = slot["quantity"] if slot else 0
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough in inventory (have {available})",
+        )
+    item = ECONOMY_ITEMS[req.item_key]
+    unit_price = _market.current_price(req.item_key)
+    # Sell at 70% of market price
+    sell_total = round(unit_price * 0.7 * req.quantity, 2)
+    # Spoiled items sell for nothing
+    shelf_life = item.shelf_life
+    if shelf_life > 0 and slot["age_days"] >= shelf_life:
+        sell_total = 0
+    _player_coins = round(_player_coins + sell_total, 2)
+    slot["quantity"] -= req.quantity
+    if slot["quantity"] <= 0:
+        del _player_inventory[req.item_key]
+    return {
+        "message": f"Sold {req.quantity} {item.name} for {sell_total:.2f} coins",
+        "coins": round(_player_coins, 2),
+        "inventory": _serialize_inventory(),
+    }

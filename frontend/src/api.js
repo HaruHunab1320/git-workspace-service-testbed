@@ -47,6 +47,7 @@ export const api = {
   getPrices: () => request('/economy/prices'),
   getEconomySummary: () => request('/economy/summary'),
   getWallet: () => request('/economy/wallet'),
+  getInventory: () => request('/inventory'),
   buyItem: (itemKey, quantity = 1) => request('/economy/buy', {
     method: 'POST',
     body: JSON.stringify({ item_key: itemKey, quantity }),

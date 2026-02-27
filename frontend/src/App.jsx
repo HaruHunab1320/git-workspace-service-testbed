@@ -8,6 +8,7 @@ import VillagersPanel from './components/VillagersPanel';
 import GardenPanel from './components/GardenPanel';
 import PetsPanel from './components/PetsPanel';
 import EconomyPanel from './components/EconomyPanel';
+import InventoryShelf from './components/InventoryShelf';
 import JournalPanel from './components/JournalPanel';
 import TeaBrewingStation from './components/TeaBrewingStation';
 import AmbientLofiMixer from './components/AmbientLofiMixer';
@@ -23,6 +24,7 @@ const TABS = [
   { id: 'garden', label: 'Garden', emoji: '🌱' },
   { id: 'pets', label: 'Pets', emoji: '🐾' },
   { id: 'economy', label: 'Economy', emoji: '💰' },
+  { id: 'inventory', label: 'Shelf', emoji: '🪵' },
   { id: 'journal', label: 'Journal', emoji: '📓' },
   { id: 'tea', label: 'Tea', emoji: '🍵' },
   { id: 'mixer', label: 'Mixer', emoji: '🎧' },
@@ -150,6 +152,8 @@ export default function App() {
         return <PetsPanel pets={gameState.pets} onRefresh={refresh} showToast={showToast} />;
       case 'economy':
         return <EconomyPanel economy={gameState.economy} season={gameState.season} onRefresh={refresh} showToast={showToast} />;
+      case 'inventory':
+        return <InventoryShelf economy={gameState.economy} onRefresh={refresh} showToast={showToast} />;
       case 'journal':
         return <JournalPanel entries={journalEntries} day={gameState.day} season={gameState.season} onRefresh={fetchJournal} showToast={showToast} />;
       case 'tea':
