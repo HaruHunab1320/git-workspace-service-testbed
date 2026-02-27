@@ -73,6 +73,11 @@ class AdoptRequest(BaseModel):
     personality: str
 
 
+class BuyRequest(BaseModel):
+    item_key: str
+    quantity: int = 1
+
+
 class JournalEntryRequest(BaseModel):
     text: str
 
@@ -307,6 +312,7 @@ def get_status():
         "economy": {
             "prices": _market.price_board(),
             "summary": _market.trade_summary(),
+            "player_coins": round(_player_coins, 2),
         },
         "recent_reports": reports,
     }
@@ -520,6 +526,43 @@ def get_economy_summary():
     return _market.trade_summary()
 
 
+@app.post("/api/economy/buy")
+def economy_buy_item(req: BuyRequest):
+    """Quick-buy from the economy panel — also adds items to player inventory."""
+    global _player_coins
+    _sync_market()
+    from economy import ITEMS as EITEMS
+    if req.item_key not in EITEMS:
+        raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
+    if req.quantity < 1:
+        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
+    item = EITEMS[req.item_key]
+    unit_price = _market.current_price(req.item_key)
+    total = round(unit_price * req.quantity, 2)
+    if _player_coins < total:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough coins ({total} needed, you have {round(_player_coins, 2)})",
+        )
+    _player_coins = round(_player_coins - total, 2)
+    # Also track in player inventory
+    if req.item_key in _player_inventory:
+        _player_inventory[req.item_key]["quantity"] += req.quantity
+    else:
+        _player_inventory[req.item_key] = {
+            "quantity": req.quantity,
+            "age_days": 0,
+            "purchased_day": game.day,
+        }
+    return {
+        "item_name": item.name,
+        "quantity": req.quantity,
+        "unit_price": unit_price,
+        "total": total,
+        "remaining_coins": _player_coins,
+    }
+
+
 # -- Journal ----------------------------------------------------------------
 
 @app.get("/api/journal")
@@ -620,7 +663,11 @@ def buy_item(req: InventoryBuyRequest):
         }
     return {
         "message": f"Bought {req.quantity} {item.name} for {total:.2f} coins",
+        "item_name": item.name,
+        "quantity": req.quantity,
+        "total": total,
         "coins": round(_player_coins, 2),
+        "remaining_coins": round(_player_coins, 2),
         "inventory": _serialize_inventory(),
     }
 
