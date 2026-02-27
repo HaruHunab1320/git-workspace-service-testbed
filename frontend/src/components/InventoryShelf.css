@@ -1,0 +1,318 @@
+/* ============================================================
+   InventoryShelf — Cozy digital shelf for purchased items
+   ============================================================ */
+
+.inventory-shelf {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Coin purse header */
+
+.coin-purse {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--tan-light), var(--cream));
+  border-radius: var(--radius);
+  border: 2px solid var(--tan);
+}
+
+.coin-purse-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coin-icon {
+  font-size: 1.4rem;
+}
+
+.coin-amount {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--sage-dark);
+}
+
+.coin-label {
+  font-size: 0.8rem;
+  color: var(--brown-light);
+  font-weight: 600;
+}
+
+.shelf-item-count {
+  font-size: 0.85rem;
+  color: var(--brown-light);
+  font-weight: 600;
+}
+
+/* Wooden shelf */
+
+.shelf-unit {
+  position: relative;
+}
+
+.shelf-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--brown-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.shelf-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  padding: 14px 12px 18px;
+  background: linear-gradient(
+    180deg,
+    rgba(212, 184, 150, 0.15) 0%,
+    rgba(212, 184, 150, 0.25) 100%
+  );
+  border-radius: var(--radius) var(--radius) 0 0;
+  min-height: 100px;
+  position: relative;
+}
+
+/* The wooden shelf plank underneath */
+.shelf-row::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(
+    180deg,
+    var(--tan) 0%,
+    var(--brown-light) 100%
+  );
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 4px rgba(74, 55, 40, 0.2);
+}
+
+/* Individual shelf item */
+
+.shelf-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px 8px;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 4px var(--shadow);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.shelf-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-md);
+  border-color: var(--sage-light);
+}
+
+.shelf-item.spoiled {
+  opacity: 0.5;
+  filter: grayscale(0.4);
+}
+
+.shelf-item-emoji {
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.shelf-item-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--brown);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shelf-item-qty {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--sage);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 800;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Freshness indicator bar */
+
+.shelf-item-freshness {
+  width: 100%;
+  height: 4px;
+  background: var(--tan-light);
+  border-radius: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.shelf-item-freshness-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+.freshness-good { background: var(--sage); }
+.freshness-warning { background: #f0c040; }
+.freshness-danger { background: var(--rose); }
+
+/* Empty shelf message */
+
+.shelf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 16px;
+  color: var(--brown-light);
+  text-align: center;
+  gap: 8px;
+}
+
+.shelf-empty-icon {
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.shelf-empty-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.shelf-empty-hint {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Shop section */
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.shop-item:hover {
+  background: var(--tan-light);
+}
+
+.shop-item-emoji {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.shop-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.shop-item-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1.2;
+}
+
+.shop-item-price {
+  font-size: 0.78rem;
+  color: var(--sage-dark);
+  font-weight: 600;
+}
+
+.shop-item-life {
+  font-size: 0.72rem;
+  color: var(--brown-light);
+}
+
+.shop-buy-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--sage);
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.shop-buy-btn:hover:not(:disabled) {
+  background: var(--sage-dark);
+  transform: translateY(-1px);
+}
+
+.shop-buy-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Sell button on shelf items */
+
+.shelf-item-sell {
+  margin-top: 4px;
+  padding: 2px 8px;
+  border: none;
+  border-radius: 4px;
+  background: var(--rose-light);
+  color: var(--brown);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.shelf-item-sell:hover {
+  background: var(--rose);
+  color: var(--white);
+}
+
+/* Spoiled tag */
+
+.spoiled-tag {
+  font-size: 0.65rem;
+  color: var(--rose);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* Section spacing */
+
+.shelf-spacer {
+  height: 16px;
+}
