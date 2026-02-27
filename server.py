@@ -46,6 +46,10 @@ game: CozyVillageGame = CozyVillageGame.create_default(seed=42)
 _journal_entries: list[dict] = []
 _journal_next_id: int = 1
 
+# Player wallet & inventory
+_player_coins: float = 100.0
+_player_inventory: dict[str, int] = {}  # item_key -> quantity
+
 
 # ---------------------------------------------------------------------------
 # Pydantic request bodies
@@ -71,6 +75,16 @@ class AdoptRequest(BaseModel):
 
 class JournalEntryRequest(BaseModel):
     text: str
+
+
+class BuyRequest(BaseModel):
+    item_key: str
+    quantity: int = 1
+
+
+class SellRequest(BaseModel):
+    item_key: str
+    quantity: int = 1
 
 
 # ---------------------------------------------------------------------------
@@ -242,7 +256,7 @@ def _full_status():
 # that stays in sync with the game season.
 # ---------------------------------------------------------------------------
 
-from economy import Market as EconomyMarket
+from economy import Market as EconomyMarket, ITEMS as ECONOMY_ITEMS
 
 _market = EconomyMarket()
 
@@ -293,6 +307,18 @@ def get_status():
         "economy": {
             "prices": _market.price_board(),
             "summary": _market.trade_summary(),
+            "wallet": {
+                "coins": round(_player_coins, 2),
+                "inventory": {
+                    k: {
+                        "name": ECONOMY_ITEMS[k].name,
+                        "category": ECONOMY_ITEMS[k].category.value,
+                        "quantity": v,
+                    }
+                    for k, v in _player_inventory.items()
+                    if v > 0
+                },
+            },
         },
         "recent_reports": reports,
     }
@@ -310,11 +336,13 @@ def advance_day():
 
 @app.post("/api/new-game")
 def new_game(seed: int = Query(default=42)):
-    global game, _market, _journal_entries, _journal_next_id
+    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory
     game = CozyVillageGame.create_default(seed=seed)
     _market = EconomyMarket()
     _journal_entries = []
     _journal_next_id = 1
+    _player_coins = 100.0
+    _player_inventory = {}
     _sync_market()
     return get_status()
 
@@ -492,6 +520,93 @@ def get_prices():
 def get_economy_summary():
     _sync_market()
     return _market.trade_summary()
+
+
+@app.get("/api/economy/wallet")
+def get_wallet():
+    return {
+        "coins": round(_player_coins, 2),
+        "inventory": {
+            k: {
+                "name": ECONOMY_ITEMS[k].name,
+                "category": ECONOMY_ITEMS[k].category.value,
+                "quantity": v,
+            }
+            for k, v in _player_inventory.items()
+            if v > 0
+        },
+    }
+
+
+@app.post("/api/economy/buy")
+def buy_item(req: BuyRequest):
+    global _player_coins
+    _sync_market()
+
+    if req.quantity < 1:
+        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
+
+    item = ECONOMY_ITEMS.get(req.item_key)
+    if item is None:
+        raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
+
+    unit_price = _market.current_price(req.item_key)
+    total = round(unit_price * req.quantity, 2)
+
+    if _player_coins < total:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough coins. Need {total}, have {round(_player_coins, 2)}",
+        )
+
+    _player_coins = round(_player_coins - total, 2)
+    _player_inventory[req.item_key] = _player_inventory.get(req.item_key, 0) + req.quantity
+
+    return {
+        "message": f"Bought {req.quantity} {item.name} for {total} coins",
+        "item": item.name,
+        "quantity": req.quantity,
+        "total_cost": total,
+        "coins_remaining": _player_coins,
+    }
+
+
+@app.post("/api/economy/sell")
+def sell_item(req: SellRequest):
+    global _player_coins
+    _sync_market()
+
+    if req.quantity < 1:
+        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
+
+    item = ECONOMY_ITEMS.get(req.item_key)
+    if item is None:
+        raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
+
+    owned = _player_inventory.get(req.item_key, 0)
+    if owned < req.quantity:
+        raise HTTPException(
+            status_code=400,
+            detail=f"You only have {owned} {item.name}",
+        )
+
+    # Sell at 80% of current market price (market spread)
+    unit_price = round(_market.current_price(req.item_key) * 0.80, 2)
+    total = round(unit_price * req.quantity, 2)
+
+    _player_inventory[req.item_key] = owned - req.quantity
+    if _player_inventory[req.item_key] == 0:
+        del _player_inventory[req.item_key]
+
+    _player_coins = round(_player_coins + total, 2)
+
+    return {
+        "message": f"Sold {req.quantity} {item.name} for {total} coins",
+        "item": item.name,
+        "quantity": req.quantity,
+        "total_earned": total,
+        "coins_remaining": _player_coins,
+    }
 
 
 # -- Journal ----------------------------------------------------------------
