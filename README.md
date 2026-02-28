@@ -100,8 +100,8 @@ The frontend connects to the API at `http://localhost:8000`.
 | GET | `/api/weather` | Current weather forecast |
 | GET | `/api/weather/forecast` | Multi-day forecast |
 | GET | `/api/villagers` | List all villagers |
-| GET | `/api/villagers/{id}` | Single villager details |
-| POST | `/api/villagers/{id}/gift` | Give a gift to a villager |
+| GET | `/api/villagers/{villager_id}` | Single villager details |
+| POST | `/api/villagers/{villager_id}/gift` | Give a gift to a villager |
 | GET | `/api/garden` | Garden grid state |
 | GET | `/api/garden/crops` | Available crops for planting |
 | POST | `/api/garden/plant` | Plant a crop |
@@ -119,16 +119,21 @@ The frontend connects to the API at `http://localhost:8000`.
 | GET | `/api/inventory` | Player inventory |
 | GET | `/api/journal` | Read journal entries |
 | POST | `/api/journal` | Add a journal entry |
-| DELETE | `/api/journal/{id}` | Delete a journal entry |
+| DELETE | `/api/journal/{entry_id}` | Delete a journal entry |
 
 ## Frontend Components
 
 The React UI includes panels for each subsystem:
 
+- **Header** — top-level app header with day/season display
+- **ActionBar** — primary action buttons (advance day, etc.)
 - **WeatherPanel** — current conditions and forecast
 - **VillagersPanel / VillagerCard** — NPC status, mood, friendships, and gifting
+- **GiftModal** — gift selection dialog for villagers
 - **GardenPanel / GardenPlot** — visual garden grid with planting controls
+- **PlantModal** — crop selection dialog for planting
 - **PetsPanel / PetCard** — pet management (adopt, feed, play, pet)
+- **AdoptModal** — pet adoption dialog
 - **EconomyPanel** — market prices and buy/sell interface
 - **InventoryShelf** — player inventory display
 - **EventLog** — real-time stream of simulation events
