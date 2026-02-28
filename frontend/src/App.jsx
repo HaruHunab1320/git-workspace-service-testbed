@@ -206,7 +206,7 @@ export default function App() {
         onNewGame={newGame}
       />
 
-      <SwarmBadge agentId="alpha" />
+      <SwarmBadge type="fireflies" />
       <LofiPlayer />
       <FocusTimer />
       <AmbientSounds sounds={sounds} weather={gameState.weather} season={gameState.season} />
