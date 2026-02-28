@@ -258,8 +258,10 @@ def _full_status():
 # ---------------------------------------------------------------------------
 
 from economy import Market as EconomyMarket, ITEMS as ECONOMY_ITEMS
+from swarm import FireflySwarm
 
 _market = EconomyMarket()
+_firefly_swarm = FireflySwarm.spawn(count=20, seed=42)
 
 
 def _sync_market():
@@ -670,6 +672,33 @@ def get_inventory():
     return {
         "coins": round(_player_coins, 2),
         "items": _serialize_inventory(),
+    }
+
+
+# -- Firefly Swarm ----------------------------------------------------------
+
+@app.get("/api/swarm")
+def get_swarm():
+    """Return the current firefly swarm state."""
+    return {
+        "count": _firefly_swarm.count,
+        "average_glow": _firefly_swarm.average_glow,
+        "brightest": _firefly_swarm.brightest(),
+        "fireflies": _firefly_swarm.snapshot(),
+    }
+
+
+@app.post("/api/swarm/tick")
+def swarm_tick(steps: int = Query(default=1, ge=1, le=50)):
+    """Advance the firefly swarm by one or more ticks."""
+    for _ in range(steps):
+        _firefly_swarm.tick()
+    return {
+        "steps": steps,
+        "count": _firefly_swarm.count,
+        "average_glow": _firefly_swarm.average_glow,
+        "brightest": _firefly_swarm.brightest(),
+        "fireflies": _firefly_swarm.snapshot(),
     }
 
 
