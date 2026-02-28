@@ -16,6 +16,7 @@ import LofiPlayer from './components/LofiPlayer';
 import FocusTimer from './components/FocusTimer';
 import AmbientSounds from './components/AmbientSounds';
 import StarryNight from './components/StarryNight';
+import SwarmBadge from './components/SwarmBadge';
 import useAmbientSounds from './hooks/useAmbientSounds';
 
 const TABS = [
@@ -205,6 +206,7 @@ export default function App() {
         onNewGame={newGame}
       />
 
+      <SwarmBadge agentId="alpha" />
       <LofiPlayer />
       <FocusTimer />
       <AmbientSounds sounds={sounds} weather={gameState.weather} season={gameState.season} />
