@@ -701,4 +701,3 @@ def swarm_tick(steps: int = Query(default=1, ge=1, le=50)):
         "fireflies": _firefly_swarm.snapshot(),
     }
 
-
