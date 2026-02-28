@@ -1,4 +1,8 @@
 .swarm-badge {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  z-index: 90;
   display: inline-flex;
   align-items: center;
   gap: 6px;
