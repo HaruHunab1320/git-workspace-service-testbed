@@ -1,0 +1,107 @@
+/* ============================================================
+   SwarmBadge — Displays swarm type, count, and activity state
+   ============================================================ */
+
+.swarm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ---- Color variants ---- */
+
+.swarm-badge--golden {
+  background: #fff8e1;
+  color: #7c6800;
+  border: 1px solid #ffe082;
+}
+
+.swarm-badge--rose {
+  background: #fce4ec;
+  color: #8e2c46;
+  border: 1px solid #f8bbd0;
+}
+
+.swarm-badge--sky {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+}
+
+.swarm-badge--amber {
+  background: #fff3e0;
+  color: #a85600;
+  border: 1px solid #ffcc80;
+}
+
+.swarm-badge--teal {
+  background: #e0f2f1;
+  color: #00695c;
+  border: 1px solid #80cbc4;
+}
+
+/* ---- Icon ---- */
+
+.swarm-badge__icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ---- Label ---- */
+
+.swarm-badge__label {
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+/* ---- Count pill ---- */
+
+.swarm-badge__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Active state ---- */
+
+.swarm-badge--active {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.swarm-badge--active .swarm-badge__icon {
+  animation: swarm-float 2s ease-in-out infinite;
+}
+
+/* ---- Pulse on count change ---- */
+
+.swarm-badge--pulse {
+  animation: swarm-pulse 0.6s ease;
+}
+
+/* ---- Animations ---- */
+
+@keyframes swarm-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes swarm-pulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
