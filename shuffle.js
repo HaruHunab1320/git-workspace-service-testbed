@@ -1,4 +1,12 @@
 /**
+ *   /\_/\
+ *  ( o.o )
+ *   > ^ <
+ *  /|   |\
+ * (_|   |_)
+ *
+ * alpha
+ *
  * Tiny array shuffle utility using the Fisher-Yates algorithm.
  */
 export function shuffle(array) {
