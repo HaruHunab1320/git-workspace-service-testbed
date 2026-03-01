@@ -10,7 +10,6 @@ Built as a **Turborepo monorepo** with npm workspaces.
 cozy-village/
 ├── turbo.json                 # Turbo task pipeline configuration
 ├── package.json               # Root workspace definition (npm workspaces)
-├── requirements.txt           # Python dependencies
 ├── .nvmrc                     # Node.js version (v20)
 │
 ├── apps/
@@ -44,7 +43,9 @@ cozy-village/
     │       └── hooks/         #   Canvas hooks
     │
     └── utils/                 # @cozy-village/utils — Shared utility functions
-        └── src/
+        ├── greet.js
+        ├── hello.js
+        └── shuffle.js
 ```
 
 ### Apps
@@ -140,7 +141,7 @@ From the repository root:
 npm install
 
 # Install Python dependencies
-pip install -r requirements.txt
+pip install fastapi uvicorn
 ```
 
 ### Development
