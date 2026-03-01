@@ -11,6 +11,7 @@ import EconomyPanel from './components/EconomyPanel';
 import InventoryShelf from './components/InventoryShelf';
 import JournalPanel from './components/JournalPanel';
 import TeaBrewingStation from './components/TeaBrewingStation';
+import ZenGardenPanel from './components/ZenGardenPanel';
 import AmbientLofiMixer from './components/AmbientLofiMixer';
 import LofiPlayer from './components/LofiPlayer';
 import FocusTimer from './components/FocusTimer';
@@ -27,6 +28,7 @@ const TABS = [
   { id: 'economy', label: 'Economy', emoji: '💰' },
   { id: 'inventory', label: 'Shelf', emoji: '🪵' },
   { id: 'journal', label: 'Journal', emoji: '📓' },
+  { id: 'zen', label: 'Zen Garden', emoji: '🧘' },
   { id: 'tea', label: 'Tea', emoji: '🍵' },
   { id: 'mixer', label: 'Mixer', emoji: '🎧' },
 ];
@@ -157,6 +159,8 @@ export default function App() {
         return <InventoryShelf economy={gameState.economy} onRefresh={refresh} showToast={showToast} />;
       case 'journal':
         return <JournalPanel entries={journalEntries} day={gameState.day} season={gameState.season} onRefresh={fetchJournal} showToast={showToast} />;
+      case 'zen':
+        return <ZenGardenPanel zenGarden={gameState.zen_garden} onRefresh={refresh} showToast={showToast} />;
       case 'tea':
         return <TeaBrewingStation showToast={showToast} />;
       case 'mixer':
