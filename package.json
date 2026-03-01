@@ -1,0 +1,9 @@
+{
+  "name": "cozy-village",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "devDependencies": {
+    "turbo": "^2"
+  },
+  "packageManager": "npm@10.8.2"
+}
