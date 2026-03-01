@@ -20,6 +20,10 @@ from villagers import (
 from garden import (
     ALL_CROPS, SEASONAL_CROPS, GrowthStage, CropQuality,
 )
+from zen_garden import (
+    ZenGarden, ALL_SUCCULENTS, ALL_ROCKS, SucculentStage, RakePattern,
+    TileKind,
+)
 from animals import (
     Species, PetPersonality, BondTier, PetMood, PetActivity,
     create_adoptable_pets,
@@ -49,6 +53,9 @@ _journal_next_id: int = 1
 # In-memory player inventory: item_key -> {quantity, age_days, purchased_day}
 _player_inventory: dict[str, dict] = {}
 _player_coins: float = 100.0
+
+# Zen garden instance
+_zen_garden: ZenGarden = ZenGarden(5, 7)
 
 
 # ---------------------------------------------------------------------------
@@ -86,6 +93,28 @@ class SellRequest(BaseModel):
     item_key: str
     quantity: int = 1
 
+
+class ZenPlaceSucculentRequest(BaseModel):
+    row: int
+    col: int
+    succulent_name: str
+
+
+class ZenPlaceRockRequest(BaseModel):
+    row: int
+    col: int
+    rock_name: str
+
+
+class ZenRakeRequest(BaseModel):
+    row: int
+    col: int
+    pattern: str
+
+
+class ZenRemoveRequest(BaseModel):
+    row: int
+    col: int
 
 
 # ---------------------------------------------------------------------------
@@ -225,6 +254,80 @@ def _serialize_crop(c):
     }
 
 
+def _serialize_zen_tile(t):
+    data = {
+        "row": t.row,
+        "col": t.col,
+        "kind": t.kind.value,
+        "rake_pattern": t.rake_pattern.value,
+        "is_empty": t.is_empty,
+    }
+    if t.has_succulent:
+        data["succulent"] = t.succulent.name
+        data["succulent_emoji"] = t.succulent.emoji
+        data["succulent_description"] = t.succulent.description
+        data["succulent_stage"] = t.succulent_stage.value
+        data["growth_progress"] = round(t.growth_progress, 2)
+        data["days_planted"] = t.days_planted
+        data["days_to_mature"] = t.succulent.days_to_mature
+        data["bloom_color"] = t.succulent.bloom_color
+        data["is_rare"] = t.succulent.is_rare
+    else:
+        data["succulent"] = None
+        data["succulent_stage"] = None
+        data["growth_progress"] = None
+    if t.has_rock:
+        data["rock"] = t.rock.name
+        data["rock_emoji"] = t.rock.emoji
+        data["rock_description"] = t.rock.description
+        data["rock_size"] = t.rock.size.value
+        data["is_special"] = t.rock.is_special
+    else:
+        data["rock"] = None
+    return data
+
+
+def _serialize_zen_garden(zg):
+    return {
+        "rows": zg.rows,
+        "cols": zg.cols,
+        "day": zg.day,
+        "total_placements": zg.total_placements,
+        "harmony_score": zg.harmony_score(),
+        "harmony_description": zg.harmony_description(),
+        "succulent_count": len(zg.succulent_tiles()),
+        "rock_count": len(zg.rock_tiles()),
+        "tiles": [
+            [_serialize_zen_tile(zg.tiles[r][c]) for c in range(zg.cols)]
+            for r in range(zg.rows)
+        ],
+    }
+
+
+def _serialize_succulent_type(s):
+    return {
+        "name": s.name,
+        "emoji": s.emoji,
+        "days_to_mature": s.days_to_mature,
+        "water_tolerance": s.water_tolerance,
+        "description": s.description,
+        "bloom_color": s.bloom_color,
+        "is_rare": s.is_rare,
+        "rarity_label": s.rarity_label,
+    }
+
+
+def _serialize_rock_type(r):
+    return {
+        "name": r.name,
+        "emoji": r.emoji,
+        "size": r.size.value,
+        "description": r.description,
+        "weight": r.weight,
+        "is_special": r.is_special,
+    }
+
+
 def _full_status():
     weather = _serialize_forecast(game.current_weather)
     villagers = {
@@ -313,6 +416,7 @@ def get_status():
             "player_coins": round(_player_coins, 2),
         },
         "recent_reports": reports,
+        "zen_garden": _serialize_zen_garden(_zen_garden),
     }
 
 
@@ -320,6 +424,7 @@ def get_status():
 def advance_day():
     report = game.advance_day()
     _sync_market()
+    _zen_garden.advance_day()
     # Age player inventory items and remove spoiled ones
     spoiled_keys = []
     for key, slot in _player_inventory.items():
@@ -337,13 +442,14 @@ def advance_day():
 
 @app.post("/api/new-game")
 def new_game(seed: int = Query(default=42)):
-    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory
+    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory, _zen_garden
     game = CozyVillageGame.create_default(seed=seed)
     _market = EconomyMarket()
     _journal_entries = []
     _journal_next_id = 1
     _player_coins = 100.0
     _player_inventory = {}
+    _zen_garden = ZenGarden(5, 7)
     _sync_market()
     return get_status()
 
@@ -673,6 +779,68 @@ def get_inventory():
         "coins": round(_player_coins, 2),
         "items": _serialize_inventory(),
     }
+
+
+# -- Zen Garden -------------------------------------------------------------
+
+@app.get("/api/zen-garden")
+def get_zen_garden():
+    return _serialize_zen_garden(_zen_garden)
+
+
+@app.get("/api/zen-garden/succulents")
+def get_available_succulents():
+    return [_serialize_succulent_type(s) for s in ALL_SUCCULENTS]
+
+
+@app.get("/api/zen-garden/rocks")
+def get_available_rocks():
+    return [_serialize_rock_type(r) for r in ALL_ROCKS]
+
+
+@app.post("/api/zen-garden/place-succulent")
+def zen_place_succulent(req: ZenPlaceSucculentRequest):
+    succulent = None
+    for s in ALL_SUCCULENTS:
+        if s.name.lower() == req.succulent_name.lower():
+            succulent = s
+            break
+    if succulent is None:
+        raise HTTPException(status_code=400, detail=f"Unknown succulent: {req.succulent_name}")
+    result = _zen_garden.place_succulent(req.row, req.col, succulent)
+    return {"message": result, "zen_garden": _serialize_zen_garden(_zen_garden)}
+
+
+@app.post("/api/zen-garden/place-rock")
+def zen_place_rock(req: ZenPlaceRockRequest):
+    rock = None
+    for r in ALL_ROCKS:
+        if r.name.lower() == req.rock_name.lower():
+            rock = r
+            break
+    if rock is None:
+        raise HTTPException(status_code=400, detail=f"Unknown rock: {req.rock_name}")
+    result = _zen_garden.place_rock(req.row, req.col, rock)
+    return {"message": result, "zen_garden": _serialize_zen_garden(_zen_garden)}
+
+
+@app.post("/api/zen-garden/rake")
+def zen_rake(req: ZenRakeRequest):
+    try:
+        pattern = RakePattern(req.pattern)
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid pattern. Valid: {[p.value for p in RakePattern if p != RakePattern.NONE]}",
+        )
+    result = _zen_garden.rake_tile(req.row, req.col, pattern)
+    return {"message": result, "zen_garden": _serialize_zen_garden(_zen_garden)}
+
+
+@app.post("/api/zen-garden/remove")
+def zen_remove(req: ZenRemoveRequest):
+    result = _zen_garden.remove_item(req.row, req.col)
+    return {"message": result, "zen_garden": _serialize_zen_garden(_zen_garden)}
 
 
 # -- Firefly Swarm ----------------------------------------------------------

@@ -57,6 +57,26 @@ export const api = {
     body: JSON.stringify({ item_key: itemKey, quantity }),
   }),
 
+  getZenGarden: () => request('/zen-garden'),
+  getAvailableSucculents: () => request('/zen-garden/succulents'),
+  getAvailableRocks: () => request('/zen-garden/rocks'),
+  placeSucculent: (row, col, succulentName) => request('/zen-garden/place-succulent', {
+    method: 'POST',
+    body: JSON.stringify({ row, col, succulent_name: succulentName }),
+  }),
+  placeRock: (row, col, rockName) => request('/zen-garden/place-rock', {
+    method: 'POST',
+    body: JSON.stringify({ row, col, rock_name: rockName }),
+  }),
+  rakeZenTile: (row, col, pattern) => request('/zen-garden/rake', {
+    method: 'POST',
+    body: JSON.stringify({ row, col, pattern }),
+  }),
+  removeZenItem: (row, col) => request('/zen-garden/remove', {
+    method: 'POST',
+    body: JSON.stringify({ row, col }),
+  }),
+
   getJournal: () => request('/journal'),
   addJournalEntry: (text) => request('/journal', {
     method: 'POST',
