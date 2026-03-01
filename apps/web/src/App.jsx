@@ -18,6 +18,7 @@ import FocusTimer from './components/FocusTimer';
 import AmbientSounds from './components/AmbientSounds';
 import StarryNight from './components/StarryNight';
 import SwarmBadge from './components/SwarmBadge';
+import { ZenGarden } from '@cozy-village/zen-garden';
 import useAmbientSounds from './hooks/useAmbientSounds';
 
 const TABS = [
@@ -30,6 +31,7 @@ const TABS = [
   { id: 'journal', label: 'Journal', emoji: '📓' },
   { id: 'zen', label: 'Zen Garden', emoji: '🧘' },
   { id: 'tea', label: 'Tea', emoji: '🍵' },
+  { id: 'zen', label: 'Zen', emoji: '🪨' },
   { id: 'mixer', label: 'Mixer', emoji: '🎧' },
 ];
 
@@ -163,6 +165,8 @@ export default function App() {
         return <ZenGardenPanel zenGarden={gameState.zen_garden} onRefresh={refresh} showToast={showToast} />;
       case 'tea':
         return <TeaBrewingStation showToast={showToast} />;
+      case 'zen':
+        return <ZenGarden showToast={showToast} />;
       case 'mixer':
         return <AmbientLofiMixer showToast={showToast} />;
       default:
