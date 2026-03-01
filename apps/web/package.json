@@ -1,5 +1,5 @@
 {
-  "name": "cozy-village-frontend",
+  "name": "@cozy-village/web",
   "private": true,
   "version": "1.0.0",
   "type": "module",
