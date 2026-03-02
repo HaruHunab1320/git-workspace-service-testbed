@@ -18,6 +18,7 @@ import FocusTimer from './components/FocusTimer';
 import AmbientSounds from './components/AmbientSounds';
 import StarryNight from './components/StarryNight';
 import CozyFireplace from './components/CozyFireplace';
+import WindChimes from './components/WindChimes';
 import SwarmBadge from './components/SwarmBadge';
 import { ZenGarden } from '@cozy-village/zen-garden';
 import useAmbientSounds from './hooks/useAmbientSounds';
@@ -221,6 +222,7 @@ export default function App() {
       <AmbientSounds sounds={sounds} weather={gameState.weather} season={gameState.season} />
       <StarryNight />
       <CozyFireplace />
+      <WindChimes />
 
       {toast && (
         <div style={{
