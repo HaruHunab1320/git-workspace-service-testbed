@@ -82,6 +82,7 @@ class AdoptRequest(BaseModel):
 
 class JournalEntryRequest(BaseModel):
     text: str
+    mood: str = ""
 
 
 class BuyRequest(BaseModel):
@@ -728,6 +729,7 @@ def add_journal_entry(req: JournalEntryRequest):
         "day": game.day,
         "season": game.season.value,
         "text": text,
+        "mood": req.mood,
     }
     _journal_next_id += 1
     _journal_entries.append(entry)
