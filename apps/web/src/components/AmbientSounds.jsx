@@ -77,6 +77,53 @@ export default function AmbientSounds({ sounds, weather, season }) {
             </button>
           </div>
 
+          <div className="ambient-layers">
+            <div className="ambient-layer-row">
+              <button
+                className={`ambient-layer-toggle ${sounds.rainOn ? 'on' : 'off'}`}
+                onClick={() => sounds.setRainOn((prev) => !prev)}
+                disabled={!sounds.enabled}
+                title="Toggle rain"
+              >
+                <span className="ambient-layer-icon">🌧️</span>
+              </button>
+              <span className="ambient-layer-name">Rain</span>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={sounds.rainVolume}
+                onChange={(e) => sounds.setRainVolume(parseFloat(e.target.value))}
+                className="ambient-slider"
+                disabled={!sounds.enabled || !sounds.rainOn}
+              />
+            </div>
+            <div className="ambient-layer-row">
+              <button
+                className={`ambient-layer-toggle ${sounds.cafeOn ? 'on' : 'off'}`}
+                onClick={() => sounds.setCafeOn((prev) => !prev)}
+                disabled={!sounds.enabled}
+                title="Toggle cafe sounds"
+              >
+                <span className="ambient-layer-icon">☕</span>
+              </button>
+              <span className="ambient-layer-name">Cafe</span>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={sounds.cafeVolume}
+                onChange={(e) => sounds.setCafeVolume(parseFloat(e.target.value))}
+                className="ambient-slider"
+                disabled={!sounds.enabled || !sounds.cafeOn}
+              />
+            </div>
+          </div>
+
+          <div className="ambient-divider" />
+
           <div className="ambient-slider-group">
             <div className="ambient-slider-row">
               <span className="ambient-slider-label">Ambience</span>
