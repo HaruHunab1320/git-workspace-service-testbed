@@ -1,6 +1,24 @@
 {
   "name": "cozy-village",
   "private": true,
+  "keywords": [
+    "game",
+    "village-simulator",
+    "life-sim",
+    "cozy",
+    "relaxing",
+    "meditative",
+    "farming",
+    "crafting",
+    "zen-garden",
+    "pet-adoption",
+    "npc-ai",
+    "weather-simulation",
+    "monorepo",
+    "react",
+    "fastapi",
+    "turborepo"
+  ],
   "workspaces": ["apps/*", "packages/*"],
   "devDependencies": {
     "turbo": "^2"
