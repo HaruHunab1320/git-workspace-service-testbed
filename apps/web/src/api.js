@@ -78,9 +78,9 @@ export const api = {
   }),
 
   getJournal: () => request('/journal'),
-  addJournalEntry: (text) => request('/journal', {
+  addJournalEntry: (text, mood = '') => request('/journal', {
     method: 'POST',
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, mood }),
   }),
   deleteJournalEntry: (id) => request(`/journal/${id}`, { method: 'DELETE' }),
 };

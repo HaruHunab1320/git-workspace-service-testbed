@@ -113,3 +113,8 @@
   margin-bottom: 8px;
   padding-left: 4px;
 }
+
+.journal-entry-mood {
+  margin-right: 6px;
+  font-size: 1rem;
+}
