@@ -19,6 +19,7 @@ import AmbientSounds from './components/AmbientSounds';
 import StarryNight from './components/StarryNight';
 import CozyFireplace from './components/CozyFireplace';
 import WindChimes from './components/WindChimes';
+import SleepingCat from './components/SleepingCat';
 import SwarmBadge from './components/SwarmBadge';
 import { ZenGarden } from '@cozy-village/zen-garden';
 import useAmbientSounds from './hooks/useAmbientSounds';
@@ -223,6 +224,7 @@ export default function App() {
       <StarryNight />
       <CozyFireplace />
       <WindChimes />
+      <SleepingCat />
 
       {toast && (
         <div style={{
