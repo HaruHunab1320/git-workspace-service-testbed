@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from './api';
+import { journalStorage } from './journalStorage';
 import Header from './components/Header';
 import ActionBar from './components/ActionBar';
 import EventLog from './components/EventLog';
@@ -71,12 +72,21 @@ export default function App() {
     try {
       const data = await api.getJournal();
       setJournalEntries(data);
+      journalStorage.save(data);
     } catch (err) {
       console.error('Failed to fetch journal:', err);
+      const cached = journalStorage.load();
+      if (cached.length > 0) {
+        setJournalEntries(cached);
+      }
     }
   }, []);
 
   useEffect(() => {
+    const cached = journalStorage.load();
+    if (cached.length > 0) {
+      setJournalEntries(cached);
+    }
     (async () => {
       await fetchStatus();
       await fetchForecast();
@@ -125,6 +135,8 @@ export default function App() {
     try {
       const seed = Math.floor(Math.random() * 10000);
       await api.newGame(seed);
+      journalStorage.clear();
+      setJournalEntries([]);
       await fetchStatus();
       await fetchForecast();
       sounds.success();
