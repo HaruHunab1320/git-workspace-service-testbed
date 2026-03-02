@@ -179,6 +179,74 @@
   left: 2px;
 }
 
+/* ---- Layer Controls ---- */
+
+.ambient-layers {
+  padding: 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ambient-layer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ambient-layer-toggle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.ambient-layer-toggle.on {
+  background: var(--sage-light);
+  border-color: var(--sage);
+}
+
+.ambient-layer-toggle.off {
+  background: var(--tan-light);
+  border-color: transparent;
+  opacity: 0.6;
+}
+
+.ambient-layer-toggle:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.ambient-layer-toggle:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.ambient-layer-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.ambient-layer-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--brown-light);
+  width: 32px;
+  flex-shrink: 0;
+}
+
+.ambient-divider {
+  height: 1px;
+  background: var(--tan-light);
+  margin: 6px 14px;
+}
+
 /* ---- Volume Sliders ---- */
 
 .ambient-slider-group {

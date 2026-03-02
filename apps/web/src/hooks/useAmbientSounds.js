@@ -38,6 +38,28 @@ export default function useAmbientSounds() {
     catch { return 0.25; }
   });
 
+  // Independent rain & cafe layer state
+  const [rainOn, setRainOn] = useState(() => {
+    try { return localStorage.getItem('manual-rain') === 'on'; }
+    catch { return false; }
+  });
+  const [rainVolume, setRainVolume] = useState(() => {
+    try { return parseFloat(localStorage.getItem('manual-rain-volume') || '0.5'); }
+    catch { return 0.5; }
+  });
+  const [cafeOn, setCafeOn] = useState(() => {
+    try { return localStorage.getItem('manual-cafe') === 'on'; }
+    catch { return false; }
+  });
+  const [cafeVolume, setCafeVolume] = useState(() => {
+    try { return parseFloat(localStorage.getItem('manual-cafe-volume') || '0.5'); }
+    catch { return 0.5; }
+  });
+  const manualRainNodesRef = useRef([]);
+  const manualRainGainRef = useRef(null);
+  const manualCafeNodesRef = useRef([]);
+  const manualCafeGainRef = useRef(null);
+
   // Persist preferences
   useEffect(() => {
     try { localStorage.setItem('ambient-sounds', enabled ? 'on' : 'off'); }
@@ -53,6 +75,26 @@ export default function useAmbientSounds() {
     try { localStorage.setItem('ui-volume', String(uiVolume)); }
     catch { /* noop */ }
   }, [uiVolume]);
+
+  useEffect(() => {
+    try { localStorage.setItem('manual-rain', rainOn ? 'on' : 'off'); }
+    catch { /* noop */ }
+  }, [rainOn]);
+
+  useEffect(() => {
+    try { localStorage.setItem('manual-rain-volume', String(rainVolume)); }
+    catch { /* noop */ }
+  }, [rainVolume]);
+
+  useEffect(() => {
+    try { localStorage.setItem('manual-cafe', cafeOn ? 'on' : 'off'); }
+    catch { /* noop */ }
+  }, [cafeOn]);
+
+  useEffect(() => {
+    try { localStorage.setItem('manual-cafe-volume', String(cafeVolume)); }
+    catch { /* noop */ }
+  }, [cafeVolume]);
 
   const getCtx = useCallback(() => {
     if (!ctxRef.current || ctxRef.current.state === 'closed') {
@@ -366,6 +408,134 @@ export default function useAmbientSounds() {
     return noise;
   }, [createNoise]);
 
+  // ─── Independent Rain & Cafe Layers ────────────────────────
+
+  const stopManualRain = useCallback(() => {
+    manualRainNodesRef.current.forEach((node) => {
+      try {
+        if (node.stop) node.stop();
+        if (node.disconnect) node.disconnect();
+      } catch { /* already stopped */ }
+    });
+    manualRainNodesRef.current = [];
+    if (manualRainGainRef.current) {
+      try { manualRainGainRef.current.disconnect(); } catch { /* noop */ }
+      manualRainGainRef.current = null;
+    }
+  }, []);
+
+  const stopManualCafe = useCallback(() => {
+    manualCafeNodesRef.current.forEach((node) => {
+      try {
+        if (node.stop) node.stop();
+        if (node.disconnect) node.disconnect();
+      } catch { /* already stopped */ }
+    });
+    manualCafeNodesRef.current = [];
+    if (manualCafeGainRef.current) {
+      try { manualCafeGainRef.current.disconnect(); } catch { /* noop */ }
+      manualCafeGainRef.current = null;
+    }
+  }, []);
+
+  const startManualRain = useCallback(() => {
+    stopManualRain();
+    const ctx = getCtx();
+
+    const gain = ctx.createGain();
+    gain.gain.value = rainVolume;
+    gain.connect(masterGainRef.current);
+    manualRainGainRef.current = gain;
+
+    // Rain — bandpass-filtered white noise
+    const noise = ctx.createBufferSource();
+    noise.buffer = createNoise(ctx, 4);
+    noise.loop = true;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 8000;
+    bp.Q.value = 0.5;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 2000;
+
+    noise.connect(bp);
+    bp.connect(hp);
+    hp.connect(gain);
+    noise.start();
+
+    manualRainNodesRef.current = [noise, bp, hp];
+  }, [getCtx, createNoise, rainVolume, stopManualRain]);
+
+  const startManualCafe = useCallback(() => {
+    stopManualCafe();
+    const ctx = getCtx();
+
+    const gain = ctx.createGain();
+    gain.gain.value = cafeVolume;
+    gain.connect(masterGainRef.current);
+    manualCafeGainRef.current = gain;
+
+    // Cafe murmur — bandpass-filtered noise with subtle modulation
+    const noise = ctx.createBufferSource();
+    noise.buffer = createNoise(ctx, 4);
+    noise.loop = true;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 800;
+    lp.Q.value = 0.5;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 200;
+    const lfo = ctx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.2;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 150;
+    lfo.connect(lfoGain);
+    lfoGain.connect(lp.frequency);
+    lfo.start();
+
+    noise.connect(lp);
+    lp.connect(hp);
+    hp.connect(gain);
+    noise.start();
+
+    manualCafeNodesRef.current = [noise, lp, hp, lfo, lfoGain];
+  }, [getCtx, createNoise, cafeVolume, stopManualCafe]);
+
+  // React to rain toggle/volume changes
+  useEffect(() => {
+    if (rainOn && enabled) {
+      startManualRain();
+    } else {
+      stopManualRain();
+    }
+    return () => stopManualRain();
+  }, [rainOn, enabled]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (manualRainGainRef.current) {
+      manualRainGainRef.current.gain.value = rainVolume;
+    }
+  }, [rainVolume]);
+
+  // React to cafe toggle/volume changes
+  useEffect(() => {
+    if (cafeOn && enabled) {
+      startManualCafe();
+    } else {
+      stopManualCafe();
+    }
+    return () => stopManualCafe();
+  }, [cafeOn, enabled]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (manualCafeGainRef.current) {
+      manualCafeGainRef.current.gain.value = cafeVolume;
+    }
+  }, [cafeVolume]);
+
   const setAmbientScene = useCallback((weather, season) => {
     if (!enabled) {
       stopAmbient();
@@ -408,11 +578,13 @@ export default function useAmbientSounds() {
   useEffect(() => {
     return () => {
       stopAmbient();
+      stopManualRain();
+      stopManualCafe();
       if (ctxRef.current && ctxRef.current.state !== 'closed') {
         ctxRef.current.close();
       }
     };
-  }, [stopAmbient]);
+  }, [stopAmbient, stopManualRain, stopManualCafe]);
 
   return {
     enabled,
@@ -431,5 +603,14 @@ export default function useAmbientSounds() {
     // Ambient
     setAmbientScene,
     stopAmbient,
+    // Independent layers
+    rainOn,
+    setRainOn,
+    rainVolume,
+    setRainVolume,
+    cafeOn,
+    setCafeOn,
+    cafeVolume,
+    setCafeVolume,
   };
 }
