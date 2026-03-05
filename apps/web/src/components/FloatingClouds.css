@@ -1,0 +1,231 @@
+/* ============================================================
+   Floating Clouds — Soothing Sky Background Animation
+   ============================================================ */
+
+/* ---- Body transition when active ---- */
+
+body.clouds-active {
+  background: linear-gradient(180deg, #c9dff0 0%, #e8f0f8 40%, #f0f4f8 100%) !important;
+  transition: background 1.2s ease;
+}
+
+/* ---- Cloud overlay container ---- */
+
+.clouds-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  animation: clouds-fade-in 1.2s ease forwards;
+}
+
+@keyframes clouds-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---- Cloud shapes ---- */
+
+.clouds-cloud {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  filter: blur(1px);
+}
+
+/* -- Layer 1: Large, slow background clouds -- */
+
+.clouds-cloud-1 {
+  width: 280px;
+  height: 80px;
+  top: 8%;
+  left: -300px;
+  border-radius: 80px;
+  opacity: 0.5;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+  box-shadow:
+    60px -20px 0 30px rgba(255,255,255,0.5),
+    120px -10px 0 20px rgba(255,255,255,0.4),
+    -30px -15px 0 25px rgba(255,255,255,0.45);
+  animation: clouds-drift-1 80s linear infinite;
+}
+
+.clouds-cloud-2 {
+  width: 320px;
+  height: 70px;
+  top: 20%;
+  left: -340px;
+  border-radius: 70px;
+  opacity: 0.4;
+  background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%);
+  box-shadow:
+    70px -25px 0 35px rgba(255,255,255,0.45),
+    140px -8px 0 18px rgba(255,255,255,0.35),
+    -40px -18px 0 28px rgba(255,255,255,0.4);
+  animation: clouds-drift-2 110s linear infinite;
+  animation-delay: -40s;
+}
+
+/* -- Layer 2: Medium, mid-speed clouds -- */
+
+.clouds-cloud-3 {
+  width: 200px;
+  height: 60px;
+  top: 12%;
+  left: -220px;
+  border-radius: 60px;
+  opacity: 0.65;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 100%);
+  box-shadow:
+    45px -18px 0 22px rgba(255,255,255,0.6),
+    95px -6px 0 15px rgba(255,255,255,0.5),
+    -20px -12px 0 18px rgba(255,255,255,0.55);
+  animation: clouds-drift-3 60s linear infinite;
+  animation-delay: -15s;
+}
+
+.clouds-cloud-4 {
+  width: 240px;
+  height: 65px;
+  top: 30%;
+  left: -260px;
+  border-radius: 65px;
+  opacity: 0.55;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+  box-shadow:
+    55px -20px 0 28px rgba(255,255,255,0.55),
+    110px -10px 0 16px rgba(255,255,255,0.4),
+    -25px -14px 0 20px rgba(255,255,255,0.5);
+  animation: clouds-drift-4 70s linear infinite;
+  animation-delay: -30s;
+}
+
+/* -- Layer 3: Small, faster foreground wisps -- */
+
+.clouds-cloud-5 {
+  width: 140px;
+  height: 40px;
+  top: 5%;
+  left: -160px;
+  border-radius: 40px;
+  opacity: 0.7;
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.75) 100%);
+  box-shadow:
+    30px -12px 0 15px rgba(255,255,255,0.7),
+    65px -5px 0 10px rgba(255,255,255,0.6),
+    -15px -8px 0 12px rgba(255,255,255,0.65);
+  animation: clouds-drift-5 45s linear infinite;
+  animation-delay: -10s;
+}
+
+.clouds-cloud-6 {
+  width: 160px;
+  height: 45px;
+  top: 25%;
+  left: -180px;
+  border-radius: 45px;
+  opacity: 0.6;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 100%);
+  box-shadow:
+    35px -14px 0 18px rgba(255,255,255,0.65),
+    75px -4px 0 12px rgba(255,255,255,0.5),
+    -18px -10px 0 14px rgba(255,255,255,0.6);
+  animation: clouds-drift-6 55s linear infinite;
+  animation-delay: -25s;
+}
+
+.clouds-cloud-7 {
+  width: 120px;
+  height: 35px;
+  top: 16%;
+  left: -140px;
+  border-radius: 35px;
+  opacity: 0.5;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.65) 100%);
+  box-shadow:
+    25px -10px 0 12px rgba(255,255,255,0.55),
+    55px -3px 0 8px rgba(255,255,255,0.45);
+  animation: clouds-drift-7 50s linear infinite;
+  animation-delay: -35s;
+}
+
+/* ---- Drift keyframes — each travels full viewport width ---- */
+
+@keyframes clouds-drift-1 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(100vw + 600px)); }
+}
+
+@keyframes clouds-drift-2 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(100vw + 680px)); }
+}
+
+@keyframes clouds-drift-3 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(100vw + 440px)); }
+}
+
+@keyframes clouds-drift-4 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(100vw + 520px)); }
+}
+
+@keyframes clouds-drift-5 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(100vw + 320px)); }
+}
+
+@keyframes clouds-drift-6 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(100vw + 360px)); }
+}
+
+@keyframes clouds-drift-7 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(100vw + 280px)); }
+}
+
+/* ---- FAB toggle button ---- */
+
+.clouds-fab {
+  position: fixed;
+  bottom: 80px;
+  right: 192px;
+  z-index: 89;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--tan), var(--tan-light));
+  color: var(--brown);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 12px rgba(74, 55, 40, 0.2);
+  transition: all 0.3s ease;
+}
+
+.clouds-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 16px rgba(74, 55, 40, 0.3);
+}
+
+.clouds-fab.active {
+  background: linear-gradient(135deg, #a8c8e8, #c9dff0);
+  box-shadow: 0 3px 16px rgba(168, 200, 232, 0.5);
+}
+
+.clouds-fab-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ---- Night mode compatibility ---- */
+
+body.stars-active .clouds-fab.active {
+  background: linear-gradient(135deg, #3a5a8c, #2a4a6c);
+  box-shadow: 0 3px 16px rgba(42, 74, 108, 0.5);
+}

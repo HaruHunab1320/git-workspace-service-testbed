@@ -18,6 +18,7 @@ import LofiPlayer from './components/LofiPlayer';
 import FocusTimer from './components/FocusTimer';
 import AmbientSounds from './components/AmbientSounds';
 import StarryNight from './components/StarryNight';
+import FloatingClouds from './components/FloatingClouds';
 import CozyFireplace from './components/CozyFireplace';
 import WindChimes from './components/WindChimes';
 import SleepingCat from './components/SleepingCat';
@@ -234,6 +235,7 @@ export default function App() {
       <FocusTimer />
       <AmbientSounds sounds={sounds} weather={gameState.weather} season={gameState.season} />
       <StarryNight />
+      <FloatingClouds />
       <CozyFireplace />
       <WindChimes />
       <SleepingCat />
