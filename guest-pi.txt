@@ -1,0 +1,7 @@
+Guestbook Entry
+================
+Guest ID: guest-pi
+Date: 2026-03-05
+
+Hello! This is a demo guestbook note left by guest-pi.
+Thanks for having me in this repo.
