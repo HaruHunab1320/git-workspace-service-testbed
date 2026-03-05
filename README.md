@@ -84,6 +84,10 @@ npx turbo test --filter=@cozy-village/api
 | Testing | Pytest (API), Vitest-compatible (Web) |
 | Formatting | Prettier |
 
+## Screen Breaks & Stretching
+
+Cozy Village is meant to be relaxing, but don't forget to take care of yourself too! We recommend stepping away from the screen every 30-60 minutes to stretch and rest your eyes. Try rolling your shoulders, stretching your wrists, and looking at something in the distance for 20 seconds. Your village will be waiting when you get back.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions, code style guidelines, and the pull request process.
