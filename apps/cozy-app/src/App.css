@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #fdf6ec;
+  color: #5a4a3a;
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: #f5e6d3;
+  border-bottom: 2px solid #e8d5c0;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #7a6a5a;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav-link:hover {
+  background: #e8d5c0;
+  color: #5a4a3a;
+}
+
+.main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
