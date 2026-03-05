@@ -50,6 +50,10 @@ game: CozyVillageGame = CozyVillageGame.create_default(seed=42)
 _journal_entries: list[dict] = []
 _journal_next_id: int = 1
 
+# In-memory dream journal storage
+_dream_entries: list[dict] = []
+_dream_next_id: int = 1
+
 # In-memory player inventory: item_key -> {quantity, age_days, purchased_day}
 _player_inventory: dict[str, dict] = {}
 _player_coins: float = 100.0
@@ -83,6 +87,20 @@ class AdoptRequest(BaseModel):
 class JournalEntryRequest(BaseModel):
     text: str
     mood: str = ""
+
+
+class DreamEntryRequest(BaseModel):
+    title: str = ""
+    content: str
+    mood: str = ""
+    tags: list[str] = []
+
+
+class DreamEntryUpdateRequest(BaseModel):
+    title: str | None = None
+    content: str | None = None
+    mood: str | None = None
+    tags: list[str] | None = None
 
 
 class BuyRequest(BaseModel):
@@ -443,11 +461,13 @@ def advance_day():
 
 @app.post("/api/new-game")
 def new_game(seed: int = Query(default=42)):
-    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory, _zen_garden
+    global game, _market, _journal_entries, _journal_next_id, _dream_entries, _dream_next_id, _player_coins, _player_inventory, _zen_garden
     game = CozyVillageGame.create_default(seed=seed)
     _market = EconomyMarket()
     _journal_entries = []
     _journal_next_id = 1
+    _dream_entries = []
+    _dream_next_id = 1
     _player_coins = 100.0
     _player_inventory = {}
     _zen_garden = ZenGarden(5, 7)
@@ -744,6 +764,62 @@ def delete_journal_entry(entry_id: int):
             _journal_entries.pop(i)
             return {"deleted": entry_id}
     raise HTTPException(status_code=404, detail="Journal entry not found")
+
+
+# -- Dream Journal ----------------------------------------------------------
+
+@app.get("/api/dream-journal")
+def get_dream_journal():
+    return _dream_entries
+
+
+@app.post("/api/dream-journal")
+def add_dream_entry(req: DreamEntryRequest):
+    global _dream_next_id
+    content = req.content.strip()
+    if not content:
+        raise HTTPException(status_code=400, detail="Dream content cannot be empty")
+    entry = {
+        "id": _dream_next_id,
+        "day": game.day,
+        "season": game.season.value,
+        "title": req.title.strip(),
+        "content": content,
+        "mood": req.mood,
+        "tags": req.tags,
+    }
+    _dream_next_id += 1
+    _dream_entries.append(entry)
+    return entry
+
+
+@app.put("/api/dream-journal/{entry_id}")
+def update_dream_entry(entry_id: int, req: DreamEntryUpdateRequest):
+    for entry in _dream_entries:
+        if entry["id"] == entry_id:
+            if req.title is not None:
+                entry["title"] = req.title.strip()
+            if req.content is not None:
+                content = req.content.strip()
+                if not content:
+                    raise HTTPException(status_code=400, detail="Dream content cannot be empty")
+                entry["content"] = content
+            if req.mood is not None:
+                entry["mood"] = req.mood
+            if req.tags is not None:
+                entry["tags"] = req.tags
+            return entry
+    raise HTTPException(status_code=404, detail="Dream entry not found")
+
+
+@app.delete("/api/dream-journal/{entry_id}")
+def delete_dream_entry(entry_id: int):
+    global _dream_entries
+    for i, entry in enumerate(_dream_entries):
+        if entry["id"] == entry_id:
+            _dream_entries.pop(i)
+            return {"deleted": entry_id}
+    raise HTTPException(status_code=404, detail="Dream entry not found")
 
 
 # -- Player Inventory (Cozy Shelf) -----------------------------------------

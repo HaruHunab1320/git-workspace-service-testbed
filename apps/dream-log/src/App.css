@@ -1,0 +1,299 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --cream: #faf6f0;
+  --sage: #7a9e7e;
+  --tan: #d4b896;
+  --rose: #c8848a;
+  --brown: #4a3728;
+  --highlight: #e8a849;
+  --indigo: #5c6bc0;
+  --lavender: #b39ddb;
+  --night: #1a1a2e;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--cream);
+  color: var(--brown);
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  color: var(--indigo);
+}
+
+.subtitle {
+  color: var(--lavender);
+  margin-top: 0.25rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: var(--indigo);
+}
+
+.dream-form textarea {
+  width: 100%;
+  min-height: 100px;
+  border: 2px solid var(--tan);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.dream-form textarea:focus {
+  outline: none;
+  border-color: var(--indigo);
+}
+
+.dream-form input[type="text"] {
+  width: 100%;
+  border: 2px solid var(--tan);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.dream-form input[type="text"]:focus {
+  outline: none;
+  border-color: var(--indigo);
+}
+
+.form-row {
+  margin-bottom: 0.75rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.mood-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mood-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  background: var(--cream);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  transition: border-color 0.15s;
+}
+
+.mood-btn:hover {
+  border-color: var(--lavender);
+}
+
+.mood-btn--active {
+  border-color: var(--indigo);
+  background: #ede7f6;
+}
+
+.mood-emoji {
+  font-size: 1.4rem;
+}
+
+.tag-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tag-input-row input {
+  flex: 1;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.tag {
+  background: var(--lavender);
+  color: #fff;
+  border-radius: 12px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tag button {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--indigo);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: var(--cream);
+  color: var(--brown);
+  border: 2px solid var(--tan);
+}
+
+.btn-danger {
+  background: var(--rose);
+  color: #fff;
+}
+
+.btn-small {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.entry-list {
+  list-style: none;
+}
+
+.entry-item {
+  border-bottom: 1px solid #eee;
+  padding: 1rem 0;
+}
+
+.entry-item:last-child {
+  border-bottom: none;
+}
+
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.entry-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.entry-meta {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.entry-content {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.entry-tags {
+  margin-top: 0.5rem;
+}
+
+.entry-mood {
+  margin-right: 0.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: #aaa;
+  padding: 2rem;
+  font-style: italic;
+}
+
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--brown);
+  color: #fff;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  z-index: 1000;
+  animation: fadeInUp 0.2s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.footer {
+  text-align: center;
+  color: #bbb;
+  font-size: 0.85rem;
+  margin-top: 2rem;
+}
