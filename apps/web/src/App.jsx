@@ -22,6 +22,7 @@ import CozyFireplace from './components/CozyFireplace';
 import WindChimes from './components/WindChimes';
 import SleepingCat from './components/SleepingCat';
 import SwarmBadge from './components/SwarmBadge';
+import TrivialClock from './components/TrivialClock';
 import { ZenGarden } from '@cozy-village/zen-garden';
 import useAmbientSounds from './hooks/useAmbientSounds';
 
@@ -229,6 +230,7 @@ export default function App() {
         onNewGame={newGame}
       />
 
+      <TrivialClock />
       <SwarmBadge type="fireflies" />
       <LofiPlayer />
       <FocusTimer />

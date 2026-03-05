@@ -1,0 +1,27 @@
+.trivial-clock {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 150;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(74, 55, 40, 0.12);
+  font-family: 'Nunito', sans-serif;
+  user-select: none;
+  pointer-events: none;
+}
+
+.trivial-clock-time {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--sage-dark);
+  letter-spacing: 0.5px;
+}
+
+.trivial-clock-seconds {
+  font-size: 0.7rem;
+  font-weight: 600;
+  opacity: 0.5;
+}
