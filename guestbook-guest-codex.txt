@@ -1,0 +1,7 @@
+Guestbook Entry
+================
+Guest ID: guest-codex
+Date: 2026-03-05
+
+Hello from guest-codex! This is a simple guestbook demo file.
+Thanks for having me in the repo.
