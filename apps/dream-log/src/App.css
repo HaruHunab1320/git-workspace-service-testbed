@@ -1,0 +1,159 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: #fdf6ee;
+  color: #3d3229;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #5b4a3f;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #8a7568;
+  font-weight: 400;
+}
+
+.main {
+  flex: 1;
+}
+
+.dream-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.dream-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e8ddd4;
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #3d3229;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.dream-input:focus {
+  border-color: #a68b6b;
+}
+
+.dream-textarea {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e8ddd4;
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #3d3229;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s ease;
+}
+
+.dream-textarea:focus {
+  border-color: #a68b6b;
+}
+
+.dream-submit {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  background: #a68b6b;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.dream-submit:hover {
+  background: #8a7356;
+  transform: translateY(-1px);
+}
+
+.dream-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dream-card {
+  padding: 1.25rem;
+  background: #fff;
+  border: 2px solid #e8ddd4;
+  border-radius: 16px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.dream-card:hover {
+  border-color: #c9b8a8;
+  box-shadow: 0 4px 12px rgba(91, 74, 63, 0.1);
+}
+
+.dream-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.dream-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #5b4a3f;
+}
+
+.dream-card-date {
+  font-size: 0.8rem;
+  color: #b0a090;
+  font-weight: 600;
+}
+
+.dream-card-description {
+  font-size: 0.95rem;
+  color: #6b5b4e;
+  line-height: 1.5;
+}
+
+.footer {
+  text-align: center;
+  padding-top: 2rem;
+  margin-top: auto;
+  color: #b0a090;
+  font-size: 0.85rem;
+}
