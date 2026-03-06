@@ -45,7 +45,15 @@
 - **Internal dependency:** `@cozy-village/zen-garden` package
 - **Scripts:** `dev` (vite), `build` (vite build), `preview` (vite preview)
 
-### 3. `apps/cozy-companion` -- Cozy Companion (`@cozy-village/cozy-companion`)
+### 3. `apps/beta` -- Beta App (`@cozy-village/beta`)
+
+- **Language:** JavaScript (ES modules)
+- **Framework:** React 18 + Vite 5
+- **Role:** New application scaffolded by agent beta
+- **Description:** A Vite + React application configured to run on port 5175.
+- **Scripts:** `dev` (vite), `build` (vite build), `preview` (vite preview)
+
+### 4. `apps/cozy-companion` -- Cozy Companion (`@cozy-village/cozy-companion`)
 
 - **Language:** JavaScript (ES modules)
 - **Framework:** React 18 + Vite 5
@@ -56,7 +64,7 @@
 - **Internal dependency:** `@cozy-village/ui` package
 - **Scripts:** `dev` (vite), `build` (vite build), `preview` (vite preview)
 
-### 4. `apps/mood-journal` -- Mood Journal (`@cozy-village/mood-journal`)
+### 5. `apps/mood-journal` -- Mood Journal (`@cozy-village/mood-journal`)
 
 - **Language:** JavaScript (ES modules)
 - **Framework:** React 18 + Vite 5
@@ -89,7 +97,7 @@
 ### 3. `packages/utils` -- Shared Utilities (`@cozy-village/utils`)
 
 - **Type:** Utility library
-- **Contents:** `greet.js` (greeting generator), `shuffle.js` (Fisher-Yates shuffle), `hello.js` (console utility)
+- **Contents:** `greet.js` (greeting generator), `shuffle.js` (Fisher-Yates shuffle), `hello.js` (console utility), `weather.js` (deterministic weather forecast generator using seeded PRNG / mulberry32)
 - **No framework dependencies**
 
 ---

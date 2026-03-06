@@ -8,6 +8,7 @@ This project is a Turborepo monorepo with npm workspaces. Key locations:
 
 - `apps/api` -- Python/FastAPI backend (`@cozy-village/api`)
 - `apps/web` -- React/Vite main frontend (`@cozy-village/web`)
+- `apps/beta` -- New React/Vite app on port 5175 (`@cozy-village/beta`)
 - `apps/cozy-companion` -- Wellness companion app (`@cozy-village/cozy-companion`)
 - `apps/mood-journal` -- Mood tracking app (`@cozy-village/mood-journal`)
 - `packages/ui` -- Shared pastel-themed UI components (`@cozy-village/ui`)
