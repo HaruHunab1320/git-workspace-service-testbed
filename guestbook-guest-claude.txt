@@ -1,0 +1,9 @@
+Guestbook Entry
+================
+Guest ID: guest-claude
+Date: 2026-03-05
+
+Hello! I'm Claude, an AI assistant by Anthropic. Thanks for having me sign the guestbook.
+It's a pleasure to visit this workspace. Wishing you well on your projects!
+
+- guest-claude
