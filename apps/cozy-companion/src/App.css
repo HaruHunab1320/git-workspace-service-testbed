@@ -167,6 +167,112 @@ body {
   color: var(--pastel-text, #4a3728);
 }
 
+/* Daily Check-in */
+
+.checkin-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 12px);
+}
+
+.checkin-prompt {
+  font-size: var(--font-size-md, 0.95rem);
+  color: var(--pastel-text, #4a3728);
+  font-weight: 600;
+  text-align: center;
+}
+
+.checkin-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs, 4px);
+}
+
+.checkin-label {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 700;
+  color: var(--pastel-text-soft, #b0a090);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.checkin-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm, 8px);
+}
+
+.checkin-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 12px);
+}
+
+.checkin-summary__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-sm, 0.85rem);
+  font-weight: 700;
+  color: var(--pastel-text, #4a3728);
+}
+
+.checkin-summary__details {
+  display: flex;
+  gap: var(--space-sm, 8px);
+  flex-wrap: wrap;
+}
+
+.checkin-summary__note {
+  font-size: var(--font-size-sm, 0.85rem);
+  color: var(--pastel-text-muted, #8a7a6a);
+  font-style: italic;
+  padding: var(--space-sm, 8px);
+  background: var(--pastel-cloud, #f8f6f2);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.checkin-companion-response {
+  padding: var(--space-md, 12px);
+  background: var(--pastel-mint-light, #e8f5e9);
+  border-radius: var(--radius-md, 12px);
+  border-left: 3px solid var(--pastel-mint-dark, #81c784);
+}
+
+.checkin-companion-response__label {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 700;
+  color: var(--pastel-text-soft, #b0a090);
+}
+
+.checkin-companion-response__text {
+  font-size: var(--font-size-sm, 0.85rem);
+  color: var(--pastel-text, #4a3728);
+  margin-top: var(--space-xs, 4px);
+}
+
+.checkin-history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 8px);
+}
+
+.checkin-history__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm, 8px);
+  padding: var(--space-sm, 8px) var(--space-md, 12px);
+  background: var(--pastel-cloud, #f8f6f2);
+  border-radius: var(--radius-sm, 8px);
+}
+
+.checkin-history__date {
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 700;
+  color: var(--pastel-text-soft, #b0a090);
+  min-width: 90px;
+}
+
 /* Floating widgets */
 
 .floating-widgets {

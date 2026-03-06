@@ -14,6 +14,8 @@ import GentleReminders from './components/GentleReminders';
 import FocusTimer from './components/FocusTimer';
 import JournalPanel from './components/JournalPanel';
 import SettingsPanel from './components/SettingsPanel';
+import DailyCheckIn from './components/DailyCheckIn';
+import useDailyCheckIn from './hooks/useDailyCheckIn';
 
 const TABS = [
   { id: 'home', label: 'Home', icon: '~' },
@@ -34,6 +36,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [mood, setMood] = useState(null);
   const [toast, setToast] = useState(null);
+  const checkIn = useDailyCheckIn();
 
   const showToast = useCallback((message, variant = 'info') => {
     setToast({ message, variant });
@@ -64,6 +67,19 @@ export default function App() {
             <PastelCard title="Your Companion" icon=">" glow="lavender" padding="lg">
               <CompanionDisplay mood={mood} />
             </PastelCard>
+
+            <DailyCheckIn
+              todayCheckIn={checkIn.todayCheckIn}
+              hasCheckedInToday={checkIn.hasCheckedInToday}
+              streak={checkIn.streak}
+              recentCheckIns={checkIn.recentCheckIns}
+              onSubmit={(data) => {
+                const response = checkIn.submitCheckIn(data);
+                setMood(data.mood);
+                return response;
+              }}
+              showToast={showToast}
+            />
 
             <div className="companion-row">
               <PastelCard title="How are you feeling?" icon="?" hoverable>
