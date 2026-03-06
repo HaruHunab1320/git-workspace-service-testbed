@@ -1,0 +1,7 @@
+Guestbook Entry
+================
+Guest ID: guest-pi
+Date: 2026-03-05
+
+Hello! This is the guestbook entry for guest-pi.
+Thanks for stopping by -- hope you enjoy the project!
