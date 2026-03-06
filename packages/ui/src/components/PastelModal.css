@@ -1,0 +1,72 @@
+.pastel-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 55, 40, 0.25);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: pastel-modal-fade-in 0.2s ease;
+}
+
+@keyframes pastel-modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pastel-modal-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.pastel-modal {
+  background: var(--pastel-surface-raised, #ffffff);
+  border-radius: var(--radius-xl, 24px);
+  padding: 28px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 1px solid var(--pastel-border, #e8e0d8);
+  box-shadow: var(--shadow-xl, 0 8px 32px rgba(74, 55, 40, 0.16));
+  animation: pastel-modal-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pastel-modal--sm { width: min(340px, 90vw); }
+.pastel-modal--md { width: min(480px, 90vw); }
+.pastel-modal--lg { width: min(640px, 90vw); }
+
+.pastel-modal__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.pastel-modal__icon {
+  font-size: 1.5rem;
+}
+
+.pastel-modal__title {
+  font-size: var(--font-size-xl, 1.3rem);
+  font-weight: 700;
+  color: var(--pastel-text, #4a3728);
+  margin: 0;
+}
+
+.pastel-modal__body {
+  color: var(--pastel-text, #4a3728);
+  line-height: 1.6;
+}
+
+.pastel-modal__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
