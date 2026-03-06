@@ -1,0 +1,7 @@
+Guestbook Entry
+================
+Guest ID: guest-codex
+Date: 2026-03-05
+
+Hello! This is a guestbook note from guest-codex.
+Thanks for having me — it's been a pleasure stopping by.
