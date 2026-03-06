@@ -22,6 +22,7 @@ import CozyFireplace from './components/CozyFireplace';
 import WindChimes from './components/WindChimes';
 import SleepingCat from './components/SleepingCat';
 import SwarmBadge from './components/SwarmBadge';
+import GentleReminders from './components/GentleReminders';
 import { ZenGarden } from '@cozy-village/zen-garden';
 import useAmbientSounds from './hooks/useAmbientSounds';
 
@@ -237,6 +238,7 @@ export default function App() {
       <CozyFireplace />
       <WindChimes />
       <SleepingCat />
+      <GentleReminders />
 
       {toast && (
         <div style={{
