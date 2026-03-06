@@ -50,7 +50,7 @@ function persistSettings(settings) {
 }
 
 export default function SettingsPanel({ showToast }) {
-  const saved = loadSettings();
+  const [saved] = useState(loadSettings);
   const [soundEnabled, setSoundEnabled] = useState(saved?.soundEnabled ?? true);
   const [remindersEnabled, setRemindersEnabled] = useState(saved?.remindersEnabled ?? true);
   const [theme, setTheme] = useState(saved?.theme ?? 'lavender');

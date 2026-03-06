@@ -7,10 +7,11 @@ const EXPRESSIONS = {
 };
 
 const MOOD_OVERLAYS = {
-  Happy: { particles: '~ ~ ~', variant: 'lemon' },
-  Calm: { particles: 'z z z', variant: 'mint' },
-  Tired: { particles: '. . .', variant: 'lavender' },
-  Stressed: { particles: '! ! !', variant: 'blush' },
+  happy: { particles: '~ ~ ~', variant: 'lemon' },
+  calm: { particles: 'z z z', variant: 'mint' },
+  tired: { particles: '. . .', variant: 'lavender' },
+  excited: { particles: '* * *', variant: 'peach' },
+  anxious: { particles: '! ! !', variant: 'blush' },
 };
 
 function Companion({ mood, studyState }) {

@@ -71,11 +71,15 @@ export default function CompanionDisplay({ mood }) {
 
   // Blink animation cycle
   useEffect(() => {
+    let blinkTimeout;
     const interval = setInterval(() => {
       setBlinking(true);
-      setTimeout(() => setBlinking(false), 200);
-    }, 4000 + Math.random() * 3000);
-    return () => clearInterval(interval);
+      blinkTimeout = setTimeout(() => setBlinking(false), 200);
+    }, 5000);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(blinkTimeout);
+    };
   }, []);
 
   // Refresh particles on mood change
@@ -88,9 +92,9 @@ export default function CompanionDisplay({ mood }) {
   const badgeVariant = MOOD_BADGE_VARIANT[mood] || 'lavender';
   const particles = AMBIENT_PARTICLES[mood] || AMBIENT_PARTICLES.default;
 
-  // Replace eyes during blink
+  // Replace eyes during blink (patterns: o.o, ^.^, -.-, u.u, *.*)
   const displayArt = blinking
-    ? art.replace(/[o^*u-]\.[\o^*u-]/, '- -')
+    ? art.replace(/[o^*u\-]\.[o^*u\-]/, '-.-')
     : art;
 
   return (
