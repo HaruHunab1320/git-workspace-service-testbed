@@ -88,18 +88,24 @@ body.season-winter { background: #e8eef5; }
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
 }
 
 .tab-btn:hover {
   background: var(--tan);
   color: var(--brown);
+  transform: translateY(-1px);
 }
 
 .tab-btn.active {
   background: var(--white);
   color: var(--sage-dark);
   box-shadow: 0 -2px 0 var(--sage) inset;
+}
+
+/* Tab content area transition */
+.panel-area {
+  animation: cozy-fade-in 0.3s ease;
 }
 
 /* ---- Cards ---- */
@@ -110,6 +116,12 @@ body.season-winter { background: #e8eef5; }
   padding: 16px;
   box-shadow: 0 2px 8px var(--shadow);
   margin-bottom: 12px;
+  animation: cozy-slide-up 0.4s ease both;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px var(--shadow-md);
 }
 
 .card-title {
@@ -132,12 +144,16 @@ body.season-winter { background: #e8eef5; }
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .btn-primary {
@@ -182,6 +198,12 @@ body.season-winter { background: #e8eef5; }
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 700;
+  animation: cozy-scale-in 0.3s ease both;
+  transition: transform 0.2s ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
 }
 
 .badge-cheerful { background: #ffeaa7; color: #6b5b00; }
@@ -220,6 +242,8 @@ body.season-winter { background: #e8eef5; }
   align-items: center;
   justify-content: center;
   z-index: 100;
+  animation: cozy-fade-in 0.25s ease;
+  backdrop-filter: blur(2px);
 }
 
 .modal {
@@ -231,6 +255,7 @@ body.season-winter { background: #e8eef5; }
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: cozy-pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .modal h2 {
@@ -269,12 +294,14 @@ body.season-winter { background: #e8eef5; }
   font-size: 0.9rem;
   background: var(--white);
   color: var(--brown);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .form-group select:focus,
 .form-group input:focus {
   outline: none;
   border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(122, 158, 126, 0.15);
 }
 
 /* ---- Grid helpers ---- */
@@ -308,6 +335,58 @@ body.season-winter { background: #e8eef5; }
   to { transform: rotate(360deg); }
 }
 
+/* ---- Soft entrance animations ---- */
+
+@keyframes cozy-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cozy-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cozy-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cozy-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  70% {
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Reduced motion: disable all custom animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ---- Pulse animation for harvestable crops ---- */
 
 @keyframes pulse {
@@ -323,6 +402,12 @@ body.season-winter { background: #e8eef5; }
 
 .magical-glow {
   box-shadow: 0 0 12px rgba(180, 140, 255, 0.5), 0 2px 8px var(--shadow);
+  animation: magical-glow-breathe 3s ease-in-out infinite;
+}
+
+@keyframes magical-glow-breathe {
+  0%, 100% { box-shadow: 0 0 12px rgba(180, 140, 255, 0.5), 0 2px 8px var(--shadow); }
+  50% { box-shadow: 0 0 20px rgba(180, 140, 255, 0.7), 0 2px 12px var(--shadow-md); }
 }
 
 /* ---- Rarity colors ---- */

@@ -5,12 +5,13 @@
 }
 
 .pet-card {
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+  animation: cozy-slide-up 0.4s ease both;
 }
 
 .pet-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px var(--shadow-md);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px var(--shadow-md);
 }
 
 .pet-header {
@@ -22,6 +23,11 @@
 
 .pet-species-emoji {
   font-size: 2.5rem;
+  transition: transform 0.3s ease;
+}
+
+.pet-card:hover .pet-species-emoji {
+  transform: scale(1.1) rotate(-5deg);
 }
 
 .pet-name {
@@ -38,6 +44,11 @@
 .pet-mood {
   font-size: 1.5rem;
   margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.pet-card:hover .pet-mood {
+  transform: scale(1.15);
 }
 
 .pet-stat {

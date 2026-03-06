@@ -27,6 +27,12 @@
   margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  animation: cozy-scale-in 0.35s ease both;
+  transition: transform 0.2s ease;
+}
+
+.weather-season-badge:hover {
+  transform: scale(1.05);
 }
 
 .season-theme-spring .weather-season-badge {
@@ -57,6 +63,17 @@
   font-size: 4rem;
   line-height: 1;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  animation: gentle-bob 4s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.weather-big-emoji:hover {
+  transform: scale(1.1);
+}
+
+@keyframes gentle-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
 .weather-temp {
@@ -95,6 +112,12 @@
   background: var(--cream);
   border-radius: 16px;
   color: var(--brown-light);
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.weather-detail:hover {
+  background: var(--tan-light);
+  transform: translateY(-1px);
 }
 
 .detail-icon {
@@ -189,6 +212,15 @@
   align-items: center;
   gap: 8px;
   padding: 4px 0;
+  animation: cozy-slide-up 0.3s ease both;
+}
+
+.festival-icon {
+  transition: transform 0.3s ease;
+}
+
+.festival-item:hover .festival-icon {
+  transform: scale(1.15) rotate(-5deg);
 }
 
 .festival-icon {
@@ -212,6 +244,12 @@
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-weight: 500;
+  animation: cozy-slide-up 0.4s ease both;
+  transition: transform 0.2s ease;
+}
+
+.weather-mood:hover {
+  transform: translateX(2px);
 }
 
 .mood-icon {
@@ -276,6 +314,11 @@
 .forecast-emoji {
   font-size: 2rem;
   margin-bottom: 4px;
+  transition: transform 0.3s ease;
+}
+
+.forecast-day:hover .forecast-emoji {
+  transform: scale(1.15);
 }
 
 .forecast-temp {
