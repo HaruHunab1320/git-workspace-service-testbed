@@ -1,19 +1,22 @@
 # Cozy Village
 
-A cozy village life simulator set in **Willowbrook** — a living world with autonomous villagers, dynamic weather, farming, pets, crafting, and a meditative zen garden.
+A cozy village life simulator set in **Willowbrook** -- a living world with autonomous villagers, dynamic weather, farming, pets, crafting, and a meditative zen garden.
 
 ## Monorepo Structure
 
 ```
 cozy-village/
 ├── apps/
-│   ├── api/          # FastAPI backend — simulation engine & REST API
-│   └── web/          # React + Vite frontend — interactive village UI
+│   ├── api/               # FastAPI backend -- simulation engine & REST API
+│   ├── web/               # React + Vite frontend -- interactive village UI
+│   ├── cozy-companion/    # React + Vite -- wellness & focus companion app
+│   └── mood-journal/      # React + Vite -- standalone mood tracking app
 ├── packages/
-│   ├── zen-garden/   # Reusable canvas-based zen garden component
-│   └── utils/        # Shared utility functions
-├── turbo.json        # Turborepo pipeline config
-└── package.json      # npm workspaces root
+│   ├── ui/            # Shared pastel-themed React component library
+│   ├── zen-garden/    # Reusable canvas-based zen garden component
+│   └── utils/         # Shared utility functions
+├── turbo.json         # Turborepo pipeline config
+└── package.json       # npm workspaces root
 ```
 
 ### Apps
@@ -22,13 +25,16 @@ cozy-village/
 |-----|---------|-------------|
 | **API** | `@cozy-village/api` | Python/FastAPI backend powering the simulation. Handles villager AI, weather, farming, pets, economy, crafting, and zen garden logic. Exposes 40+ REST endpoints. |
 | **Web** | `@cozy-village/web` | React 18 frontend with 30+ components. Includes ambient features like a lo-fi mixer, fireplace, wind chimes, and starry night sky. |
+| **Cozy Companion** | `@cozy-village/cozy-companion` | A wellness and focus companion app with mood tracking, a focus timer, gentle reminders, and a personal journal. Uses the shared `@cozy-village/ui` component library. |
+| **Mood Journal** | `@cozy-village/mood-journal` | A minimal standalone mood tracking app with a 6-mood picker. Part of the Cozy Village universe. |
 
 ### Packages
 
 | Package | Name | Description |
 |---------|------|-------------|
+| **ui** | `@cozy-village/ui` | Shared pastel-themed React component library. Includes PastelButton, PastelCard, PastelTabs, PastelModal, PastelToast, PastelInput, PastelAvatar, and more. |
 | **zen-garden** | `@cozy-village/zen-garden` | Interactive canvas drawing component with rake patterns, succulent/rock placement, and a tool palette. |
-| **utils** | `@cozy-village/utils` | Shared helpers — Fisher-Yates shuffle, greeting generator, and console utilities. |
+| **utils** | `@cozy-village/utils` | Shared helpers -- Fisher-Yates shuffle, greeting generator, and console utilities. |
 
 ## Getting Started
 
@@ -41,7 +47,7 @@ npm install
 # Install Python dependencies
 pip install -r apps/api/requirements.txt
 
-# Start all dev servers (API + Web)
+# Start all dev servers (API + Web + Companion + Mood Journal)
 npx turbo dev
 ```
 
@@ -61,18 +67,19 @@ Filter to a specific package:
 ```bash
 npx turbo dev --filter=@cozy-village/web
 npx turbo test --filter=@cozy-village/api
+npx turbo dev --filter=@cozy-village/cozy-companion
 ```
 
 ## Game Systems
 
-- **Villagers** — 6 NPCs with personalities, daily schedules, moods, and a 5-tier friendship system
-- **Weather** — Seasonal temperature cycles with rain, snow, fog, and magical events like aurora borealis
-- **Garden** — Grid-based farming with crop growth stages and seasonal planting
-- **Pets** — 6 adoptable species with bonding progression and unique personalities
-- **Economy** — Market with supply/demand pricing and seasonal fluctuations
-- **Crafting** — Tiered recipe discovery using gathered materials
-- **Zen Garden** — Interactive sand raking, succulent, and rock placement
-- **Journal** — Personal entry system tied to in-game days
+- **Villagers** -- 6 NPCs with personalities, daily schedules, moods, and a 5-tier friendship system
+- **Weather** -- Seasonal temperature cycles with rain, snow, fog, and magical events like aurora borealis
+- **Garden** -- Grid-based farming with crop growth stages and seasonal planting
+- **Pets** -- 6 adoptable species with bonding progression and unique personalities
+- **Economy** -- Market with supply/demand pricing and seasonal fluctuations
+- **Crafting** -- Tiered recipe discovery using gathered materials
+- **Zen Garden** -- Interactive sand raking, succulent, and rock placement
+- **Journal** -- Personal entry system tied to in-game days
 
 ## Tech Stack
 
@@ -81,6 +88,7 @@ npx turbo test --filter=@cozy-village/api
 | Frontend | React 18, Vite 5, CSS |
 | Backend | Python, FastAPI, Uvicorn |
 | Monorepo | Turborepo 2, npm workspaces |
+| UI Library | `@cozy-village/ui` (pastel-themed components) |
 | Testing | Pytest (API), Vitest-compatible (Web) |
 | Formatting | Prettier |
 
