@@ -1,28 +1,26 @@
+import { PastelButton } from '@cozy-village/ui';
+
 const MOODS = [
-  { label: 'Happy', emoji: '(^ v ^)' },
-  { label: 'Calm', emoji: '(- _ -)' },
-  { label: 'Tired', emoji: '(= _ =)' },
-  { label: 'Stressed', emoji: '(> _ <)' },
+  { id: 'happy', label: 'Happy', variant: 'peach' },
+  { id: 'calm', label: 'Calm', variant: 'mint' },
+  { id: 'tired', label: 'Tired', variant: 'lavender' },
+  { id: 'excited', label: 'Excited', variant: 'sky' },
+  { id: 'anxious', label: 'Anxious', variant: 'blush' },
 ];
 
-function MoodSelector({ selectedMood, onSelect }) {
+export default function MoodSelector({ selected, onSelect }) {
   return (
-    <div className="mood-selector">
-      <h2 className="section-title">How are you feeling?</h2>
-      <div className="mood-grid">
-        {MOODS.map((mood) => (
-          <button
-            key={mood.label}
-            className={`mood-btn${selectedMood === mood.label ? ' mood-btn--active' : ''}`}
-            onClick={() => onSelect(mood.label)}
-          >
-            <span className="mood-emoji">{mood.emoji}</span>
-            <span className="mood-label">{mood.label}</span>
-          </button>
-        ))}
-      </div>
+    <div className="mood-grid">
+      {MOODS.map((mood) => (
+        <PastelButton
+          key={mood.id}
+          variant={selected === mood.id ? mood.variant : 'ghost'}
+          size="sm"
+          onClick={() => onSelect(mood.id)}
+        >
+          {mood.label}
+        </PastelButton>
+      ))}
     </div>
   );
 }
-
-export default MoodSelector;

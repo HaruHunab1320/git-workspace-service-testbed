@@ -1,107 +1,105 @@
-import { useState, useEffect, useCallback } from 'react';
-import Companion from './components/Companion';
-import StudyTimer from './components/StudyTimer';
+import { useState, useCallback } from 'react';
+import {
+  PastelCard,
+  PastelButton,
+  PastelTabs,
+  PastelToast,
+  PastelDivider,
+  PastelAvatar,
+  PastelBadge,
+} from '@cozy-village/ui';
+import CompanionDisplay from './components/CompanionDisplay';
 import MoodSelector from './components/MoodSelector';
-import MessageLog from './components/MessageLog';
 import GentleReminders from './components/GentleReminders';
+import FocusTimer from './components/FocusTimer';
+import JournalPanel from './components/JournalPanel';
+import SettingsPanel from './components/SettingsPanel';
 
-const COMPANION_RESPONSES = {
-  idle: [
-    "I'm here whenever you're ready to study!",
-    "Take your time... no rush at all.",
-    "The rain outside sounds nice, doesn't it?",
-  ],
-  studying: [
-    "You're doing great! Keep it up!",
-    "Focus mode activated. You've got this.",
-    "One step at a time... you're making progress.",
-    "I'll keep you company while you work.",
-  ],
-  break: [
-    "Nice work! You earned this break.",
-    "Stretch a little, grab some water!",
-    "Breaks are important too. Rest well.",
-  ],
-  happy: [
-    "Your good energy is contagious!",
-    "Love to see you in such a great mood!",
-  ],
-  calm: [
-    "What a peaceful vibe. Let's keep it going.",
-    "Calm and collected... perfect study energy.",
-  ],
-  tired: [
-    "It's okay to rest. We can study later.",
-    "Maybe a short session today? No pressure.",
-  ],
-  stressed: [
-    "Deep breaths... you've handled tough things before.",
-    "Let's take it slow. One thing at a time.",
-  ],
-};
+const TABS = [
+  { id: 'home', label: 'Home', icon: '~' },
+  { id: 'journal', label: 'Journal', icon: '#' },
+  { id: 'settings', label: 'Settings', icon: '*' },
+];
 
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+const DEFAULT_REMINDERS = [
+  'Take a deep breath and relax your shoulders.',
+  'Have you had a glass of water recently?',
+  'Stretch your arms above your head for a moment.',
+  'Look away from the screen at something distant.',
+  'You are doing great today.',
+  'Remember to check in with how you feel.',
+];
 
-function App() {
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home');
   const [mood, setMood] = useState(null);
-  const [studyState, setStudyState] = useState('idle');
-  const [messages, setMessages] = useState([
-    { text: "Hey there! I'm your cozy study buddy. How are you feeling today?", timestamp: Date.now() },
-  ]);
+  const [toast, setToast] = useState(null);
 
-  const addMessage = useCallback((text) => {
-    setMessages((prev) => [...prev.slice(-19), { text, timestamp: Date.now() }]);
+  const showToast = useCallback((message, variant = 'info') => {
+    setToast({ message, variant });
   }, []);
 
-  const handleMoodSelect = useCallback((selectedMood) => {
-    setMood(selectedMood);
-    const moodKey = selectedMood.toLowerCase();
-    const responses = COMPANION_RESPONSES[moodKey] || COMPANION_RESPONSES.idle;
-    addMessage(pickRandom(responses));
-  }, [addMessage]);
-
-  const handleStudyStateChange = useCallback((newState) => {
-    setStudyState(newState);
-    const responses = COMPANION_RESPONSES[newState] || COMPANION_RESPONSES.idle;
-    addMessage(pickRandom(responses));
-  }, [addMessage]);
-
-  useEffect(() => {
-    if (studyState !== 'studying') return;
-    const interval = setInterval(() => {
-      addMessage(pickRandom(COMPANION_RESPONSES.studying));
-    }, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [studyState, addMessage]);
+  const dismissToast = useCallback(() => setToast(null), []);
 
   return (
-    <div className="app">
-      <header className="header">
-        <h1 className="title">Cozy Companion</h1>
-        <p className="subtitle">Your lo-fi study buddy</p>
+    <div className="companion-app">
+      <header className="companion-header">
+        <PastelAvatar name="Cozy Companion" emoji="~" size="xl" />
+        <h1 className="companion-header__title">Cozy Companion</h1>
+        <p className="companion-header__subtitle">Your gentle space for focus and calm</p>
       </header>
 
-      <main className="main">
-        <div className="companion-area">
-          <Companion mood={mood} studyState={studyState} />
-        </div>
+      <PastelTabs
+        tabs={TABS}
+        activeId={activeTab}
+        onChange={setActiveTab}
+        variant="pill"
+      />
 
-        <div className="controls">
-          <MoodSelector selectedMood={mood} onSelect={handleMoodSelect} />
-          <StudyTimer studyState={studyState} onStateChange={handleStudyStateChange} />
-        </div>
+      <PastelDivider />
 
-        <MessageLog messages={messages} />
-        <GentleReminders />
+      <main className="companion-main">
+        {activeTab === 'home' && (
+          <>
+            <PastelCard title="Your Companion" icon=">" glow="lavender" padding="lg">
+              <CompanionDisplay mood={mood} />
+            </PastelCard>
+
+            <div className="companion-row">
+              <PastelCard title="How are you feeling?" icon="?" hoverable>
+                <MoodSelector selected={mood} onSelect={(m) => {
+                  setMood(m);
+                  showToast(`Mood set to ${m}`, 'success');
+                }} />
+              </PastelCard>
+
+              <PastelCard title="Focus Timer" icon="@" hoverable>
+                <FocusTimer showToast={showToast} />
+              </PastelCard>
+            </div>
+
+            <PastelCard title="Gentle Reminders" icon="*" glow="mint">
+              <GentleReminders reminders={DEFAULT_REMINDERS} intervalMs={30000} />
+            </PastelCard>
+          </>
+        )}
+
+        {activeTab === 'journal' && (
+          <JournalPanel showToast={showToast} />
+        )}
+
+        {activeTab === 'settings' && (
+          <SettingsPanel showToast={showToast} />
+        )}
       </main>
 
-      <footer className="footer">
-        <p>Part of the Cozy Village universe</p>
-      </footer>
+      <PastelToast
+        message={toast?.message}
+        variant={toast?.variant}
+        visible={!!toast}
+        onDismiss={dismissToast}
+        duration={3000}
+      />
     </div>
   );
 }
-
-export default App;
