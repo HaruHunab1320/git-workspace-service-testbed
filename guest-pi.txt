@@ -1,0 +1,9 @@
+== Guestbook Entry ==
+ID:   guest-pi
+Date: 2026-03-05
+
+Hello from guest-pi! Thanks for having me.
+
+  3.14159265358979...
+
+-- guest-pi
