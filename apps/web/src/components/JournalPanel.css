@@ -18,11 +18,13 @@
   background: var(--white);
   resize: vertical;
   line-height: 1.6;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .journal-compose textarea:focus {
   outline: none;
   border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(122, 158, 126, 0.15);
 }
 
 .journal-compose textarea::placeholder {
@@ -54,6 +56,12 @@
   background: var(--cream);
   border-left: 3px solid var(--rose-light);
   position: relative;
+  animation: cozy-slide-up 0.35s ease both;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.journal-entry:hover {
+  background: rgba(232, 213, 190, 0.5);
 }
 
 .journal-entry-header {
