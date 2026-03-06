@@ -1,0 +1,7 @@
+Guestbook Entry
+================
+Guest ID: guest-aider
+Date: 2026-03-05
+
+Hello! This is a demo guestbook note left by guest-aider.
+Thanks for having me!
