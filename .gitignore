@@ -4,3 +4,25 @@ __pycache__/
 *.pyc
 .claude/
 .turbo/
+
+# Environment and secrets
+.env
+.env.*
+*.pem
+*.key
+*.secret
+credentials.json
+secrets.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs and coverage
+*.log
+coverage/
+.nyc_output/
