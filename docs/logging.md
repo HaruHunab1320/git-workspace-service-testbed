@@ -2,14 +2,12 @@
 
 ## Overview
 
-The `@cozy-village/utils` package provides a standardized logger utility via `createLogger`. It replaces scattered `console.*` calls with a consistent, prefixed, level-aware logging interface.
+The codebase provides a standardized `Logger` class in `src/logger.ts`. It replaces scattered `console.*` calls with a consistent, prefixed, level-aware logging interface. A default `logger` instance is exported for immediate use.
 
-## Usage
+## Quick Start
 
-```js
-const { createLogger } = require('@cozy-village/utils/logger');
-
-const logger = createLogger('MyComponent');
+```ts
+import { logger } from '../src/logger';
 
 logger.info('Server started on port 3000');
 logger.warn('Deprecated API called');
@@ -17,44 +15,83 @@ logger.error('Failed to connect', err);
 logger.debug('Request payload:', data);
 ```
 
+## Creating a Custom Logger
+
+```ts
+import { Logger } from '../src/logger';
+
+const logger = new Logger({ prefix: 'MyService', minLevel: 'warn' });
+logger.info('This will be suppressed');
+logger.warn('This will be logged');
+```
+
 ## API
 
-### `createLogger(prefix, options?)`
+### `new Logger(options?)`
 
 Creates a logger instance.
 
-**Parameters:**
+**`LoggerOptions`:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `prefix` | `string` | *(required)* | Label included in every log message (e.g. component or module name) |
-| `options.level` | `string` | `'info'` | Minimum log level. Messages below this level are suppressed. |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `prefix` | `string` | `"alpha"` | Label included in every log message |
+| `minLevel` | `LogLevel` | `"info"` | Minimum severity level; messages below this are suppressed |
 
-**Returns** an object with four methods: `debug`, `info`, `warn`, `error`. Each accepts any number of arguments, matching the `console.*` signature.
+### Log Methods
+
+Each method accepts a message string and optional additional arguments:
+
+- **`debug(message, ...args)`** — uses `console.debug`
+- **`info(message, ...args)`** — uses `console.info`
+- **`warn(message, ...args)`** — uses `console.warn`
+- **`error(message, ...args)`** — uses `console.error`
+
+### `child(prefix)`
+
+Creates a new `Logger` instance with a chained prefix and the same `minLevel`. Useful for scoping logs within sub-components or sub-modules.
+
+```ts
+const parentLogger = new Logger({ prefix: 'App' });
+const childLogger = parentLogger.child('Database');
+
+childLogger.info('Connected');
+// Output: [2026-03-06T12:00:00.000Z] [App:Database] INFO: Connected
+```
 
 ### Log Levels
 
 Levels from least to most severe:
 
-| Level | Value | Console method |
+| Level | Value | Console Method |
 |-------|-------|---------------|
-| `debug` | 0 | `console.log` |
+| `debug` | 0 | `console.debug` |
 | `info` | 1 | `console.info` |
 | `warn` | 2 | `console.warn` |
 | `error` | 3 | `console.error` |
 
-Setting `options.level` to `'warn'` suppresses `debug` and `info` messages.
+### Exported Types
 
-### `LOG_LEVELS`
+- **`LogLevel`** — `"debug" | "info" | "warn" | "error"`
+- **`LoggerOptions`** — `{ prefix?: string; minLevel?: LogLevel }`
 
-Exported constant mapping level names to their numeric values, useful for custom comparisons.
+### Default Instance
+
+```ts
+export const logger = new Logger();
+// prefix: "alpha", minLevel: "info"
+```
 
 ## Output Format
 
-Each log line is prefixed with a timestamp, level, and the logger's prefix:
+```
+[<ISO timestamp>] [<prefix>] <LEVEL>: <message>
+```
+
+Example:
 
 ```
-[2026-03-06T12:00:00.000Z] [INFO] [MyComponent] Server started on port 3000
+[2026-03-06T12:00:00.000Z] [alpha] INFO: Server started on port 3000
 ```
 
 ## Migration Guide
@@ -63,8 +100,21 @@ Replace direct `console.*` calls with logger instances:
 
 ```diff
 - console.error('Failed to fetch status:', err);
-+ const logger = createLogger('App');
++ import { logger } from '../src/logger';
 + logger.error('Failed to fetch status:', err);
 ```
 
-Create one logger per module or component for clear, filterable output.
+For module-specific logging, create a scoped logger:
+
+```ts
+const log = new Logger({ prefix: 'InventoryShelf' });
+log.error('Failed to fetch inventory:', err);
+```
+
+Or use `child()` to create sub-scoped loggers from an existing instance:
+
+```ts
+const dbLog = logger.child('Database');
+dbLog.error('Query failed', err);
+// Output: [2026-03-06T12:00:00.000Z] [alpha:Database] ERROR: Query failed
+```
