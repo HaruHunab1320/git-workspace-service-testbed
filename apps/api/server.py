@@ -118,6 +118,20 @@ class ZenRemoveRequest(BaseModel):
     col: int
 
 
+class GatherRequest(BaseModel):
+    material_name: str
+    quantity: int = 1
+
+
+class CraftRequest(BaseModel):
+    recipe_name: str
+    workstation: str = "hand-crafted"
+
+
+class LearnRecipeRequest(BaseModel):
+    recipe_name: str
+
+
 # ---------------------------------------------------------------------------
 # Serialization helpers
 # ---------------------------------------------------------------------------
@@ -363,9 +377,19 @@ def _full_status():
 
 from economy import Market as EconomyMarket, ITEMS as ECONOMY_ITEMS
 from swarm import FireflySwarm
+from crafting import (
+    Crafter, Inventory as CraftingInventory, craft as craft_item,
+    ALL_RECIPES, ALL_MATERIALS, seasonal_materials,
+    Workstation, Season as CraftSeason, CraftingError,
+)
 
 _market = EconomyMarket()
 _firefly_swarm = FireflySwarm.spawn(count=20, seed=42)
+_crafter = Crafter(name="Player")
+# Teach default recipes
+for _r in ALL_RECIPES:
+    if _r.unlocked_by_default:
+        _crafter.known_recipes.add(_r.name)
 
 
 def _sync_market():
@@ -379,6 +403,67 @@ def _sync_market():
     }
     _market.season = season_map.get(game.season.value, ESeason.SPRING)
     _market.day = game.day
+
+
+def _craft_season() -> CraftSeason:
+    """Get the current crafting season enum."""
+    craft_season_map = {
+        "spring": CraftSeason.SPRING,
+        "summer": CraftSeason.SUMMER,
+        "autumn": CraftSeason.AUTUMN,
+        "winter": CraftSeason.WINTER,
+    }
+    return craft_season_map.get(game.season.value, CraftSeason.SPRING)
+
+
+def _serialize_crafter(c: Crafter):
+    return {
+        "name": c.name,
+        "skill_level": c.skill_level,
+        "experience": c.experience,
+        "xp_for_next_level": c._xp_for_next_level,
+        "materials": c.inventory.material_summary,
+        "crafted_items": [
+            {
+                "name": item.display_name,
+                "recipe": item.recipe.name,
+                "quality": item.quality.value,
+                "comfort": round(item.comfort, 1),
+                "category": item.recipe.category.name.lower(),
+                "tool_speed_bonus": round(item.tool_speed_bonus, 2),
+            }
+            for item in c.inventory.items
+        ],
+        "known_recipes": sorted(c.known_recipes),
+        "equipped_tool": c.equipped_tool.display_name if c.equipped_tool else None,
+        "total_comfort": round(c.inventory.total_comfort, 1),
+    }
+
+
+def _serialize_recipe(r):
+    return {
+        "name": r.name,
+        "category": r.category.name.lower(),
+        "ingredients": [
+            {"material": ing.material.name, "quantity": ing.quantity}
+            for ing in r.ingredients
+        ],
+        "workstation": r.workstation.value,
+        "base_craft_time": r.base_craft_time,
+        "skill_requirement": r.skill_requirement,
+        "comfort_score": r.comfort_score,
+        "description": r.description,
+        "unlocked_by_default": r.unlocked_by_default,
+    }
+
+
+def _serialize_material(m):
+    return {
+        "name": m.name,
+        "rarity": m.rarity.name.lower(),
+        "seasons": [s.name.lower() for s in m.seasons],
+        "description": m.description,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -443,7 +528,7 @@ def advance_day():
 
 @app.post("/api/new-game")
 def new_game(seed: int = Query(default=42)):
-    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory, _zen_garden
+    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory, _zen_garden, _crafter
     game = CozyVillageGame.create_default(seed=seed)
     _market = EconomyMarket()
     _journal_entries = []
@@ -451,6 +536,10 @@ def new_game(seed: int = Query(default=42)):
     _player_coins = 100.0
     _player_inventory = {}
     _zen_garden = ZenGarden(5, 7)
+    _crafter = Crafter(name="Player")
+    for _r in ALL_RECIPES:
+        if _r.unlocked_by_default:
+            _crafter.known_recipes.add(_r.name)
     _sync_market()
     return get_status()
 
@@ -843,6 +932,145 @@ def zen_rake(req: ZenRakeRequest):
 def zen_remove(req: ZenRemoveRequest):
     result = _zen_garden.remove_item(req.row, req.col)
     return {"message": result, "zen_garden": _serialize_zen_garden(_zen_garden)}
+
+
+# -- Crafting ---------------------------------------------------------------
+
+@app.get("/api/crafting")
+def get_crafting():
+    """Return current crafter state."""
+    season = _craft_season()
+    available = seasonal_materials(season)
+    return {
+        "crafter": _serialize_crafter(_crafter),
+        "season": season.name.lower(),
+        "available_materials": [_serialize_material(m) for m in available],
+    }
+
+
+@app.get("/api/crafting/recipes")
+def get_recipes():
+    """Return all recipes with whether the player knows them."""
+    recipes = []
+    for r in ALL_RECIPES:
+        data = _serialize_recipe(r)
+        data["known"] = _crafter.knows_recipe(r)
+        data["can_craft"] = (
+            _crafter.knows_recipe(r)
+            and _crafter.skill_level >= r.skill_requirement
+            and _crafter.inventory.has_materials_for(r)
+        )
+        # Show how many of each ingredient the player has
+        data["ingredient_status"] = [
+            {
+                "material": ing.material.name,
+                "needed": ing.quantity,
+                "have": _crafter.inventory.material_count(ing.material),
+            }
+            for ing in r.ingredients
+        ]
+        recipes.append(data)
+    return recipes
+
+
+@app.get("/api/crafting/materials")
+def get_materials():
+    """Return all materials with seasonal availability."""
+    season = _craft_season()
+    return [
+        {
+            **_serialize_material(m),
+            "available_now": m.available_in(season),
+            "in_inventory": _crafter.inventory.material_count(m),
+        }
+        for m in ALL_MATERIALS
+    ]
+
+
+@app.post("/api/crafting/gather")
+def gather_material(req: GatherRequest):
+    """Gather a material (if available this season)."""
+    season = _craft_season()
+    material = None
+    for m in ALL_MATERIALS:
+        if m.name.lower() == req.material_name.lower():
+            material = m
+            break
+    if material is None:
+        raise HTTPException(status_code=400, detail=f"Unknown material: {req.material_name}")
+    try:
+        msg = _crafter.gather(material, season, quantity=max(1, min(10, req.quantity)))
+    except CraftingError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {
+        "message": msg,
+        "crafter": _serialize_crafter(_crafter),
+    }
+
+
+@app.post("/api/crafting/craft")
+def do_craft(req: CraftRequest):
+    """Craft an item from a known recipe."""
+    recipe = None
+    for r in ALL_RECIPES:
+        if r.name.lower() == req.recipe_name.lower():
+            recipe = r
+            break
+    if recipe is None:
+        raise HTTPException(status_code=400, detail=f"Unknown recipe: {req.recipe_name}")
+    try:
+        workstation = Workstation(req.workstation)
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid workstation. Valid: {[w.value for w in Workstation]}",
+        )
+    season = _craft_season()
+    result = craft_item(_crafter, recipe, available_workstation=workstation, season=season)
+    if not result.success:
+        raise HTTPException(status_code=400, detail="; ".join(result.errors))
+    return {
+        "message": result.summary,
+        "item": {
+            "name": result.item.display_name,
+            "quality": result.item.quality.value,
+            "comfort": round(result.item.comfort, 1),
+            "category": result.item.recipe.category.name.lower(),
+        },
+        "xp_gained": result.xp_gained,
+        "craft_time": result.craft_time,
+        "level_up_messages": list(result.level_up_messages),
+        "crafter": _serialize_crafter(_crafter),
+    }
+
+
+@app.post("/api/crafting/learn")
+def learn_recipe(req: LearnRecipeRequest):
+    """Learn a locked recipe."""
+    recipe = None
+    for r in ALL_RECIPES:
+        if r.name.lower() == req.recipe_name.lower():
+            recipe = r
+            break
+    if recipe is None:
+        raise HTTPException(status_code=400, detail=f"Unknown recipe: {req.recipe_name}")
+    msg = _crafter.learn_recipe(recipe)
+    return {"message": msg, "crafter": _serialize_crafter(_crafter)}
+
+
+@app.post("/api/crafting/equip")
+def equip_tool(tool_index: int = Query(default=0, ge=0)):
+    """Equip a crafted tool by index in the crafted items list."""
+    tools = [item for item in _crafter.inventory.items if item.recipe.category.name == "TOOL"]
+    if not tools:
+        raise HTTPException(status_code=400, detail="No tools crafted yet.")
+    if tool_index >= len(tools):
+        raise HTTPException(status_code=400, detail=f"Tool index out of range (have {len(tools)} tools).")
+    try:
+        msg = _crafter.equip_tool(tools[tool_index])
+    except CraftingError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"message": msg, "crafter": _serialize_crafter(_crafter)}
 
 
 # -- Firefly Swarm ----------------------------------------------------------
