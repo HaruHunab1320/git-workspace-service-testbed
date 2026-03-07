@@ -8,7 +8,10 @@ export default function PastelTabs({
   className = '',
 }) {
   return (
-    <div className={`pastel-tabs pastel-tabs--${variant} ${className}`} role="tablist">
+    <div
+      className={`pastel-tabs pastel-tabs--${variant} ${className}`}
+      role="tablist"
+    >
       {tabs.map((tab) => (
         <button
           key={tab.id}

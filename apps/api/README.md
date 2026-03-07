@@ -50,32 +50,33 @@ cozy-village/
 
 ### Apps
 
-| Package | Path | Description |
-|---------|------|-------------|
-| `@cozy-village/api` | `apps/api` | FastAPI backend powering the village simulation engine |
+| Package             | Path       | Description                                             |
+| ------------------- | ---------- | ------------------------------------------------------- |
+| `@cozy-village/api` | `apps/api` | FastAPI backend powering the village simulation engine  |
 | `@cozy-village/web` | `apps/web` | React/Vite frontend UI for interacting with the village |
 
 ### Packages
 
-| Package | Path | Description |
-|---------|------|-------------|
+| Package                    | Path                  | Description                                                           |
+| -------------------------- | --------------------- | --------------------------------------------------------------------- |
 | `@cozy-village/zen-garden` | `packages/zen-garden` | Reusable React component library for an interactive zen garden canvas |
-| `@cozy-village/utils` | `packages/utils` | Shared utility functions |
+| `@cozy-village/utils`      | `packages/utils`      | Shared utility functions                                              |
 
 ### Turbo Pipeline
 
 Defined in `turbo.json`:
 
-| Task | Depends On | Outputs | Cache |
-|------|-----------|---------|-------|
-| `build` | `^build` (dependencies first) | `dist/**` | Yes |
-| `dev` | — | — | Disabled (persistent) |
-| `test` | `^build` (dependencies first) | — | Yes |
-| `lint` | — | — | Yes |
+| Task    | Depends On                    | Outputs   | Cache                 |
+| ------- | ----------------------------- | --------- | --------------------- |
+| `build` | `^build` (dependencies first) | `dist/**` | Yes                   |
+| `dev`   | —                             | —         | Disabled (persistent) |
+| `test`  | `^build` (dependencies first) | —         | Yes                   |
+| `lint`  | —                             | —         | Yes                   |
 
 ## Features
 
 ### Villager NPCs (`apps/api/villagers.py`)
+
 - 6 unique villagers with distinct personalities (cheerful, grumpy, shy, adventurous, scholarly, nurturing)
 - Daily schedules that vary by season and time of day (dawn through night)
 - Dynamic mood system (joyful, content, neutral, lonely, upset)
@@ -85,6 +86,7 @@ Defined in `turbo.json`:
 - Birthday events with spontaneous gift exchanges among friends
 
 ### Weather Engine (`apps/api/weather.py`)
+
 - Seasonal temperature model with smooth sinusoidal curves
 - 10 sky conditions from clear to blizzard
 - Rare magical events: aurora showers, petal blizzards, moonbow nights
@@ -92,6 +94,7 @@ Defined in `turbo.json`:
 - Village mood tracking based on weather history and streaks
 
 ### Garden & Farming (`apps/api/garden.py`)
+
 - Grid-based garden with plantable plots and soil types
 - Crops progress through growth stages: seed, sprout, growing, flowering, harvestable
 - Weather directly affects crop growth (sunny, rainy, stormy, frost, magical)
@@ -100,6 +103,7 @@ Defined in `turbo.json`:
 - Harvested produce can be gifted to villagers or sold at market
 
 ### Pet Companions (`apps/api/animals.py`)
+
 - 6 species: cat, dog, rabbit, owl, fox, hedgehog
 - Pet personalities: playful, lazy, curious, loyal, mischievous, gentle
 - Bond progression from stranger to soulmate
@@ -107,12 +111,14 @@ Defined in `turbo.json`:
 - Pets react to seasons and weather, and interact with villagers
 
 ### Economy (`apps/api/economy.py`)
+
 - Village market with seasonal price fluctuations and supply/demand
 - Player wallet (100 starting coins) with buy/sell transactions
 - 80% sell-back spread on market items
 - Item spoilage based on shelf life
 
 ### Crafting (`apps/api/crafting.py`)
+
 - Tiered material system: common, uncommon, rare, legendary
 - Recipe discovery through crafting experience
 - Quality influenced by crafter skill and tool bonuses
@@ -120,6 +126,7 @@ Defined in `turbo.json`:
 - Seasonal material availability
 
 ### Unified Game Engine (`apps/api/game.py`)
+
 - Orchestrates all subsystems into a single day-advance loop
 - Each day: weather advances, villagers follow schedules, garden grows, pets explore, market updates
 - `DailyReport` aggregates events across all systems
@@ -128,6 +135,7 @@ Defined in `turbo.json`:
 ## Getting Started
 
 ### Prerequisites
+
 - Python 3.10+
 - Node.js 20+ (see `.nvmrc`)
 - npm 10+
@@ -153,6 +161,7 @@ npx turbo dev
 ```
 
 This starts:
+
 - **API server** at `http://localhost:8000` (FastAPI with hot reload)
 - **Web frontend** at `http://localhost:5173` (Vite dev server)
 
@@ -196,34 +205,34 @@ python animals.py    # 7-day pet manager demo
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/status` | Full game state snapshot |
-| POST | `/api/advance-day` | Advance the simulation by one day |
-| POST | `/api/new-game` | Reset to a fresh game |
-| GET | `/api/weather` | Current weather forecast |
-| GET | `/api/weather/forecast` | Multi-day forecast |
-| GET | `/api/villagers` | List all villagers |
-| GET | `/api/villagers/{villager_id}` | Single villager details |
-| POST | `/api/villagers/{villager_id}/gift` | Give a gift to a villager |
-| GET | `/api/garden` | Garden grid state |
-| GET | `/api/garden/crops` | Available crops for planting |
-| POST | `/api/garden/plant` | Plant a crop |
-| GET | `/api/pets` | List adopted pets |
-| GET | `/api/pets/adoptable` | Available pets for adoption |
-| POST | `/api/pets/adopt` | Adopt a pet |
-| POST | `/api/pets/{name}/pet` | Pet an animal |
-| POST | `/api/pets/{name}/feed` | Feed a pet |
-| POST | `/api/pets/{name}/play` | Play with a pet |
-| GET | `/api/economy/prices` | Current market prices |
-| GET | `/api/economy/summary` | Economy overview |
-| GET | `/api/economy/wallet` | Player balance and inventory value |
-| POST | `/api/economy/buy` | Buy an item |
-| POST | `/api/economy/sell` | Sell an item |
-| GET | `/api/inventory` | Player inventory |
-| GET | `/api/journal` | Read journal entries |
-| POST | `/api/journal` | Add a journal entry |
-| DELETE | `/api/journal/{entry_id}` | Delete a journal entry |
+| Method | Endpoint                            | Description                        |
+| ------ | ----------------------------------- | ---------------------------------- |
+| GET    | `/api/status`                       | Full game state snapshot           |
+| POST   | `/api/advance-day`                  | Advance the simulation by one day  |
+| POST   | `/api/new-game`                     | Reset to a fresh game              |
+| GET    | `/api/weather`                      | Current weather forecast           |
+| GET    | `/api/weather/forecast`             | Multi-day forecast                 |
+| GET    | `/api/villagers`                    | List all villagers                 |
+| GET    | `/api/villagers/{villager_id}`      | Single villager details            |
+| POST   | `/api/villagers/{villager_id}/gift` | Give a gift to a villager          |
+| GET    | `/api/garden`                       | Garden grid state                  |
+| GET    | `/api/garden/crops`                 | Available crops for planting       |
+| POST   | `/api/garden/plant`                 | Plant a crop                       |
+| GET    | `/api/pets`                         | List adopted pets                  |
+| GET    | `/api/pets/adoptable`               | Available pets for adoption        |
+| POST   | `/api/pets/adopt`                   | Adopt a pet                        |
+| POST   | `/api/pets/{name}/pet`              | Pet an animal                      |
+| POST   | `/api/pets/{name}/feed`             | Feed a pet                         |
+| POST   | `/api/pets/{name}/play`             | Play with a pet                    |
+| GET    | `/api/economy/prices`               | Current market prices              |
+| GET    | `/api/economy/summary`              | Economy overview                   |
+| GET    | `/api/economy/wallet`               | Player balance and inventory value |
+| POST   | `/api/economy/buy`                  | Buy an item                        |
+| POST   | `/api/economy/sell`                 | Sell an item                       |
+| GET    | `/api/inventory`                    | Player inventory                   |
+| GET    | `/api/journal`                      | Read journal entries               |
+| POST   | `/api/journal`                      | Add a journal entry                |
+| DELETE | `/api/journal/{entry_id}`           | Delete a journal entry             |
 
 ## Frontend Components
 

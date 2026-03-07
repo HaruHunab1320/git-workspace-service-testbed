@@ -12,11 +12,53 @@ export default function ZenGardenPanel({ zenGarden, onRefresh, showToast }) {
   const [modalTarget, setModalTarget] = useState(null); // { row, col, type: 'succulent' | 'rock' }
   const [rakePattern, setRakePattern] = useState('waves');
 
-  const handleTileClick = useCallback(async (row, col) => {
-    if (!zenGarden) return;
-    const tile = zenGarden.tiles[row][col];
+  const handleTileClick = useCallback(
+    async (row, col) => {
+      if (!zenGarden) return;
+      const tile = zenGarden.tiles[row][col];
 
-    if (placementMode === 'remove') {
+      if (placementMode === 'remove') {
+        try {
+          const result = await api.removeZenItem(row, col);
+          showToast(result.message);
+          await onRefresh();
+        } catch (err) {
+          showToast(err.message);
+        }
+        return;
+      }
+
+      if (placementMode === 'rake') {
+        if (!tile.is_empty && tile.kind !== 'sand') {
+          showToast('Can only rake empty sand tiles.');
+          return;
+        }
+        try {
+          const result = await api.rakeZenTile(row, col, rakePattern);
+          showToast(result.message);
+          await onRefresh();
+        } catch (err) {
+          showToast(err.message);
+        }
+        return;
+      }
+
+      // For succulent/rock placement, show modal if tile is empty
+      if (
+        tile.is_empty ||
+        (tile.kind === 'sand' &&
+          (!tile.rake_pattern || tile.rake_pattern === 'none'))
+      ) {
+        setModalTarget({ row, col, type: placementMode });
+      } else {
+        showToast('This tile is occupied. Use remove mode first.');
+      }
+    },
+    [zenGarden, placementMode, rakePattern, onRefresh, showToast]
+  );
+
+  const handleRightClick = useCallback(
+    async (row, col) => {
       try {
         const result = await api.removeZenItem(row, col);
         showToast(result.message);
@@ -24,44 +66,16 @@ export default function ZenGardenPanel({ zenGarden, onRefresh, showToast }) {
       } catch (err) {
         showToast(err.message);
       }
-      return;
-    }
-
-    if (placementMode === 'rake') {
-      if (!tile.is_empty && tile.kind !== 'sand') {
-        showToast('Can only rake empty sand tiles.');
-        return;
-      }
-      try {
-        const result = await api.rakeZenTile(row, col, rakePattern);
-        showToast(result.message);
-        await onRefresh();
-      } catch (err) {
-        showToast(err.message);
-      }
-      return;
-    }
-
-    // For succulent/rock placement, show modal if tile is empty
-    if (tile.is_empty || (tile.kind === 'sand' && (!tile.rake_pattern || tile.rake_pattern === 'none'))) {
-      setModalTarget({ row, col, type: placementMode });
-    } else {
-      showToast('This tile is occupied. Use remove mode first.');
-    }
-  }, [zenGarden, placementMode, rakePattern, onRefresh, showToast]);
-
-  const handleRightClick = useCallback(async (row, col) => {
-    try {
-      const result = await api.removeZenItem(row, col);
-      showToast(result.message);
-      await onRefresh();
-    } catch (err) {
-      showToast(err.message);
-    }
-  }, [onRefresh, showToast]);
+    },
+    [onRefresh, showToast]
+  );
 
   if (!zenGarden) {
-    return <div className="card"><p>No zen garden data.</p></div>;
+    return (
+      <div className="card">
+        <p>No zen garden data.</p>
+      </div>
+    );
   }
 
   const harmonyPercent = zenGarden.harmony_score || 0;
@@ -78,9 +92,7 @@ export default function ZenGardenPanel({ zenGarden, onRefresh, showToast }) {
         </div>
 
         <div className="zen-harmony">
-          <div className="harmony-label">
-            Harmony: {harmonyPercent}/100
-          </div>
+          <div className="harmony-label">Harmony: {harmonyPercent}/100</div>
           <div className="progress-bar" style={{ height: 8, flex: 1 }}>
             <div
               className={`progress-fill ${harmonyPercent >= 70 ? 'sage' : harmonyPercent >= 40 ? 'tan' : 'rose'}`}
@@ -120,7 +132,9 @@ export default function ZenGardenPanel({ zenGarden, onRefresh, showToast }) {
 
         {placementMode === 'rake' && (
           <div className="zen-rake-options">
-            <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Pattern:</label>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>
+              Pattern:
+            </label>
             {RAKE_PATTERNS.map((p) => (
               <button
                 key={p}
@@ -163,8 +177,13 @@ export default function ZenGardenPanel({ zenGarden, onRefresh, showToast }) {
         </div>
 
         <div className="zen-hint">
-          Click a tile to {placementMode === 'remove' ? 'remove' : placementMode === 'rake' ? 'rake' : `place a ${placementMode}`}.
-          Right-click any tile to remove it.
+          Click a tile to{' '}
+          {placementMode === 'remove'
+            ? 'remove'
+            : placementMode === 'rake'
+              ? 'rake'
+              : `place a ${placementMode}`}
+          . Right-click any tile to remove it.
         </div>
       </div>
 

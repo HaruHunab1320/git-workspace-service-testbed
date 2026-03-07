@@ -160,7 +160,12 @@ export default function App() {
   }
 
   if (!gameState) {
-    return <div className="loading">Could not connect to server. Start the backend with: uvicorn server:app --reload</div>;
+    return (
+      <div className="loading">
+        Could not connect to server. Start the backend with: uvicorn server:app
+        --reload
+      </div>
+    );
   }
 
   const renderPanel = () => {
@@ -168,25 +173,69 @@ export default function App() {
       case 'weather':
         return <WeatherPanel weather={gameState.weather} forecast={forecast} />;
       case 'villagers':
-        return <VillagersPanel villagers={gameState.villagers} onRefresh={refresh} showToast={showToast} />;
+        return (
+          <VillagersPanel
+            villagers={gameState.villagers}
+            onRefresh={refresh}
+            showToast={showToast}
+          />
+        );
       case 'garden':
-        return <GardenPanel garden={gameState.garden} season={gameState.season} onRefresh={refresh} showToast={showToast} />;
+        return (
+          <GardenPanel
+            garden={gameState.garden}
+            season={gameState.season}
+            onRefresh={refresh}
+            showToast={showToast}
+          />
+        );
       case 'pets':
-        return <PetsPanel pets={gameState.pets} onRefresh={refresh} showToast={showToast} />;
+        return (
+          <PetsPanel
+            pets={gameState.pets}
+            onRefresh={refresh}
+            showToast={showToast}
+          />
+        );
       case 'economy':
-        return <EconomyPanel economy={gameState.economy} season={gameState.season} onRefresh={refresh} showToast={showToast} />;
+        return (
+          <EconomyPanel
+            economy={gameState.economy}
+            season={gameState.season}
+            onRefresh={refresh}
+            showToast={showToast}
+          />
+        );
       case 'inventory':
-        return <InventoryShelf economy={gameState.economy} onRefresh={refresh} showToast={showToast} />;
+        return (
+          <InventoryShelf
+            economy={gameState.economy}
+            onRefresh={refresh}
+            showToast={showToast}
+          />
+        );
       case 'crafting':
         return <CraftingPanel showToast={showToast} />;
       case 'journal':
-        return <JournalPanel entries={journalEntries} day={gameState.day} season={gameState.season} onRefresh={fetchJournal} showToast={showToast} />;
+        return (
+          <JournalPanel
+            entries={journalEntries}
+            day={gameState.day}
+            season={gameState.season}
+            onRefresh={fetchJournal}
+            showToast={showToast}
+          />
+        );
       case 'zen':
-        return <ZenGardenPanel zenGarden={gameState.zen_garden} onRefresh={refresh} showToast={showToast} />;
+        return (
+          <ZenGardenPanel
+            zenGarden={gameState.zen_garden}
+            onRefresh={refresh}
+            showToast={showToast}
+          />
+        );
       case 'tea':
         return <TeaBrewingStation showToast={showToast} />;
-      case 'zen':
-        return <ZenGarden showToast={showToast} />;
       case 'mixer':
         return <AmbientLofiMixer showToast={showToast} />;
       default:
@@ -200,7 +249,10 @@ export default function App() {
         day={gameState.day}
         season={gameState.season}
         weather={gameState.weather}
-        villageMood={gameState.recent_reports?.[gameState.recent_reports.length - 1]?.village_mood}
+        villageMood={
+          gameState.recent_reports?.[gameState.recent_reports.length - 1]
+            ?.village_mood
+        }
       />
 
       <div className="main-content">
@@ -237,7 +289,11 @@ export default function App() {
       <SwarmBadge type="fireflies" />
       <LofiPlayer />
       <FocusTimer />
-      <AmbientSounds sounds={sounds} weather={gameState.weather} season={gameState.season} />
+      <AmbientSounds
+        sounds={sounds}
+        weather={gameState.weather}
+        season={gameState.season}
+      />
       <StarryNight />
       <CozyFireplace />
       <WindChimes />
@@ -245,12 +301,21 @@ export default function App() {
       <GentleReminders />
 
       {toast && (
-        <div style={{
-          position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
-          background: 'var(--brown)', color: 'var(--white)', padding: '10px 20px',
-          borderRadius: 'var(--radius)', fontWeight: 600, zIndex: 200,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-        }}>
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 80,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'var(--brown)',
+            color: 'var(--white)',
+            padding: '10px 20px',
+            borderRadius: 'var(--radius)',
+            fontWeight: 600,
+            zIndex: 200,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          }}
+        >
           {toast}
         </div>
       )}

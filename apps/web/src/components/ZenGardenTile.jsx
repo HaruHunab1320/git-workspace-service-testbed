@@ -19,8 +19,12 @@ export default function ZenGardenTile({ tile, onClick, onRightClick }) {
   };
 
   // Empty sand tile
-  if (tile.is_empty && !tile.rake_pattern || tile.rake_pattern === 'none') {
-    if (tile.kind === 'sand' && tile.rake_pattern && tile.rake_pattern !== 'none') {
+  if ((tile.is_empty && !tile.rake_pattern) || tile.rake_pattern === 'none') {
+    if (
+      tile.kind === 'sand' &&
+      tile.rake_pattern &&
+      tile.rake_pattern !== 'none'
+    ) {
       // Raked sand
       return (
         <div
@@ -29,7 +33,9 @@ export default function ZenGardenTile({ tile, onClick, onRightClick }) {
           onContextMenu={handleContextMenu}
           title={`Raked ${tile.rake_pattern} pattern - click to change`}
         >
-          <span className="tile-emoji">{RAKE_EMOJI[tile.rake_pattern] || '~'}</span>
+          <span className="tile-emoji">
+            {RAKE_EMOJI[tile.rake_pattern] || '~'}
+          </span>
           <div className="tile-label">{tile.rake_pattern}</div>
         </div>
       );
@@ -47,7 +53,11 @@ export default function ZenGardenTile({ tile, onClick, onRightClick }) {
   }
 
   // Raked sand
-  if (tile.kind === 'sand' && tile.rake_pattern && tile.rake_pattern !== 'none') {
+  if (
+    tile.kind === 'sand' &&
+    tile.rake_pattern &&
+    tile.rake_pattern !== 'none'
+  ) {
     return (
       <div
         className="zen-tile raked"
@@ -55,7 +65,9 @@ export default function ZenGardenTile({ tile, onClick, onRightClick }) {
         onContextMenu={handleContextMenu}
         title={`Raked ${tile.rake_pattern} pattern - right-click to remove`}
       >
-        <span className="tile-emoji">{RAKE_EMOJI[tile.rake_pattern] || '~'}</span>
+        <span className="tile-emoji">
+          {RAKE_EMOJI[tile.rake_pattern] || '~'}
+        </span>
         <div className="tile-label">{tile.rake_pattern}</div>
       </div>
     );
@@ -74,7 +86,10 @@ export default function ZenGardenTile({ tile, onClick, onRightClick }) {
         onContextMenu={handleContextMenu}
         title={`${tile.succulent} (${tile.succulent_stage}) - ${progress}% grown`}
       >
-        <span className="tile-emoji">{isBlooming ? '✨' : ''}{emoji}</span>
+        <span className="tile-emoji">
+          {isBlooming ? '✨' : ''}
+          {emoji}
+        </span>
         <div className="tile-label">{tile.succulent}</div>
         <div className="progress-bar" style={{ height: 3, marginTop: 3 }}>
           <div

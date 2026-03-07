@@ -2,17 +2,28 @@ import './Header.css';
 
 const SEASON_EMOJI = { spring: '🌸', summer: '☀️', autumn: '🍂', winter: '❄️' };
 const MOOD_EMOJI = {
-  joyful: '😄', content: '😊', melancholy: '😔',
-  cozy: '☕', enchanted: '✨', restless: '💨',
+  joyful: '😄',
+  content: '😊',
+  melancholy: '😔',
+  cozy: '☕',
+  enchanted: '✨',
+  restless: '💨',
 };
 const SKY_EMOJI = {
-  clear: '☀️', partly_cloudy: '⛅', overcast: '☁️',
-  drizzle: '🌧️', rain: '🌧️', thunderstorm: '⛈️',
-  snow: '🌨️', blizzard: '🌨️', fog: '🌫️', hail: '🪨',
+  clear: '☀️',
+  partly_cloudy: '⛅',
+  overcast: '☁️',
+  drizzle: '🌧️',
+  rain: '🌧️',
+  thunderstorm: '⛈️',
+  snow: '🌨️',
+  blizzard: '🌨️',
+  fog: '🌫️',
+  hail: '🪨',
 };
 
 export default function Header({ day, season, weather, villageMood }) {
-  const skyEmoji = weather ? (SKY_EMOJI[weather.sky] || '☀️') : '☀️';
+  const skyEmoji = weather ? SKY_EMOJI[weather.sky] || '☀️' : '☀️';
   const temp = weather ? `${weather.temperature_c}°C` : '--';
   const moodEmoji = MOOD_EMOJI[villageMood] || '😊';
 
@@ -29,7 +40,11 @@ export default function Header({ day, season, weather, villageMood }) {
         </div>
         <div className="header-stat">
           <span className="stat-emoji">{SEASON_EMOJI[season] || '🌸'}</span>
-          <span>{season ? season.charAt(0).toUpperCase() + season.slice(1) : 'Spring'}</span>
+          <span>
+            {season
+              ? season.charAt(0).toUpperCase() + season.slice(1)
+              : 'Spring'}
+          </span>
         </div>
         <div className="header-stat">
           <span className="stat-emoji">{skyEmoji}</span>

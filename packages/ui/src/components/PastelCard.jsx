@@ -22,7 +22,9 @@ export default function PastelCard({
     hoverable && 'pastel-card--hoverable',
     glow && (GLOW_MAP[glow] || ''),
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={cls} {...props}>

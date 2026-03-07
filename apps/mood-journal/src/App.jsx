@@ -36,7 +36,8 @@ function App() {
           </div>
           {selectedMood && (
             <p className="mood-confirmation">
-              You're feeling <strong>{selectedMood.toLowerCase()}</strong> today.
+              You're feeling <strong>{selectedMood.toLowerCase()}</strong>{' '}
+              today.
             </p>
           )}
         </section>

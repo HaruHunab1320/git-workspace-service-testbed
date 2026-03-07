@@ -37,7 +37,9 @@ export default function DailyEntry({ day, season, onSubmit, submitting }) {
     <div className="daily-entry" data-id="journal-entry">
       <div className="daily-entry-header">
         <h3 className="card-title">How are you feeling?</h3>
-        <span className="daily-entry-date">Day {day} — {season}</span>
+        <span className="daily-entry-date">
+          Day {day} — {season}
+        </span>
       </div>
 
       <div className="daily-entry-moods">
@@ -60,13 +62,19 @@ export default function DailyEntry({ day, season, onSubmit, submitting }) {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={selectedMood ? 'Write a short note about your day...' : 'Select a mood first...'}
+        placeholder={
+          selectedMood
+            ? 'Write a short note about your day...'
+            : 'Select a mood first...'
+        }
         maxLength={NOTE_MAX}
         disabled={!selectedMood || submitting}
       />
 
       <div className="daily-entry-footer">
-        <span className="daily-entry-char-count">{note.length}/{NOTE_MAX}</span>
+        <span className="daily-entry-char-count">
+          {note.length}/{NOTE_MAX}
+        </span>
         <button
           className="btn btn-primary"
           onClick={handleSubmit}

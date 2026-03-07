@@ -23,8 +23,15 @@ function MessageLog({ messages }) {
       <div className="message-log">
         {messages.map((msg, i) => (
           <div key={msg.timestamp || i} className="message-bubble">
-            <PastelBadge variant="lavender" size="sm" className="message-bubble__time">
-              {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            <PastelBadge
+              variant="lavender"
+              size="sm"
+              className="message-bubble__time"
+            >
+              {new Date(msg.timestamp).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </PastelBadge>
             <span className="message-bubble__text">{msg.text}</span>
           </div>

@@ -49,7 +49,9 @@ function Receipt({ purchase, onDone }) {
         </div>
         <div className="receipt-divider" />
         <div className="receipt-line">
-          <span>{purchase.item_name || purchase.message} x{purchase.quantity || 1}</span>
+          <span>
+            {purchase.item_name || purchase.message} x{purchase.quantity || 1}
+          </span>
           <span>{(purchase.total || 0).toFixed(2)}</span>
         </div>
         <div className="receipt-divider" />
@@ -59,7 +61,9 @@ function Receipt({ purchase, onDone }) {
         </div>
         <div className="receipt-line receipt-remaining">
           <span>Wallet</span>
-          <span>{(purchase.remaining_coins ?? purchase.coins ?? 0).toFixed(2)} coins</span>
+          <span>
+            {(purchase.remaining_coins ?? purchase.coins ?? 0).toFixed(2)} coins
+          </span>
         </div>
         <div className="receipt-footer">
           {'\u2728'} Thank you for shopping! {'\u2728'}
@@ -69,7 +73,12 @@ function Receipt({ purchase, onDone }) {
   );
 }
 
-export default function EconomyPanel({ economy, season, onRefresh, showToast }) {
+export default function EconomyPanel({
+  economy,
+  season,
+  onRefresh,
+  showToast,
+}) {
   const prices = economy?.prices || [];
   const summary = economy?.summary || {};
   const playerCoins = economy?.player_coins ?? 0;
@@ -123,14 +132,19 @@ export default function EconomyPanel({ economy, season, onRefresh, showToast }) 
               const trend = diff > 0.5 ? 'up' : diff < -0.5 ? 'down' : 'stable';
               const canAfford = playerCoins >= item.price;
               return (
-                <tr key={item.key} className={sparkleKey === item.key ? 'row-purchased' : ''}>
+                <tr
+                  key={item.key}
+                  className={sparkleKey === item.key ? 'row-purchased' : ''}
+                >
                   <td>
                     <span className="item-emoji">
                       {CATEGORY_EMOJI[item.category] || '📦'}
                     </span>
                     {item.name}
                   </td>
-                  <td className="cat-cell">{item.category.replace('_', ' ')}</td>
+                  <td className="cat-cell">
+                    {item.category.replace('_', ' ')}
+                  </td>
                   <td>{item.base_price.toFixed(2)}</td>
                   <td className="price-cell">{item.price.toFixed(2)}</td>
                   <td>
@@ -138,7 +152,11 @@ export default function EconomyPanel({ economy, season, onRefresh, showToast }) 
                       {trend === 'up' ? '⬆️' : trend === 'down' ? '⬇️' : '➖'}
                     </span>
                   </td>
-                  <td>{item.shelf_life === 'infinite' ? '∞' : `${item.shelf_life}d`}</td>
+                  <td>
+                    {item.shelf_life === 'infinite'
+                      ? '∞'
+                      : `${item.shelf_life}d`}
+                  </td>
                   <td className="buy-cell">
                     <button
                       className={`btn-buy ${!canAfford ? 'btn-buy-disabled' : ''}`}
@@ -168,7 +186,9 @@ export default function EconomyPanel({ economy, season, onRefresh, showToast }) 
             <div className="summary-label">Items Traded</div>
           </div>
           <div className="summary-stat">
-            <div className="summary-val">{(summary.coins_exchanged || 0).toFixed(2)}</div>
+            <div className="summary-val">
+              {(summary.coins_exchanged || 0).toFixed(2)}
+            </div>
             <div className="summary-label">Coins Exchanged</div>
           </div>
           <div className="summary-stat">

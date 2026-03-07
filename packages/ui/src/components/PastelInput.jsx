@@ -9,7 +9,9 @@ export default function PastelInput({
   ...props
 }) {
   return (
-    <div className={`pastel-input-group ${error ? 'pastel-input-group--error' : ''} ${className}`}>
+    <div
+      className={`pastel-input-group ${error ? 'pastel-input-group--error' : ''} ${className}`}
+    >
       {label && <label className="pastel-input__label">{label}</label>}
       <div className="pastel-input__wrapper">
         {icon && <span className="pastel-input__icon">{icon}</span>}

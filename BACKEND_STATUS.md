@@ -13,16 +13,16 @@ The backend is a **Python FastAPI application** (`apps/api/`) serving a single-p
 
 ## Technology Stack
 
-| Component | Technology |
-|-----------|-----------|
-| Framework | FastAPI |
-| Server | Uvicorn |
-| Language | Python (Node 20 via `.nvmrc` for monorepo tooling only) |
-| Data Models | Python dataclasses + Pydantic request models |
-| Database | None (in-memory globals) |
-| Auth | None |
-| Testing | pytest |
-| Monorepo | Turborepo + npm workspaces |
+| Component   | Technology                                              |
+| ----------- | ------------------------------------------------------- |
+| Framework   | FastAPI                                                 |
+| Server      | Uvicorn                                                 |
+| Language    | Python (Node 20 via `.nvmrc` for monorepo tooling only) |
+| Data Models | Python dataclasses + Pydantic request models            |
+| Database    | None (in-memory globals)                                |
+| Auth        | None                                                    |
+| Testing     | pytest                                                  |
+| Monorepo    | Turborepo + npm workspaces                              |
 
 **Dependencies** (`requirements.txt`): `fastapi`, `uvicorn[standard]` — intentionally minimal.
 
@@ -46,18 +46,18 @@ State resets on process restart. The `/api/new-game` endpoint resets all globals
 
 The backend is split into eight well-separated simulation subsystems:
 
-| Module | Purpose | Lines |
-|--------|---------|-------|
-| `game.py` | Orchestrator — composes subsystems into `advance_day()` loop | ~427 |
-| `villagers.py` | NPC personalities, schedules, friendships, gifts, moods | Large |
-| `weather.py` | Seasonal weather engine, magical events, village mood | Large |
-| `garden.py` | Farming: crop types, growth stages, watering, harvesting, companion planting | Large |
-| `animals.py` | Pet companions: adoption, bonding, foraging, species profiles | Large |
-| `economy.py` | Market trading: items, seasonal pricing, spoilage, recipes | Large |
-| `crafting.py` | Recipe and material crafting system | Medium |
-| `zen_garden.py` | Zen garden: succulents, rocks, raking patterns, harmony scoring | Medium |
-| `swarm.py` | Firefly particle physics simulation | Small |
-| `math_utils.py` | Single `clamp()` utility | Tiny |
+| Module          | Purpose                                                                      | Lines  |
+| --------------- | ---------------------------------------------------------------------------- | ------ |
+| `game.py`       | Orchestrator — composes subsystems into `advance_day()` loop                 | ~427   |
+| `villagers.py`  | NPC personalities, schedules, friendships, gifts, moods                      | Large  |
+| `weather.py`    | Seasonal weather engine, magical events, village mood                        | Large  |
+| `garden.py`     | Farming: crop types, growth stages, watering, harvesting, companion planting | Large  |
+| `animals.py`    | Pet companions: adoption, bonding, foraging, species profiles                | Large  |
+| `economy.py`    | Market trading: items, seasonal pricing, spoilage, recipes                   | Large  |
+| `crafting.py`   | Recipe and material crafting system                                          | Medium |
+| `zen_garden.py` | Zen garden: succulents, rocks, raking patterns, harmony scoring              | Medium |
+| `swarm.py`      | Firefly particle physics simulation                                          | Small  |
+| `math_utils.py` | Single `clamp()` utility                                                     | Tiny   |
 
 ### Game Loop
 
@@ -78,25 +78,30 @@ The backend is split into eight well-separated simulation subsystems:
 **35 endpoints** across 9 domains, all under `/api/`:
 
 ### Game Management (3)
+
 - `GET /api/status` — full state snapshot
 - `POST /api/advance-day` — simulate one day
 - `POST /api/new-game?seed=42` — reset game
 
 ### Weather (2)
+
 - `GET /api/weather` — current conditions + mood + streak
 - `GET /api/weather/forecast?days=5` — multi-day forecast (1–14)
 
 ### Villagers (3)
+
 - `GET /api/villagers` — all villager states
 - `GET /api/villagers/{villager_id}` — single villager
 - `POST /api/villagers/{villager_id}/gift` — give gift
 
 ### Garden (3)
+
 - `GET /api/garden` — grid state
 - `GET /api/garden/crops` — seasonal crop list
 - `POST /api/garden/plant` — plant a crop
 
 ### Pets (6)
+
 - `GET /api/pets` — adopted pets
 - `GET /api/pets/adoptable` — available for adoption
 - `POST /api/pets/adopt` — adopt a pet
@@ -105,6 +110,7 @@ The backend is split into eight well-separated simulation subsystems:
 - `POST /api/pets/{name}/play` — play
 
 ### Economy (5)
+
 - `GET /api/economy/prices` — market price board
 - `GET /api/economy/summary` — trade summary
 - `GET /api/economy/wallet` — coins + inventory
@@ -112,11 +118,13 @@ The backend is split into eight well-separated simulation subsystems:
 - `POST /api/economy/sell` — sell item (70% of market price, spoiled = 0)
 
 ### Journal (3)
+
 - `GET /api/journal` — all entries
 - `POST /api/journal` — add entry
 - `DELETE /api/journal/{entry_id}` — delete entry
 
 ### Zen Garden (5)
+
 - `GET /api/zen-garden` — full state + harmony score
 - `GET /api/zen-garden/succulents` — available types
 - `GET /api/zen-garden/rocks` — available types
@@ -126,25 +134,27 @@ The backend is split into eight well-separated simulation subsystems:
 - `POST /api/zen-garden/remove` — remove tile item
 
 ### Firefly Swarm (2)
+
 - `GET /api/swarm` — current state
 - `POST /api/swarm/tick?steps=1` — advance 1–50 ticks
 
 ### Inventory (1)
+
 - `GET /api/inventory` — player coins + items with freshness
 
 ## Test Coverage
 
 Seven test files cover all simulation domains:
 
-| Test File | Module | Focus Areas |
-|-----------|--------|-------------|
-| `test_animals.py` | animals | Bond tiers, species profiles, mood, foraging |
-| `test_economy.py` | economy | Seasonal pricing, ingredient costs, spoilage |
-| `test_game.py` | game | Creation, weather mapping, day advance, player actions |
-| `test_garden.py` | garden | Seasonal crops, growth, watering, harvesting, companion planting |
-| `test_villagers.py` | villagers | Schedules (full year), weather integration, birthday gifts |
-| `test_weather.py` | weather | Calendar, temperature, sky, magical events, festivals, mood, streaks |
-| `test_zen_garden.py` | zen_garden | Succulents, rocks, tiles, raking, harmony |
+| Test File            | Module     | Focus Areas                                                          |
+| -------------------- | ---------- | -------------------------------------------------------------------- |
+| `test_animals.py`    | animals    | Bond tiers, species profiles, mood, foraging                         |
+| `test_economy.py`    | economy    | Seasonal pricing, ingredient costs, spoilage                         |
+| `test_game.py`       | game       | Creation, weather mapping, day advance, player actions               |
+| `test_garden.py`     | garden     | Seasonal crops, growth, watering, harvesting, companion planting     |
+| `test_villagers.py`  | villagers  | Schedules (full year), weather integration, birthday gifts           |
+| `test_weather.py`    | weather    | Calendar, temperature, sky, magical events, festivals, mood, streaks |
+| `test_zen_garden.py` | zen_garden | Succulents, rocks, tiles, raking, harmony                            |
 
 **Not tested:** `server.py` endpoints (no integration/API tests), `crafting.py`, `swarm.py`, `math_utils.py`.
 

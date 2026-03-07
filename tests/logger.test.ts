@@ -44,7 +44,10 @@ describe('Logger', () => {
 
     it('accepts custom transports', () => {
       const transport = createTestTransport();
-      const logger = new Logger({ transports: [transport], timestamp: fixedTimestamp });
+      const logger = new Logger({
+        transports: [transport],
+        timestamp: fixedTimestamp,
+      });
       logger.info('hello');
       expect(transport.entries).toHaveLength(1);
     });

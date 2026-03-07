@@ -21,13 +21,13 @@ logger.error('Connection failed', { host: 'localhost', port: 5432 });
 
 Levels are ordered by severity. Messages below the configured minimum level are suppressed.
 
-| Level    | Value | Description                        |
-|----------|-------|------------------------------------|
-| `DEBUG`  | 0     | Verbose output for development     |
-| `INFO`   | 1     | General operational messages       |
-| `WARN`   | 2     | Potential issues worth noting      |
-| `ERROR`  | 3     | Failures that need attention       |
-| `SILENT` | 4     | Suppresses all output              |
+| Level    | Value | Description                    |
+| -------- | ----- | ------------------------------ |
+| `DEBUG`  | 0     | Verbose output for development |
+| `INFO`   | 1     | General operational messages   |
+| `WARN`   | 2     | Potential issues worth noting  |
+| `ERROR`  | 3     | Failures that need attention   |
+| `SILENT` | 4     | Suppresses all output          |
 
 Default level: `INFO`
 
@@ -43,12 +43,12 @@ logger.info('This will be suppressed');
 
 ### `new Logger(options?)`
 
-| Option       | Type             | Default                    | Description                            |
-|--------------|------------------|----------------------------|----------------------------------------|
-| `level`      | `LogLevel`       | `LogLevel.INFO`            | Minimum level to log                   |
-| `context`    | `string`         | `undefined`                | Label prepended to log messages        |
-| `transports` | `LogTransport[]` | `[Logger.consoleTransport]`| Output handlers for log entries        |
-| `timestamp`  | `() => string`   | `() => new Date().toISOString()` | Timestamp generator         |
+| Option       | Type             | Default                          | Description                     |
+| ------------ | ---------------- | -------------------------------- | ------------------------------- |
+| `level`      | `LogLevel`       | `LogLevel.INFO`                  | Minimum level to log            |
+| `context`    | `string`         | `undefined`                      | Label prepended to log messages |
+| `transports` | `LogTransport[]` | `[Logger.consoleTransport]`      | Output handlers for log entries |
+| `timestamp`  | `() => string`   | `() => new Date().toISOString()` | Timestamp generator             |
 
 ### Log Methods
 

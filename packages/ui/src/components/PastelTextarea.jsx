@@ -8,7 +8,9 @@ export default function PastelTextarea({
   ...props
 }) {
   return (
-    <div className={`pastel-textarea-group ${error ? 'pastel-textarea-group--error' : ''} ${className}`}>
+    <div
+      className={`pastel-textarea-group ${error ? 'pastel-textarea-group--error' : ''} ${className}`}
+    >
       {label && <label className="pastel-textarea__label">{label}</label>}
       <textarea className="pastel-textarea" {...props} />
       {hint && !error && <span className="pastel-textarea__hint">{hint}</span>}

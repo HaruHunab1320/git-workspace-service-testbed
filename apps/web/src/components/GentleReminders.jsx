@@ -2,11 +2,36 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import './GentleReminders.css';
 
 const REMINDERS = [
-  { id: 'water', emoji: '\u{1F4A7}', message: 'Time for a sip of water', detail: 'Stay hydrated, friend' },
-  { id: 'stretch', emoji: '\u{1F331}', message: 'Stretch break', detail: 'Roll your shoulders and breathe' },
-  { id: 'eyes', emoji: '\u{1F30C}', message: 'Rest your eyes', detail: 'Look at something far away for 20s' },
-  { id: 'breathe', emoji: '\u{1F343}', message: 'Deep breath', detail: 'Inhale for 4, hold for 4, exhale for 4' },
-  { id: 'posture', emoji: '\u{1FA91}', message: 'Check your posture', detail: 'Sit up tall, relax your jaw' },
+  {
+    id: 'water',
+    emoji: '\u{1F4A7}',
+    message: 'Time for a sip of water',
+    detail: 'Stay hydrated, friend',
+  },
+  {
+    id: 'stretch',
+    emoji: '\u{1F331}',
+    message: 'Stretch break',
+    detail: 'Roll your shoulders and breathe',
+  },
+  {
+    id: 'eyes',
+    emoji: '\u{1F30C}',
+    message: 'Rest your eyes',
+    detail: 'Look at something far away for 20s',
+  },
+  {
+    id: 'breathe',
+    emoji: '\u{1F343}',
+    message: 'Deep breath',
+    detail: 'Inhale for 4, hold for 4, exhale for 4',
+  },
+  {
+    id: 'posture',
+    emoji: '\u{1FA91}',
+    message: 'Check your posture',
+    detail: 'Sit up tall, relax your jaw',
+  },
 ];
 
 const DEFAULT_INTERVAL_MIN = 30;
@@ -77,10 +102,13 @@ export default function GentleReminders() {
   const scheduleNext = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (!enabled) return;
-    timerRef.current = setTimeout(() => {
-      showNextReminder();
-      scheduleNext();
-    }, intervalMin * 60 * 1000);
+    timerRef.current = setTimeout(
+      () => {
+        showNextReminder();
+        scheduleNext();
+      },
+      intervalMin * 60 * 1000
+    );
   }, [enabled, intervalMin, showNextReminder]);
 
   useEffect(() => {
@@ -156,10 +184,7 @@ export default function GentleReminders() {
           </div>
 
           <div className="reminder-preview">
-            <button
-              className="reminder-preview-btn"
-              onClick={showNextReminder}
-            >
+            <button className="reminder-preview-btn" onClick={showNextReminder}>
               preview reminder
             </button>
           </div>

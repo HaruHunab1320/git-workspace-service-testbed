@@ -36,10 +36,18 @@ body {
   transition: background 0.6s ease;
 }
 
-body.season-spring { background: #f0f7e8; }
-body.season-summer { background: #faf6e0; }
-body.season-autumn { background: #f7efe0; }
-body.season-winter { background: #e8eef5; }
+body.season-spring {
+  background: #f0f7e8;
+}
+body.season-summer {
+  background: #faf6e0;
+}
+body.season-autumn {
+  background: #f7efe0;
+}
+body.season-winter {
+  background: #e8eef5;
+}
 
 /* ---- Layout ---- */
 
@@ -88,7 +96,11 @@ body.season-winter { background: #e8eef5; }
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
 }
 
 .tab-btn:hover {
@@ -117,7 +129,9 @@ body.season-winter { background: #e8eef5; }
   box-shadow: 0 2px 8px var(--shadow);
   margin-bottom: 12px;
   animation: cozy-slide-up 0.4s ease both;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
 }
 
 .card:hover {
@@ -206,12 +220,30 @@ body.season-winter { background: #e8eef5; }
   transform: scale(1.05);
 }
 
-.badge-cheerful { background: #ffeaa7; color: #6b5b00; }
-.badge-grumpy { background: #dfe6e9; color: #555; }
-.badge-shy { background: #e0c3fc; color: #5b3a8a; }
-.badge-adventurous { background: #ffecd2; color: #8b5e00; }
-.badge-scholarly { background: #c8e6ff; color: #1a5276; }
-.badge-nurturing { background: #d4edda; color: #2d6a3f; }
+.badge-cheerful {
+  background: #ffeaa7;
+  color: #6b5b00;
+}
+.badge-grumpy {
+  background: #dfe6e9;
+  color: #555;
+}
+.badge-shy {
+  background: #e0c3fc;
+  color: #5b3a8a;
+}
+.badge-adventurous {
+  background: #ffecd2;
+  color: #8b5e00;
+}
+.badge-scholarly {
+  background: #c8e6ff;
+  color: #1a5276;
+}
+.badge-nurturing {
+  background: #d4edda;
+  color: #2d6a3f;
+}
 
 /* ---- Progress bars ---- */
 
@@ -228,9 +260,15 @@ body.season-winter { background: #e8eef5; }
   transition: width 0.4s ease;
 }
 
-.progress-fill.sage { background: var(--sage); }
-.progress-fill.rose { background: var(--rose); }
-.progress-fill.tan { background: var(--tan); }
+.progress-fill.sage {
+  background: var(--sage);
+}
+.progress-fill.rose {
+  background: var(--rose);
+}
+.progress-fill.tan {
+  background: var(--tan);
+}
 
 /* ---- Modal ---- */
 
@@ -294,7 +332,9 @@ body.season-winter { background: #e8eef5; }
   font-size: 0.9rem;
   background: var(--white);
   color: var(--brown);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .form-group select:focus,
@@ -306,8 +346,16 @@ body.season-winter { background: #e8eef5; }
 
 /* ---- Grid helpers ---- */
 
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
 
 /* ---- Loading ---- */
 
@@ -332,14 +380,20 @@ body.season-winter { background: #e8eef5; }
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ---- Soft entrance animations ---- */
 
 @keyframes cozy-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes cozy-slide-up {
@@ -380,7 +434,9 @@ body.season-winter { background: #e8eef5; }
 
 /* Reduced motion: disable all custom animations */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -390,8 +446,13 @@ body.season-winter { background: #e8eef5; }
 /* ---- Pulse animation for harvestable crops ---- */
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
 }
 
 .harvestable {
@@ -401,28 +462,55 @@ body.season-winter { background: #e8eef5; }
 /* ---- Magical glow ---- */
 
 .magical-glow {
-  box-shadow: 0 0 12px rgba(180, 140, 255, 0.5), 0 2px 8px var(--shadow);
+  box-shadow:
+    0 0 12px rgba(180, 140, 255, 0.5),
+    0 2px 8px var(--shadow);
   animation: magical-glow-breathe 3s ease-in-out infinite;
 }
 
 @keyframes magical-glow-breathe {
-  0%, 100% { box-shadow: 0 0 12px rgba(180, 140, 255, 0.5), 0 2px 8px var(--shadow); }
-  50% { box-shadow: 0 0 20px rgba(180, 140, 255, 0.7), 0 2px 12px var(--shadow-md); }
+  0%,
+  100% {
+    box-shadow:
+      0 0 12px rgba(180, 140, 255, 0.5),
+      0 2px 8px var(--shadow);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(180, 140, 255, 0.7),
+      0 2px 12px var(--shadow-md);
+  }
 }
 
 /* ---- Rarity colors ---- */
 
-.rarity-common { color: var(--brown-light); }
-.rarity-uncommon { color: #2980b9; }
-.rarity-rare { color: #8e44ad; }
+.rarity-common {
+  color: var(--brown-light);
+}
+.rarity-uncommon {
+  color: #2980b9;
+}
+.rarity-rare {
+  color: #8e44ad;
+}
 
 /* ---- Mood emoji helpers ---- */
 
-.mood-joyful { color: #f1c40f; }
-.mood-content { color: var(--sage); }
-.mood-neutral { color: var(--brown-light); }
-.mood-lonely { color: #3498db; }
-.mood-upset { color: var(--rose); }
+.mood-joyful {
+  color: #f1c40f;
+}
+.mood-content {
+  color: var(--sage);
+}
+.mood-neutral {
+  color: var(--brown-light);
+}
+.mood-lonely {
+  color: #3498db;
+}
+.mood-upset {
+  color: var(--rose);
+}
 
 /* ---- Scrollbar ---- */
 

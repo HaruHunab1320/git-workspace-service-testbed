@@ -22,9 +22,15 @@ export default function useRakingCanvas({ tool, rakeWidth, stoneColor }) {
   const rakeWidthRef = useRef(rakeWidth);
   const stoneColorRef = useRef(stoneColor);
 
-  useEffect(() => { toolRef.current = tool; }, [tool]);
-  useEffect(() => { rakeWidthRef.current = rakeWidth; }, [rakeWidth]);
-  useEffect(() => { stoneColorRef.current = stoneColor; }, [stoneColor]);
+  useEffect(() => {
+    toolRef.current = tool;
+  }, [tool]);
+  useEffect(() => {
+    rakeWidthRef.current = rakeWidth;
+  }, [rakeWidth]);
+  useEffect(() => {
+    stoneColorRef.current = stoneColor;
+  }, [stoneColor]);
 
   const generateSand = useCallback((ctx, w, h) => {
     const imageData = ctx.createImageData(w, h);

@@ -35,22 +35,22 @@ The `App` component is the heart of Cozy Companion. It sets up a gentle three-ta
 
 ### Tab structure
 
-| Tab | What it shows |
-|-----|---------------|
-| **Home** | Your companion, mood selector, focus timer, and gentle reminders |
-| **Journal** | A freeform writing space with saved entries |
-| **Settings** | Companion name, theme, sound, and reminder preferences |
+| Tab          | What it shows                                                    |
+| ------------ | ---------------------------------------------------------------- |
+| **Home**     | Your companion, mood selector, focus timer, and gentle reminders |
+| **Journal**  | A freeform writing space with saved entries                      |
+| **Settings** | Companion name, theme, sound, and reminder preferences           |
 
 ### Default reminders
 
 The app comes with a built-in set of wellness reminders that rotate every 30 seconds:
 
-- *Take a deep breath and relax your shoulders.*
-- *Have you had a glass of water recently?*
-- *Stretch your arms above your head for a moment.*
-- *Look away from the screen at something distant.*
-- *You are doing great today.*
-- *Remember to check in with how you feel.*
+- _Take a deep breath and relax your shoulders._
+- _Have you had a glass of water recently?_
+- _Stretch your arms above your head for a moment._
+- _Look away from the screen at something distant._
+- _You are doing great today._
+- _Remember to check in with how you feel._
 
 ---
 
@@ -62,22 +62,22 @@ This is the visual heart of the app — a charming ASCII-art cat named **Mochi**
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `mood` | `string` or `null` | — | One of `'happy'`, `'calm'`, `'tired'`, `'excited'`, `'anxious'`, or `null` |
+| Prop   | Type               | Default | Description                                                                |
+| ------ | ------------------ | ------- | -------------------------------------------------------------------------- |
+| `mood` | `string` or `null` | —       | One of `'happy'`, `'calm'`, `'tired'`, `'excited'`, `'anxious'`, or `null` |
 
 ### Mood reactions
 
 Each mood changes Mochi's expression and shows a unique message:
 
-| Mood | Expression | Message |
-|------|------------|---------|
-| `happy` | `( ^.^ )` | "Your companion is purring contentedly!" |
-| `calm` | `( -.- )` | "A peaceful moment together..." |
-| `tired` | `( u.u )` | "Let's take it easy today." |
-| `excited` | `( *.* )` | "So much energy! What an adventure!" |
-| `anxious` | `( o.o )` | "It's okay. Deep breaths together." |
-| *(none)* | `( o.o )` | "Hello! How are you today?" |
+| Mood      | Expression | Message                                  |
+| --------- | ---------- | ---------------------------------------- |
+| `happy`   | `( ^.^ )`  | "Your companion is purring contentedly!" |
+| `calm`    | `( -.- )`  | "A peaceful moment together..."          |
+| `tired`   | `( u.u )`  | "Let's take it easy today."              |
+| `excited` | `( *.* )`  | "So much energy! What an adventure!"     |
+| `anxious` | `( o.o )`  | "It's okay. Deep breaths together."      |
+| _(none)_  | `( o.o )`  | "Hello! How are you today?"              |
 
 When a mood is selected, a `PastelBadge` appears beneath Mochi's name with a color that matches the mood (e.g., lemon for happy, mint for calm, lavender for tired).
 
@@ -99,18 +99,18 @@ An earlier version of the companion display that uses simpler text-face expressi
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `mood` | `string` or `null` | — | One of `'Happy'`, `'Calm'`, `'Tired'`, `'Stressed'` |
-| `studyState` | `string` | — | One of `'idle'`, `'studying'`, `'break'` |
+| Prop         | Type               | Default | Description                                         |
+| ------------ | ------------------ | ------- | --------------------------------------------------- |
+| `mood`       | `string` or `null` | —       | One of `'Happy'`, `'Calm'`, `'Tired'`, `'Stressed'` |
+| `studyState` | `string`           | —       | One of `'idle'`, `'studying'`, `'break'`            |
 
 ### Expressions
 
-| Study State | Face | Status Text |
-|-------------|------|-------------|
-| `idle` | `(^ _ ^)` | "Relaxing..." |
-| `studying` | `(o _ o)` | "Studying together!" |
-| `break` | `(^ u ^)` | "Break time~" |
+| Study State | Face      | Status Text          |
+| ----------- | --------- | -------------------- |
+| `idle`      | `(^ _ ^)` | "Relaxing..."        |
+| `studying`  | `(o _ o)` | "Studying together!" |
+| `break`     | `(^ u ^)` | "Break time~"        |
 
 Mood overlays appear as small repeated characters (e.g., `~~~` for Happy, `zzz` for Calm).
 
@@ -124,20 +124,20 @@ A row of soft buttons that let you tell your companion how you're feeling.
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `selected` | `string` or `null` | The currently active mood id |
+| Prop       | Type                       | Description                          |
+| ---------- | -------------------------- | ------------------------------------ |
+| `selected` | `string` or `null`         | The currently active mood id         |
 | `onSelect` | `(moodId: string) => void` | Called when a mood button is clicked |
 
 ### Available moods
 
-| ID | Label | Button Color (when selected) |
-|----|-------|------------------------------|
-| `happy` | Happy | peach |
-| `calm` | Calm | mint |
-| `tired` | Tired | lavender |
-| `excited` | Excited | sky |
-| `anxious` | Anxious | blush |
+| ID        | Label   | Button Color (when selected) |
+| --------- | ------- | ---------------------------- |
+| `happy`   | Happy   | peach                        |
+| `calm`    | Calm    | mint                         |
+| `tired`   | Tired   | lavender                     |
+| `excited` | Excited | sky                          |
+| `anxious` | Anxious | blush                        |
 
 Unselected buttons use the `ghost` variant, making them blend softly into the background until clicked.
 
@@ -151,16 +151,16 @@ A Pomodoro-style focus timer with preset durations and a gentle progress bar.
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
+| Prop        | Type                                          | Description                         |
+| ----------- | --------------------------------------------- | ----------------------------------- |
 | `showToast` | `(message: string, variant?: string) => void` | Optional callback for notifications |
 
 ### Presets
 
-| Label | Duration |
-|-------|----------|
-| 5 min | 300 seconds |
-| 15 min | 900 seconds |
+| Label  | Duration               |
+| ------ | ---------------------- |
+| 5 min  | 300 seconds            |
+| 15 min | 900 seconds            |
 | 25 min | 1500 seconds (default) |
 
 ### How it works
@@ -170,7 +170,7 @@ A Pomodoro-style focus timer with preset durations and a gentle progress bar.
 3. If you pause and resume, the button reads **Resume**.
 4. **Reset** stops the timer and returns it to the selected duration.
 5. A `PastelProgress` bar fills from left to right as time passes.
-6. When the timer reaches zero, a success toast appears: *"Focus session complete!"*
+6. When the timer reaches zero, a success toast appears: _"Focus session complete!"_
 
 ### Technical notes
 
@@ -187,10 +187,10 @@ A softly pulsing reminder that cycles through kind messages at a configurable in
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `reminders` | `string[]` | `[]` | Array of reminder messages to cycle through |
-| `intervalMs` | `number` | `30000` | Milliseconds between reminder changes |
+| Prop         | Type       | Default | Description                                 |
+| ------------ | ---------- | ------- | ------------------------------------------- |
+| `reminders`  | `string[]` | `[]`    | Array of reminder messages to cycle through |
+| `intervalMs` | `number`   | `30000` | Milliseconds between reminder changes       |
 
 ### Behavior
 
@@ -214,13 +214,13 @@ A private writing space where you can capture thoughts, feelings, or anything on
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
+| Prop        | Type                                          | Description                             |
+| ----------- | --------------------------------------------- | --------------------------------------- |
 | `showToast` | `(message: string, variant?: string) => void` | Optional callback for save confirmation |
 
 ### Features
 
-- **Write freely** in a multi-line text area with the placeholder *"What's on your mind? Write freely..."*
+- **Write freely** in a multi-line text area with the placeholder _"What's on your mind? Write freely..."_
 - **Save** your entry with the mint-colored button (disabled when the text area is empty).
 - **Browse past entries** below a labeled divider, each showing a timestamp and your text.
 - **Delete** any entry with the small `x` button beside its date.
@@ -255,8 +255,8 @@ A scrollable log of messages from your companion. This component is not currentl
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
+| Prop       | Type                                         | Description         |
+| ---------- | -------------------------------------------- | ------------------- |
 | `messages` | `Array<{ timestamp: string, text: string }>` | Messages to display |
 
 ### Behavior
@@ -274,9 +274,9 @@ A classic Pomodoro timer with fixed 25-minute study / 5-minute break cycles. Thi
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `studyState` | `string` | One of `'idle'`, `'studying'`, `'break'` |
+| Prop            | Type                      | Description                                      |
+| --------------- | ------------------------- | ------------------------------------------------ |
+| `studyState`    | `string`                  | One of `'idle'`, `'studying'`, `'break'`         |
 | `onStateChange` | `(state: string) => void` | Called when the timer transitions between states |
 
 ### Cycle
@@ -296,18 +296,18 @@ A cozy configuration screen for personalizing your companion experience.
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
+| Prop        | Type                                          | Description                             |
+| ----------- | --------------------------------------------- | --------------------------------------- |
 | `showToast` | `(message: string, variant?: string) => void` | Optional callback for save confirmation |
 
 ### Settings available
 
-| Setting | Control | Options |
-|---------|---------|---------|
-| **Companion Name** | Text input | Any name you like (default: "Mochi") |
-| **Color Theme** | Dropdown select | Lavender Dreams, Mint Meadow, Rose Garden, Peach Sunset, Cloud Nine |
-| **Sound Effects** | Toggle switch | On / Off (mint colored) |
-| **Gentle Reminders** | Toggle switch | On / Off (lavender colored) |
+| Setting              | Control         | Options                                                             |
+| -------------------- | --------------- | ------------------------------------------------------------------- |
+| **Companion Name**   | Text input      | Any name you like (default: "Mochi")                                |
+| **Color Theme**      | Dropdown select | Lavender Dreams, Mint Meadow, Rose Garden, Peach Sunset, Cloud Nine |
+| **Sound Effects**    | Toggle switch   | On / Off (mint colored)                                             |
+| **Gentle Reminders** | Toggle switch   | On / Off (lavender colored)                                         |
 
 ### Current limitations
 
@@ -334,16 +334,16 @@ The app uses a combination of CSS custom properties from `@cozy-village/ui` desi
 
 ### Key CSS classes
 
-| Class | Purpose |
-|-------|---------|
-| `.companion-display` | Centers the ASCII art, name, badge, and message |
-| `.companion-ascii` | Monospace pre-formatted text for the ASCII cat |
-| `.mood-grid` | Flex-wrap layout for mood buttons |
-| `.reminder-item` | Styled reminder with pulse animation |
-| `.timer-display` | Centered timer with large tabular numbers |
-| `.timer-controls` | Centered flex row for timer buttons |
-| `.journal-entries` | Scrollable list of past entries (max 300px) |
-| `.journal-entry` | Individual entry with left lavender border accent |
+| Class                | Purpose                                           |
+| -------------------- | ------------------------------------------------- |
+| `.companion-display` | Centers the ASCII art, name, badge, and message   |
+| `.companion-ascii`   | Monospace pre-formatted text for the ASCII cat    |
+| `.mood-grid`         | Flex-wrap layout for mood buttons                 |
+| `.reminder-item`     | Styled reminder with pulse animation              |
+| `.timer-display`     | Centered timer with large tabular numbers         |
+| `.timer-controls`    | Centered flex row for timer buttons               |
+| `.journal-entries`   | Scrollable list of past entries (max 300px)       |
+| `.journal-entry`     | Individual entry with left lavender border accent |
 
 ### Design tokens used
 
@@ -359,20 +359,20 @@ On screens narrower than 640px, the `.companion-row` grid collapses from two col
 
 The app uses several components from the `@cozy-village/ui` package. Here's a quick reference for the ones you'll see throughout:
 
-| Component | Used for |
-|-----------|----------|
-| `PastelCard` | Wrapping sections with titles, icons, optional glow borders |
-| `PastelButton` | All interactive buttons (variants: `mint`, `ghost`, `peach`, etc.) |
-| `PastelTabs` | Top-level navigation between Home, Journal, Settings |
-| `PastelToast` | Temporary notification popups |
-| `PastelDivider` | Horizontal separators, optionally labeled |
-| `PastelAvatar` | The header avatar with emoji |
-| `PastelBadge` | Small colored labels (mood badge, timer presets) |
-| `PastelProgress` | The focus timer's progress bar |
-| `PastelTextarea` | Journal text input |
-| `PastelInput` | Settings text input (companion name) |
-| `PastelSelect` | Settings dropdown (theme picker) |
-| `PastelToggle` | Settings on/off switches |
+| Component        | Used for                                                           |
+| ---------------- | ------------------------------------------------------------------ |
+| `PastelCard`     | Wrapping sections with titles, icons, optional glow borders        |
+| `PastelButton`   | All interactive buttons (variants: `mint`, `ghost`, `peach`, etc.) |
+| `PastelTabs`     | Top-level navigation between Home, Journal, Settings               |
+| `PastelToast`    | Temporary notification popups                                      |
+| `PastelDivider`  | Horizontal separators, optionally labeled                          |
+| `PastelAvatar`   | The header avatar with emoji                                       |
+| `PastelBadge`    | Small colored labels (mood badge, timer presets)                   |
+| `PastelProgress` | The focus timer's progress bar                                     |
+| `PastelTextarea` | Journal text input                                                 |
+| `PastelInput`    | Settings text input (companion name)                               |
+| `PastelSelect`   | Settings dropdown (theme picker)                                   |
+| `PastelToggle`   | Settings on/off switches                                           |
 
 All shared components support a `variant` prop for color theming (e.g., `lavender`, `mint`, `peach`, `sky`, `blush`, `lemon`).
 

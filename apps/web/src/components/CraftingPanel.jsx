@@ -4,10 +4,10 @@ import './CraftingPanel.css';
 
 const WORKSTATION_EMOJI = {
   'hand-crafted': '\u270B',
-  'workbench': '\u{1FA9A}',
-  'forge': '\u{1F525}',
-  'loom': '\u{1F9F5}',
-  'kiln': '\u{1FAD9}',
+  workbench: '\u{1FA9A}',
+  forge: '\u{1F525}',
+  loom: '\u{1F9F5}',
+  kiln: '\u{1FAD9}',
   'enchanting table': '\u2728',
 };
 
@@ -27,10 +27,10 @@ function CraftResult({ result, onDone }) {
   return (
     <div className="craft-result-overlay" onClick={onDone}>
       <div className="craft-result-card">
-        <div className="craft-result-title">
-          {'\u2728'} Crafted!
-        </div>
-        <div className={`craft-result-quality quality-${result.item.quality.toLowerCase()}`}>
+        <div className="craft-result-title">{'\u2728'} Crafted!</div>
+        <div
+          className={`craft-result-quality quality-${result.item.quality.toLowerCase()}`}
+        >
           {result.item.name}
         </div>
         <div className="craft-result-details">
@@ -40,7 +40,9 @@ function CraftResult({ result, onDone }) {
           <div>Craft time: {result.craft_time}h</div>
         </div>
         {result.level_up_messages.map((msg, i) => (
-          <div key={i} className="craft-result-levelup">{msg}</div>
+          <div key={i} className="craft-result-levelup">
+            {msg}
+          </div>
         ))}
       </div>
     </div>
@@ -147,11 +149,14 @@ export default function CraftingPanel({ showToast }) {
     return <div className="loading">Loading crafting...</div>;
   }
 
-  const xpPercent = crafter.xp_for_next_level > 0
-    ? Math.min(100, (crafter.experience / crafter.xp_for_next_level) * 100)
-    : 0;
+  const xpPercent =
+    crafter.xp_for_next_level > 0
+      ? Math.min(100, (crafter.experience / crafter.xp_for_next_level) * 100)
+      : 0;
 
-  const tools = crafter.crafted_items.filter((item) => item.category === 'tool');
+  const tools = crafter.crafted_items.filter(
+    (item) => item.category === 'tool'
+  );
 
   return (
     <div className="crafting-panel">
@@ -197,7 +202,10 @@ export default function CraftingPanel({ showToast }) {
       {subTab === 'materials' && (
         <div className="materials-grid">
           {materials.map((mat) => (
-            <div key={mat.name} className={`material-card ${!mat.available_now ? 'unavailable' : ''}`}>
+            <div
+              key={mat.name}
+              className={`material-card ${!mat.available_now ? 'unavailable' : ''}`}
+            >
               <div className="material-name">
                 {RARITY_EMOJI[mat.rarity] || ''} {mat.name}
               </div>
@@ -225,21 +233,30 @@ export default function CraftingPanel({ showToast }) {
       {subTab === 'recipes' && (
         <div className="recipes-list">
           {recipes.map((recipe) => (
-            <div key={recipe.name} className={`recipe-card ${!recipe.known ? 'locked' : ''}`}>
+            <div
+              key={recipe.name}
+              className={`recipe-card ${!recipe.known ? 'locked' : ''}`}
+            >
               <div className="recipe-top">
                 <div>
                   <div className="recipe-name">
-                    {recipe.known ? '' : '\u{1F512} '}{recipe.name}
+                    {recipe.known ? '' : '\u{1F512} '}
+                    {recipe.name}
                   </div>
                   <div className="recipe-desc">{recipe.description}</div>
                 </div>
                 <span className="recipe-category">{recipe.category}</span>
               </div>
               <div className="recipe-meta">
-                <span>{WORKSTATION_EMOJI[recipe.workstation] || ''} {recipe.workstation}</span>
+                <span>
+                  {WORKSTATION_EMOJI[recipe.workstation] || ''}{' '}
+                  {recipe.workstation}
+                </span>
                 <span>Skill: {recipe.skill_requirement}</span>
                 <span>Time: {recipe.base_craft_time}h</span>
-                {recipe.comfort_score > 0 && <span>Comfort: {recipe.comfort_score}</span>}
+                {recipe.comfort_score > 0 && (
+                  <span>Comfort: {recipe.comfort_score}</span>
+                )}
               </div>
               <div className="recipe-ingredients">
                 {recipe.ingredient_status.map((ing) => (
@@ -257,10 +274,18 @@ export default function CraftingPanel({ showToast }) {
                   onClick={() => handleCraft(recipe)}
                   disabled={!recipe.can_craft || busy}
                 >
-                  {busy ? 'Working...' : recipe.can_craft ? 'Craft' : 'Missing materials or skill'}
+                  {busy
+                    ? 'Working...'
+                    : recipe.can_craft
+                      ? 'Craft'
+                      : 'Missing materials or skill'}
                 </button>
               ) : (
-                <button className="btn-learn" onClick={() => handleLearn(recipe.name)} disabled={busy}>
+                <button
+                  className="btn-learn"
+                  onClick={() => handleLearn(recipe.name)}
+                  disabled={busy}
+                >
                   Learn Recipe
                 </button>
               )}
@@ -286,26 +311,35 @@ export default function CraftingPanel({ showToast }) {
                 {crafter.crafted_items.map((item, idx) => (
                   <div key={idx} className="crafted-card">
                     <div className="crafted-name">{item.name}</div>
-                    <div className={`crafted-quality quality-${item.quality.toLowerCase()}`}>
+                    <div
+                      className={`crafted-quality quality-${item.quality.toLowerCase()}`}
+                    >
                       {item.quality}
                     </div>
                     {item.comfort > 0 && (
-                      <div className="crafted-stat">Comfort: {item.comfort}</div>
+                      <div className="crafted-stat">
+                        Comfort: {item.comfort}
+                      </div>
                     )}
                     {item.category === 'tool' && (
                       <>
                         <div className="crafted-stat">
-                          Speed: {item.tool_speed_bonus > 0 ? '+' : ''}{(item.tool_speed_bonus * 100).toFixed(0)}%
+                          Speed: {item.tool_speed_bonus > 0 ? '+' : ''}
+                          {(item.tool_speed_bonus * 100).toFixed(0)}%
                         </div>
                         <button
                           className={`btn-equip ${crafter.equipped_tool === item.name ? 'equipped' : ''}`}
                           onClick={() => {
-                            const toolIdx = tools.findIndex((t) => t.name === item.name);
+                            const toolIdx = tools.findIndex(
+                              (t) => t.name === item.name
+                            );
                             if (toolIdx >= 0) handleEquip(toolIdx);
                           }}
                           disabled={crafter.equipped_tool === item.name || busy}
                         >
-                          {crafter.equipped_tool === item.name ? 'Equipped' : 'Equip'}
+                          {crafter.equipped_tool === item.name
+                            ? 'Equipped'
+                            : 'Equip'}
                         </button>
                       </>
                     )}
@@ -317,7 +351,9 @@ export default function CraftingPanel({ showToast }) {
         </>
       )}
 
-      {craftResult && <CraftResult result={craftResult} onDone={dismissResult} />}
+      {craftResult && (
+        <CraftResult result={craftResult} onDone={dismissResult} />
+      )}
     </div>
   );
 }

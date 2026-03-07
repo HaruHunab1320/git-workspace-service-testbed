@@ -5,13 +5,19 @@ const STUDY_DURATION = 25 * 60;
 const BREAK_DURATION = 5 * 60;
 
 function formatTime(seconds) {
-  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, '0');
   const s = (seconds % 60).toString().padStart(2, '0');
   return `${m}:${s}`;
 }
 
 const STATE_CONFIG = {
-  idle: { label: 'Ready when you are', variant: 'lavender', progress: 'lavender' },
+  idle: {
+    label: 'Ready when you are',
+    variant: 'lavender',
+    progress: 'lavender',
+  },
   studying: { label: 'Focus time', variant: 'mint', progress: 'mint' },
   break: { label: 'Break time', variant: 'peach', progress: 'peach' },
 };
@@ -63,7 +69,9 @@ function StudyTimer({ studyState, onStateChange }) {
     <div className="study-timer">
       <div className="study-timer__display">
         <span className="timer-time">{formatTime(timeLeft)}</span>
-        <PastelBadge variant={config.variant} size="sm">{config.label}</PastelBadge>
+        <PastelBadge variant={config.variant} size="sm">
+          {config.label}
+        </PastelBadge>
       </div>
 
       <PastelProgress

@@ -54,7 +54,9 @@ function createRng(seed) {
 export function getForecast(day, season) {
   const s = season.toLowerCase();
   if (!SEASON_SET.has(s)) {
-    throw new Error(`Invalid season "${season}". Must be one of: ${SEASONS.join(', ')}`);
+    throw new Error(
+      `Invalid season "${season}". Must be one of: ${SEASONS.join(', ')}`
+    );
   }
 
   const seed = day * 2654435761 + SEASON_INDEX.get(s) * 7919;

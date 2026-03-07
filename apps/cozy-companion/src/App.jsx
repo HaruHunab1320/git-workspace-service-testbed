@@ -59,12 +59,15 @@ export default function App() {
 
   const dismissToast = useCallback(() => setToast(null), []);
 
-  const handleMoodSelect = useCallback((m) => {
-    setMood(m);
-    if (m) {
-      showToast(`Mood set to ${m}`, 'success');
-    }
-  }, [showToast]);
+  const handleMoodSelect = useCallback(
+    (m) => {
+      setMood(m);
+      if (m) {
+        showToast(`Mood set to ${m}`, 'success');
+      }
+    },
+    [showToast]
+  );
 
   return (
     <div className="companion-app">
@@ -89,7 +92,12 @@ export default function App() {
       <main className="companion-main">
         {activeTab === 'home' && (
           <>
-            <PastelCard title="Your Companion" icon=">" glow="lavender" padding="lg">
+            <PastelCard
+              title="Your Companion"
+              icon=">"
+              glow="lavender"
+              padding="lg"
+            >
               <CompanionDisplay mood={mood} />
             </PastelCard>
 
@@ -104,11 +112,17 @@ export default function App() {
             </div>
 
             <PastelCard title="Gentle Reminders" icon="*" glow="mint">
-              <GentleReminders reminders={DEFAULT_REMINDERS} intervalMs={30000} />
+              <GentleReminders
+                reminders={DEFAULT_REMINDERS}
+                intervalMs={30000}
+              />
             </PastelCard>
 
             <div className="companion-footer-tip">
-              <PastelTooltip text="Visit the Journal tab to write about your day" position="top">
+              <PastelTooltip
+                text="Visit the Journal tab to write about your day"
+                position="top"
+              >
                 <PastelBadge variant="lavender" size="sm">
                   Tip: Use the journal to reflect on your day
                 </PastelBadge>
@@ -117,13 +131,9 @@ export default function App() {
           </>
         )}
 
-        {activeTab === 'journal' && (
-          <JournalPanel showToast={showToast} />
-        )}
+        {activeTab === 'journal' && <JournalPanel showToast={showToast} />}
 
-        {activeTab === 'settings' && (
-          <SettingsPanel showToast={showToast} />
-        )}
+        {activeTab === 'settings' && <SettingsPanel showToast={showToast} />}
       </main>
 
       <footer className="companion-app-footer">

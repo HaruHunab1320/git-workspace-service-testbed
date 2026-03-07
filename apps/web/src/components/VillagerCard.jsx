@@ -2,12 +2,21 @@ import { useState } from 'react';
 import GiftModal from './GiftModal';
 
 const MOOD_EMOJI = {
-  joyful: '😄', content: '😊', neutral: '😐',
-  lonely: '😢', upset: '😠',
+  joyful: '😄',
+  content: '😊',
+  neutral: '😐',
+  lonely: '😢',
+  upset: '😠',
 };
 
 function friendshipHearts(tier) {
-  const map = { stranger: 0, acquaintance: 1, friend: 2, close_friend: 3, best_friend: 5 };
+  const map = {
+    stranger: 0,
+    acquaintance: 1,
+    friend: 2,
+    close_friend: 3,
+    best_friend: 5,
+  };
   const count = map[tier] ?? 0;
   return '❤️'.repeat(count) || '🤍';
 }
@@ -31,15 +40,14 @@ export default function VillagerCard({ villager, onRefresh, showToast }) {
         </span>
       </div>
 
-      <div className="villager-detail">
-        📍 {villager.location}
-      </div>
+      <div className="villager-detail">📍 {villager.location}</div>
 
       {playerFriendship && (
         <div className="villager-detail">
           <span>{friendshipHearts(playerFriendship.tier)}</span>
           <span className="friendship-label">
-            {playerFriendship.tier.replace('_', ' ')} ({playerFriendship.points} pts)
+            {playerFriendship.tier.replace('_', ' ')} ({playerFriendship.points}{' '}
+            pts)
           </span>
         </div>
       )}
@@ -52,7 +60,10 @@ export default function VillagerCard({ villager, onRefresh, showToast }) {
       )}
 
       <div style={{ marginTop: 8 }}>
-        <button className="btn btn-sm btn-primary" onClick={() => setShowGift(true)}>
+        <button
+          className="btn btn-sm btn-primary"
+          onClick={() => setShowGift(true)}
+        >
           🎁 Give Gift
         </button>
       </div>

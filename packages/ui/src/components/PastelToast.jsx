@@ -30,7 +30,11 @@ export default function PastelToast({
       {icon && <span className="pastel-toast__icon">{icon}</span>}
       <span className="pastel-toast__message">{message}</span>
       {onDismiss && (
-        <button className="pastel-toast__close" onClick={onDismiss} aria-label="Dismiss">
+        <button
+          className="pastel-toast__close"
+          onClick={onDismiss}
+          aria-label="Dismiss"
+        >
           x
         </button>
       )}

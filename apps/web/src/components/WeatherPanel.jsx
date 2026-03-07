@@ -1,9 +1,16 @@
 import './WeatherPanel.css';
 
 const SKY_EMOJI = {
-  clear: '☀️', partly_cloudy: '⛅', overcast: '☁️',
-  drizzle: '🌧️', rain: '🌧️', thunderstorm: '⛈️',
-  snow: '🌨️', blizzard: '🌨️', fog: '🌫️', hail: '🪨',
+  clear: '☀️',
+  partly_cloudy: '⛅',
+  overcast: '☁️',
+  drizzle: '🌧️',
+  rain: '🌧️',
+  thunderstorm: '⛈️',
+  snow: '🌨️',
+  blizzard: '🌨️',
+  fog: '🌫️',
+  hail: '🪨',
 };
 
 const MAGICAL_EMOJI = {
@@ -11,7 +18,7 @@ const MAGICAL_EMOJI = {
   'petal blizzard': '🌸',
   'moonbow night': '🌙',
   'eternal golden hour': '🌅',
-  'starfall': '⭐',
+  starfall: '⭐',
   'whispering mist': '🌫️',
   'firefly storm': '🪲',
   'crystal frost': '💎',
@@ -21,8 +28,12 @@ const MAGICAL_EMOJI = {
 
 const SEASON_EMOJI = { spring: '🌸', summer: '☀️', autumn: '🍂', winter: '❄️' };
 const MOOD_EMOJI = {
-  joyful: '😄', content: '😊', melancholy: '😔',
-  cozy: '☕', enchanted: '✨', restless: '💨',
+  joyful: '😄',
+  content: '😊',
+  melancholy: '😔',
+  cozy: '☕',
+  enchanted: '✨',
+  restless: '💨',
 };
 const MOOD_LABEL = {
   joyful: 'The village is joyful!',
@@ -60,17 +71,23 @@ export default function WeatherPanel({ weather, forecast }) {
   return (
     <div className={`weather-panel season-theme-${season}`}>
       {/* Current weather card */}
-      <div className={`card weather-current ${weather.is_magical ? 'magical-glow' : ''}`}>
+      <div
+        className={`card weather-current ${weather.is_magical ? 'magical-glow' : ''}`}
+      >
         <div className="weather-season-badge">
           <span>{SEASON_EMOJI[season] || '🌸'}</span>
           <span>{season.charAt(0).toUpperCase() + season.slice(1)}</span>
         </div>
 
         <div className="weather-main">
-          <span className="weather-big-emoji">{SKY_EMOJI[weather.sky] || '☀️'}</span>
+          <span className="weather-big-emoji">
+            {SKY_EMOJI[weather.sky] || '☀️'}
+          </span>
           <div className="weather-info">
             <div className="weather-temp">{weather.temperature_c}&deg;C</div>
-            <div className="weather-feels">Feels like {weather.feels_like_c}&deg;C</div>
+            <div className="weather-feels">
+              Feels like {weather.feels_like_c}&deg;C
+            </div>
             <div className="weather-sky">{weather.sky.replace(/_/g, ' ')}</div>
           </div>
         </div>
@@ -82,7 +99,9 @@ export default function WeatherPanel({ weather, forecast }) {
           </div>
           <div className="weather-detail">
             <span className="detail-icon">🌬️</span>
-            <span>Wind: {weather.wind_speed_kph} km/h {weather.wind_direction}</span>
+            <span>
+              Wind: {weather.wind_speed_kph} km/h {weather.wind_direction}
+            </span>
           </div>
           <div className="weather-detail">
             <span className="detail-icon">⚠️</span>
@@ -95,7 +114,8 @@ export default function WeatherPanel({ weather, forecast }) {
         {/* Weather streak indicator */}
         {streak && streak.days >= 2 && (
           <div className="weather-streak">
-            {SKY_EMOJI[streak.sky] || '☀️'} {streak.days} days of {streak.sky.replace(/_/g, ' ')}
+            {SKY_EMOJI[streak.sky] || '☀️'} {streak.days} days of{' '}
+            {streak.sky.replace(/_/g, ' ')}
           </div>
         )}
 
@@ -118,7 +138,9 @@ export default function WeatherPanel({ weather, forecast }) {
             <div className="festival-header">🎉 Festival Day!</div>
             {weather.festivals.map((f, i) => (
               <div key={i} className="festival-item">
-                <span className="festival-icon">{FESTIVAL_EMOJI[f] || '🎪'}</span>
+                <span className="festival-icon">
+                  {FESTIVAL_EMOJI[f] || '🎪'}
+                </span>
                 <span className="festival-name">{f}</span>
               </div>
             ))}
@@ -128,8 +150,12 @@ export default function WeatherPanel({ weather, forecast }) {
         {/* Village mood */}
         {weather.village_mood && (
           <div className={`weather-mood mood-${weather.village_mood}`}>
-            <span className="mood-icon">{MOOD_EMOJI[weather.village_mood] || '😊'}</span>
-            <span>{MOOD_LABEL[weather.village_mood] || weather.village_mood}</span>
+            <span className="mood-icon">
+              {MOOD_EMOJI[weather.village_mood] || '😊'}
+            </span>
+            <span>
+              {MOOD_LABEL[weather.village_mood] || weather.village_mood}
+            </span>
           </div>
         )}
       </div>
@@ -139,7 +165,10 @@ export default function WeatherPanel({ weather, forecast }) {
         <h3 className="card-title">📅 5-Day Forecast</h3>
         <div className="forecast-grid">
           {forecast.map((f, i) => (
-            <div key={i} className={`forecast-day ${f.is_magical ? 'magical-glow' : ''}`}>
+            <div
+              key={i}
+              className={`forecast-day ${f.is_magical ? 'magical-glow' : ''}`}
+            >
               <div className="forecast-day-num">Day {f.day}</div>
               <div className="forecast-emoji">{SKY_EMOJI[f.sky] || '☀️'}</div>
               <div className="forecast-temp">{f.temperature_c}&deg;C</div>

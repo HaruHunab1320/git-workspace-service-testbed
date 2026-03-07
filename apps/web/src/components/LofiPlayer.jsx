@@ -2,10 +2,26 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import './LofiPlayer.css';
 
 const STATIONS = [
-  { name: 'Sleepy Village', url: 'https://stream.zeno.fm/0r0xa792kwzuv', emoji: '🏡' },
-  { name: 'Rainy Window', url: 'https://stream.zeno.fm/f3wvbbqmdg8uv', emoji: '🌧️' },
-  { name: 'Cozy Fireplace', url: 'https://stream.zeno.fm/4d6bhkaqmg8uv', emoji: '🔥' },
-  { name: 'Moonlit Garden', url: 'https://stream.zeno.fm/mfnb0u0cxzzuv', emoji: '🌙' },
+  {
+    name: 'Sleepy Village',
+    url: 'https://stream.zeno.fm/0r0xa792kwzuv',
+    emoji: '🏡',
+  },
+  {
+    name: 'Rainy Window',
+    url: 'https://stream.zeno.fm/f3wvbbqmdg8uv',
+    emoji: '🌧️',
+  },
+  {
+    name: 'Cozy Fireplace',
+    url: 'https://stream.zeno.fm/4d6bhkaqmg8uv',
+    emoji: '🔥',
+  },
+  {
+    name: 'Moonlit Garden',
+    url: 'https://stream.zeno.fm/mfnb0u0cxzzuv',
+    emoji: '🌙',
+  },
 ];
 
 export default function LofiPlayer() {
@@ -22,13 +38,16 @@ export default function LofiPlayer() {
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = volume;
-    audio.play().then(() => {
-      setIsPlaying(true);
-      setHasError(false);
-    }).catch(() => {
-      setHasError(true);
-      setIsPlaying(false);
-    });
+    audio
+      .play()
+      .then(() => {
+        setIsPlaying(true);
+        setHasError(false);
+      })
+      .catch(() => {
+        setHasError(true);
+        setIsPlaying(false);
+      });
   }, [volume]);
 
   const pause = useCallback(() => {
@@ -92,7 +111,10 @@ export default function LofiPlayer() {
         <div className="lofi-panel">
           <div className="lofi-header">
             <span className="lofi-title">lo-fi radio</span>
-            <button className="lofi-collapse-btn" onClick={() => setIsExpanded(false)}>
+            <button
+              className="lofi-collapse-btn"
+              onClick={() => setIsExpanded(false)}
+            >
               &minus;
             </button>
           </div>
@@ -117,12 +139,18 @@ export default function LofiPlayer() {
           </div>
 
           <div className="lofi-station-info">
-            <span className="lofi-station-name">{station.emoji} {station.name}</span>
+            <span className="lofi-station-name">
+              {station.emoji} {station.name}
+            </span>
             {hasError && <span className="lofi-error">stream unavailable</span>}
           </div>
 
           <div className="lofi-controls">
-            <button className="lofi-ctrl-btn" onClick={prevStation} title="Previous station">
+            <button
+              className="lofi-ctrl-btn"
+              onClick={prevStation}
+              title="Previous station"
+            >
               ⏮
             </button>
             <button
@@ -132,13 +160,19 @@ export default function LofiPlayer() {
             >
               {isPlaying ? '⏸' : '▶'}
             </button>
-            <button className="lofi-ctrl-btn" onClick={nextStation} title="Next station">
+            <button
+              className="lofi-ctrl-btn"
+              onClick={nextStation}
+              title="Next station"
+            >
               ⏭
             </button>
           </div>
 
           <div className="lofi-volume">
-            <span className="lofi-volume-icon">{volume === 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}</span>
+            <span className="lofi-volume-icon">
+              {volume === 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}
+            </span>
             <input
               type="range"
               min="0"

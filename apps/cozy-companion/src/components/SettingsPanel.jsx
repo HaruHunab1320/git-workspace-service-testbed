@@ -52,10 +52,16 @@ function persistSettings(settings) {
 export default function SettingsPanel({ showToast }) {
   const [saved] = useState(loadSettings);
   const [soundEnabled, setSoundEnabled] = useState(saved?.soundEnabled ?? true);
-  const [remindersEnabled, setRemindersEnabled] = useState(saved?.remindersEnabled ?? true);
+  const [remindersEnabled, setRemindersEnabled] = useState(
+    saved?.remindersEnabled ?? true
+  );
   const [theme, setTheme] = useState(saved?.theme ?? 'lavender');
-  const [companionName, setCompanionName] = useState(saved?.companionName ?? 'Mochi');
-  const [reminderInterval, setReminderInterval] = useState(saved?.reminderInterval ?? '30000');
+  const [companionName, setCompanionName] = useState(
+    saved?.companionName ?? 'Mochi'
+  );
+  const [reminderInterval, setReminderInterval] = useState(
+    saved?.reminderInterval ?? '30000'
+  );
   const [confirmReset, setConfirmReset] = useState(false);
   const [hasUnsaved, setHasUnsaved] = useState(false);
 
@@ -71,7 +77,14 @@ export default function SettingsPanel({ showToast }) {
     });
     setHasUnsaved(false);
     showToast?.('Settings saved', 'success');
-  }, [soundEnabled, remindersEnabled, theme, companionName, reminderInterval, showToast]);
+  }, [
+    soundEnabled,
+    remindersEnabled,
+    theme,
+    companionName,
+    reminderInterval,
+    showToast,
+  ]);
 
   const handleReset = useCallback(() => {
     setSoundEnabled(true);
@@ -91,7 +104,10 @@ export default function SettingsPanel({ showToast }) {
         <PastelInput
           label="Companion Name"
           value={companionName}
-          onChange={(e) => { setCompanionName(e.target.value); markDirty(); }}
+          onChange={(e) => {
+            setCompanionName(e.target.value);
+            markDirty();
+          }}
           placeholder="Give your companion a name"
           hint="Your companion will remember this"
         />
@@ -104,7 +120,10 @@ export default function SettingsPanel({ showToast }) {
           label="Color Theme"
           options={THEME_OPTIONS}
           value={theme}
-          onChange={(e) => { setTheme(e.target.value); markDirty(); }}
+          onChange={(e) => {
+            setTheme(e.target.value);
+            markDirty();
+          }}
         />
 
         <div className="theme-preview">
@@ -113,7 +132,10 @@ export default function SettingsPanel({ showToast }) {
               key={opt.value}
               className={`theme-swatch ${theme === opt.value ? 'theme-swatch--active' : ''}`}
               style={{ background: `var(${THEME_PREVIEW[opt.value]})` }}
-              onClick={() => { setTheme(opt.value); markDirty(); }}
+              onClick={() => {
+                setTheme(opt.value);
+                markDirty();
+              }}
               aria-label={opt.label}
               title={opt.label}
             />
@@ -127,14 +149,20 @@ export default function SettingsPanel({ showToast }) {
         <PastelToggle
           label="Sound Effects"
           checked={soundEnabled}
-          onChange={(e) => { setSoundEnabled(e.target.checked); markDirty(); }}
+          onChange={(e) => {
+            setSoundEnabled(e.target.checked);
+            markDirty();
+          }}
           variant="mint"
         />
 
         <PastelToggle
           label="Gentle Reminders"
           checked={remindersEnabled}
-          onChange={(e) => { setRemindersEnabled(e.target.checked); markDirty(); }}
+          onChange={(e) => {
+            setRemindersEnabled(e.target.checked);
+            markDirty();
+          }}
           variant="lavender"
         />
       </div>
@@ -145,7 +173,10 @@ export default function SettingsPanel({ showToast }) {
             label="Reminder Frequency"
             options={INTERVAL_OPTIONS}
             value={reminderInterval}
-            onChange={(e) => { setReminderInterval(e.target.value); markDirty(); }}
+            onChange={(e) => {
+              setReminderInterval(e.target.value);
+              markDirty();
+            }}
           />
         </div>
       )}
@@ -153,12 +184,20 @@ export default function SettingsPanel({ showToast }) {
       <PastelDivider />
 
       <div className="settings-actions">
-        <PastelButton variant="ghost" size="sm" onClick={() => setConfirmReset(true)}>
+        <PastelButton
+          variant="ghost"
+          size="sm"
+          onClick={() => setConfirmReset(true)}
+        >
           Reset to Defaults
         </PastelButton>
         <PastelButton variant="mint" onClick={handleSave}>
           Save Settings
-          {hasUnsaved && <PastelBadge variant="peach" size="sm" className="unsaved-dot">*</PastelBadge>}
+          {hasUnsaved && (
+            <PastelBadge variant="peach" size="sm" className="unsaved-dot">
+              *
+            </PastelBadge>
+          )}
         </PastelButton>
       </div>
 
@@ -170,7 +209,10 @@ export default function SettingsPanel({ showToast }) {
         size="sm"
         actions={
           <>
-            <PastelButton variant="ghost" onClick={() => setConfirmReset(false)}>
+            <PastelButton
+              variant="ghost"
+              onClick={() => setConfirmReset(false)}
+            >
               Cancel
             </PastelButton>
             <PastelButton variant="blush" onClick={handleReset}>

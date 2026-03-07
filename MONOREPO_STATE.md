@@ -117,27 +117,27 @@
 
 ## Workspace Configuration
 
-| File | Purpose |
-|------|---------|
-| `package.json` | Root workspace definition (`apps/*`, `packages/*`) |
-| `turbo.json` | Turborepo pipeline -- `build`, `dev`, `test`, `lint` tasks |
-| `.prettierrc` | Code formatting config |
-| `.editorconfig` | Editor settings |
-| `.nvmrc` | Node.js version pin (20) |
+| File            | Purpose                                                    |
+| --------------- | ---------------------------------------------------------- |
+| `package.json`  | Root workspace definition (`apps/*`, `packages/*`)         |
+| `turbo.json`    | Turborepo pipeline -- `build`, `dev`, `test`, `lint` tasks |
+| `.prettierrc`   | Code formatting config                                     |
+| `.editorconfig` | Editor settings                                            |
+| `.nvmrc`        | Node.js version pin (20)                                   |
 
 ## Existing Documentation
 
-| File | Description |
-|------|-------------|
-| `README.md` | Project overview, structure, setup instructions, game systems |
-| `CONTRIBUTING.md` | Contribution guidelines |
-| `MONOREPO_STATE.md` | This file -- monorepo inventory and state summary |
-| `BACKEND_STATUS.md` | Backend implementation status and details |
-| `FRONTEND_STATUS.md` | Frontend implementation status and details |
-| `TEA_RECIPES.md` | Tea recipe content for the tea brewing feature |
-| `CLAUDE_TEST.md` | Test marker file |
-| `docs/logging.md` | Logger utility API documentation |
+| File                 | Description                                                   |
+| -------------------- | ------------------------------------------------------------- |
+| `README.md`          | Project overview, structure, setup instructions, game systems |
+| `CONTRIBUTING.md`    | Contribution guidelines                                       |
+| `MONOREPO_STATE.md`  | This file -- monorepo inventory and state summary             |
+| `BACKEND_STATUS.md`  | Backend implementation status and details                     |
+| `FRONTEND_STATUS.md` | Frontend implementation status and details                    |
+| `TEA_RECIPES.md`     | Tea recipe content for the tea brewing feature                |
+| `CLAUDE_TEST.md`     | Test marker file                                              |
+| `docs/logging.md`    | Logger utility API documentation                              |
 
 ---
 
-*Updated by agent gamma*
+_Updated by agent gamma_

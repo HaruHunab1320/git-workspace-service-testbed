@@ -5,11 +5,14 @@ const STORAGE_KEY = 'windchimes-state';
 
 // Pentatonic scale tuned for shimmery, high-register chime tones
 const CHIME_NOTES = [
-  523.3, 587.3, 659.3, 784.0, 880.0,
-  1046.5, 1174.7, 1318.5, 1568.0,
+  523.3, 587.3, 659.3, 784.0, 880.0, 1046.5, 1174.7, 1318.5, 1568.0,
 ];
 
-const PACE_LABELS = { gentle: 'Gentle', moderate: 'Moderate', lively: 'Lively' };
+const PACE_LABELS = {
+  gentle: 'Gentle',
+  moderate: 'Moderate',
+  lively: 'Lively',
+};
 const PACES = ['gentle', 'moderate', 'lively'];
 
 // Interval ranges (ms) for each pace — [min, max]
@@ -208,7 +211,9 @@ export default function WindChimes() {
   };
 
   return (
-    <div className={`windchimes-widget ${isExpanded ? 'expanded' : 'collapsed'}`}>
+    <div
+      className={`windchimes-widget ${isExpanded ? 'expanded' : 'collapsed'}`}
+    >
       {isExpanded ? (
         <div className="windchimes-panel">
           <div className="windchimes-header">
@@ -222,7 +227,11 @@ export default function WindChimes() {
           </div>
 
           {/* Chime Visualization */}
-          <div className="windchimes-visual" onClick={playPreview} title="Click to preview">
+          <div
+            className="windchimes-visual"
+            onClick={playPreview}
+            title="Click to preview"
+          >
             <div className="windchimes-bar" />
             <div className={`windchimes-tubes ${swaying ? 'sway' : ''}`}>
               <div className="chime-tube tube-1" />
@@ -278,9 +287,7 @@ export default function WindChimes() {
             />
           </div>
 
-          <div className="windchimes-hint">
-            Click the chimes to preview
-          </div>
+          <div className="windchimes-hint">Click the chimes to preview</div>
         </div>
       ) : (
         <button

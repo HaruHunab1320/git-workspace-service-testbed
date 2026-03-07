@@ -53,8 +53,14 @@
 }
 
 @keyframes lofi-pulse-ring {
-  0% { transform: scale(1); opacity: 0.7; }
-  100% { transform: scale(1.35); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
 }
 
 /* ---- Expanded Panel ---- */
@@ -69,8 +75,14 @@
 }
 
 @keyframes lofi-slide-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .lofi-header {
@@ -128,7 +140,8 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%,
+  background: radial-gradient(
+    circle at 50% 50%,
     var(--brown) 18%,
     var(--brown-light) 19%,
     var(--brown-light) 22%,
@@ -155,7 +168,9 @@
 }
 
 @keyframes lofi-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .lofi-vinyl-label {
@@ -184,15 +199,29 @@
   animation: lofi-bounce 1.2s ease-in-out infinite alternate;
 }
 
-.lofi-bar:nth-child(1) { height: 30%; }
-.lofi-bar:nth-child(2) { height: 60%; }
-.lofi-bar:nth-child(3) { height: 45%; }
-.lofi-bar:nth-child(4) { height: 70%; }
-.lofi-bar:nth-child(5) { height: 35%; }
+.lofi-bar:nth-child(1) {
+  height: 30%;
+}
+.lofi-bar:nth-child(2) {
+  height: 60%;
+}
+.lofi-bar:nth-child(3) {
+  height: 45%;
+}
+.lofi-bar:nth-child(4) {
+  height: 70%;
+}
+.lofi-bar:nth-child(5) {
+  height: 35%;
+}
 
 @keyframes lofi-bounce {
-  0% { transform: scaleY(0.3); }
-  100% { transform: scaleY(1); }
+  0% {
+    transform: scaleY(0.3);
+  }
+  100% {
+    transform: scaleY(1);
+  }
 }
 
 /* ---- Station Info ---- */

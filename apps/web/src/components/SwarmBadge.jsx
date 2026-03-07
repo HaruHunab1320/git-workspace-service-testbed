@@ -9,7 +9,11 @@ const SWARM_TYPES = {
   dragonflies: { emoji: '\u{1FAB0}', label: 'Dragonflies', color: 'teal' },
 };
 
-export default function SwarmBadge({ type = 'fireflies', count = 0, active = false }) {
+export default function SwarmBadge({
+  type = 'fireflies',
+  count = 0,
+  active = false,
+}) {
   const swarm = SWARM_TYPES[type] || SWARM_TYPES.fireflies;
   const [pulse, setPulse] = useState(false);
 
@@ -22,7 +26,9 @@ export default function SwarmBadge({ type = 'fireflies', count = 0, active = fal
   }, [count, active]);
 
   return (
-    <div className={`swarm-badge swarm-badge--${swarm.color} ${active ? 'swarm-badge--active' : ''} ${pulse ? 'swarm-badge--pulse' : ''}`}>
+    <div
+      className={`swarm-badge swarm-badge--${swarm.color} ${active ? 'swarm-badge--active' : ''} ${pulse ? 'swarm-badge--pulse' : ''}`}
+    >
       <span className="swarm-badge__icon">{swarm.emoji}</span>
       <span className="swarm-badge__label">{swarm.label}</span>
       {count > 0 && <span className="swarm-badge__count">{count}</span>}

@@ -51,8 +51,15 @@ body {
 }
 
 @keyframes header-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.12); opacity: 0; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
 }
 
 .companion-header__title {
@@ -70,8 +77,14 @@ body {
 }
 
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ---- Main Layout ---- */
@@ -123,22 +136,38 @@ body {
 }
 
 @keyframes companion-breathe {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
 }
 
 .companion-shadow {
   width: 60px;
   height: 8px;
-  background: radial-gradient(ellipse, rgba(74, 55, 40, 0.08) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse,
+    rgba(74, 55, 40, 0.08) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   margin-top: 4px;
   animation: shadow-breathe 4s ease-in-out infinite;
 }
 
 @keyframes shadow-breathe {
-  0%, 100% { transform: scaleX(1); opacity: 1; }
-  50% { transform: scaleX(0.85); opacity: 0.6; }
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scaleX(0.85);
+    opacity: 0.6;
+  }
 }
 
 .companion-particles {
@@ -169,7 +198,10 @@ body {
   }
   100% {
     opacity: 0;
-    transform: translate(var(--x-offset, 0), calc(-1 * var(--float-distance, 24px)));
+    transform: translate(
+      var(--x-offset, 0),
+      calc(-1 * var(--float-distance, 24px))
+    );
   }
 }
 
@@ -332,8 +364,13 @@ body {
 }
 
 @keyframes timer-done-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .timer-state-label {
@@ -400,16 +437,28 @@ body {
   align-items: flex-start;
   gap: var(--space-md, 12px);
   padding: var(--space-lg, 16px);
-  background: linear-gradient(135deg, var(--pastel-lavender-light, #f3ebfa), var(--pastel-mint-light, #e8f8ee));
+  background: linear-gradient(
+    135deg,
+    var(--pastel-lavender-light, #f3ebfa),
+    var(--pastel-mint-light, #e8f8ee)
+  );
   border-radius: var(--radius-lg, 16px);
   border: 1px solid var(--pastel-lavender, #e8d5f5);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   animation: reminder-enter 0.4s ease;
 }
 
 @keyframes reminder-enter {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .reminder-card--fading {
@@ -425,8 +474,13 @@ body {
 }
 
 @keyframes icon-glow {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .reminder-card__text {
@@ -692,7 +746,8 @@ body {
   gap: var(--space-sm, 8px);
   padding: var(--space-sm, 8px) var(--space-md, 12px);
   background: var(--pastel-lavender-light, #f3ebfa);
-  border-radius: var(--radius-md, 12px) var(--radius-md, 12px) var(--radius-md, 12px) 4px;
+  border-radius: var(--radius-md, 12px) var(--radius-md, 12px)
+    var(--radius-md, 12px) 4px;
   animation: fade-in-up 0.3s ease;
 }
 
@@ -784,6 +839,10 @@ body {
 /* ---- Utility Animations ---- */
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }

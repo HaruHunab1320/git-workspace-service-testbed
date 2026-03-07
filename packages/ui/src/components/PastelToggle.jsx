@@ -10,7 +10,9 @@ export default function PastelToggle({
   ...props
 }) {
   return (
-    <label className={`pastel-toggle ${disabled ? 'pastel-toggle--disabled' : ''} ${className}`}>
+    <label
+      className={`pastel-toggle ${disabled ? 'pastel-toggle--disabled' : ''} ${className}`}
+    >
       <input
         type="checkbox"
         className="pastel-toggle__input"

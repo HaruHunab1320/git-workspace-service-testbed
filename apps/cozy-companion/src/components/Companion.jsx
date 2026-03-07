@@ -24,7 +24,9 @@ function Companion({ mood, studyState }) {
         <div className="companion-widget__body">
           <div className="companion-widget__face">{expression.face}</div>
           {overlay && (
-            <div className="companion-widget__particles">{overlay.particles}</div>
+            <div className="companion-widget__particles">
+              {overlay.particles}
+            </div>
           )}
         </div>
       </PastelTooltip>

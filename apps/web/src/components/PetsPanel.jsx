@@ -9,8 +9,17 @@ export default function PetsPanel({ pets, onRefresh, showToast }) {
 
   return (
     <div className="pets-panel">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <h3 className="card-title" style={{ margin: 0 }}>🐾 Pet Companions</h3>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 12,
+        }}
+      >
+        <h3 className="card-title" style={{ margin: 0 }}>
+          🐾 Pet Companions
+        </h3>
         <button className="btn btn-primary" onClick={() => setShowAdopt(true)}>
           🏠 Adopt
         </button>

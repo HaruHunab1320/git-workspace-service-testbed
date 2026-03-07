@@ -17,7 +17,9 @@ export default function PastelProgress({
       {(label || showValue) && (
         <div className="pastel-progress__header">
           {label && <span className="pastel-progress__label">{label}</span>}
-          {showValue && <span className="pastel-progress__value">{Math.round(pct)}%</span>}
+          {showValue && (
+            <span className="pastel-progress__value">{Math.round(pct)}%</span>
+          )}
         </div>
       )}
       <div className={`pastel-progress__track pastel-progress__track--${size}`}>

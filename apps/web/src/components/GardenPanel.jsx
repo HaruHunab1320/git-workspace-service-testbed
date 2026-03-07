@@ -7,7 +7,11 @@ export default function GardenPanel({ garden, season, onRefresh, showToast }) {
   const [plantTarget, setPlantTarget] = useState(null);
 
   if (!garden) {
-    return <div className="card"><p>No garden data.</p></div>;
+    return (
+      <div className="card">
+        <p>No garden data.</p>
+      </div>
+    );
   }
 
   const handlePlotClick = (row, col) => {

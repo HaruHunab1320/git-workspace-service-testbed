@@ -2,21 +2,125 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import './AmbientLofiMixer.css';
 
 const CHANNELS = [
-  { id: 'rain', name: 'Rain', emoji: '🌧️', color: '#7a9ec8', description: 'Gentle rainfall on a window' },
-  { id: 'vinyl', name: 'Vinyl Crackle', emoji: '💿', color: '#b8956a', description: 'Warm record player hiss' },
-  { id: 'keys', name: 'Piano Keys', emoji: '🎹', color: '#c8848a', description: 'Soft Rhodes chords' },
-  { id: 'bass', name: 'Lo-fi Bass', emoji: '🎸', color: '#7a9e7e', description: 'Mellow sub-bass hum' },
-  { id: 'fire', name: 'Fireplace', emoji: '🔥', color: '#c8a04a', description: 'Crackling embers' },
-  { id: 'wind', name: 'Night Wind', emoji: '🍃', color: '#8faabe', description: 'Soft breeze through trees' },
-  { id: 'birds', name: 'Morning Birds', emoji: '🐦', color: '#a8c5a0', description: 'Distant birdsong' },
-  { id: 'cafe', name: 'Cafe Murmur', emoji: '☕', color: '#9e8a7a', description: 'Quiet coffeeshop bustle' },
+  {
+    id: 'rain',
+    name: 'Rain',
+    emoji: '🌧️',
+    color: '#7a9ec8',
+    description: 'Gentle rainfall on a window',
+  },
+  {
+    id: 'vinyl',
+    name: 'Vinyl Crackle',
+    emoji: '💿',
+    color: '#b8956a',
+    description: 'Warm record player hiss',
+  },
+  {
+    id: 'keys',
+    name: 'Piano Keys',
+    emoji: '🎹',
+    color: '#c8848a',
+    description: 'Soft Rhodes chords',
+  },
+  {
+    id: 'bass',
+    name: 'Lo-fi Bass',
+    emoji: '🎸',
+    color: '#7a9e7e',
+    description: 'Mellow sub-bass hum',
+  },
+  {
+    id: 'fire',
+    name: 'Fireplace',
+    emoji: '🔥',
+    color: '#c8a04a',
+    description: 'Crackling embers',
+  },
+  {
+    id: 'wind',
+    name: 'Night Wind',
+    emoji: '🍃',
+    color: '#8faabe',
+    description: 'Soft breeze through trees',
+  },
+  {
+    id: 'birds',
+    name: 'Morning Birds',
+    emoji: '🐦',
+    color: '#a8c5a0',
+    description: 'Distant birdsong',
+  },
+  {
+    id: 'cafe',
+    name: 'Cafe Murmur',
+    emoji: '☕',
+    color: '#9e8a7a',
+    description: 'Quiet coffeeshop bustle',
+  },
 ];
 
 const PRESETS = [
-  { id: 'rainy_study', name: 'Rainy Study', emoji: '📚', levels: { rain: 0.7, vinyl: 0.4, keys: 0.5, bass: 0.3, fire: 0, wind: 0, birds: 0, cafe: 0.2 } },
-  { id: 'cozy_night', name: 'Cozy Night', emoji: '🌙', levels: { rain: 0, vinyl: 0.3, keys: 0.4, bass: 0.4, fire: 0.6, wind: 0.2, birds: 0, cafe: 0 } },
-  { id: 'morning_cafe', name: 'Morning Cafe', emoji: '☀️', levels: { rain: 0, vinyl: 0.2, keys: 0.3, bass: 0.2, fire: 0, wind: 0, birds: 0.5, cafe: 0.6 } },
-  { id: 'deep_focus', name: 'Deep Focus', emoji: '🧠', levels: { rain: 0.5, vinyl: 0.1, keys: 0, bass: 0.5, fire: 0, wind: 0.3, birds: 0, cafe: 0 } },
+  {
+    id: 'rainy_study',
+    name: 'Rainy Study',
+    emoji: '📚',
+    levels: {
+      rain: 0.7,
+      vinyl: 0.4,
+      keys: 0.5,
+      bass: 0.3,
+      fire: 0,
+      wind: 0,
+      birds: 0,
+      cafe: 0.2,
+    },
+  },
+  {
+    id: 'cozy_night',
+    name: 'Cozy Night',
+    emoji: '🌙',
+    levels: {
+      rain: 0,
+      vinyl: 0.3,
+      keys: 0.4,
+      bass: 0.4,
+      fire: 0.6,
+      wind: 0.2,
+      birds: 0,
+      cafe: 0,
+    },
+  },
+  {
+    id: 'morning_cafe',
+    name: 'Morning Cafe',
+    emoji: '☀️',
+    levels: {
+      rain: 0,
+      vinyl: 0.2,
+      keys: 0.3,
+      bass: 0.2,
+      fire: 0,
+      wind: 0,
+      birds: 0.5,
+      cafe: 0.6,
+    },
+  },
+  {
+    id: 'deep_focus',
+    name: 'Deep Focus',
+    emoji: '🧠',
+    levels: {
+      rain: 0.5,
+      vinyl: 0.1,
+      keys: 0,
+      bass: 0.5,
+      fire: 0,
+      wind: 0.3,
+      birds: 0,
+      cafe: 0,
+    },
+  },
 ];
 
 const DEFAULT_LEVELS = Object.fromEntries(CHANNELS.map((ch) => [ch.id, 0]));
@@ -74,209 +178,221 @@ export default function AmbientLofiMixer({ showToast }) {
     return buf;
   }, []);
 
-  const buildChannel = useCallback((ctx, channelId) => {
-    const gain = ctx.createGain();
-    gain.gain.value = levels[channelId] || 0;
-    gain.connect(masterGainRef.current);
+  const buildChannel = useCallback(
+    (ctx, channelId) => {
+      const gain = ctx.createGain();
+      gain.gain.value = levels[channelId] || 0;
+      gain.connect(masterGainRef.current);
 
-    const nodes = [];
+      const nodes = [];
 
-    switch (channelId) {
-      case 'rain': {
-        const noise = ctx.createBufferSource();
-        noise.buffer = createNoise(ctx, 4);
-        noise.loop = true;
-        const bp = ctx.createBiquadFilter();
-        bp.type = 'bandpass';
-        bp.frequency.value = 8000;
-        bp.Q.value = 0.5;
-        const hp = ctx.createBiquadFilter();
-        hp.type = 'highpass';
-        hp.frequency.value = 2000;
-        noise.connect(bp);
-        bp.connect(hp);
-        hp.connect(gain);
-        noise.start();
-        nodes.push(noise, bp, hp);
-        break;
-      }
-      case 'vinyl': {
-        const noise = ctx.createBufferSource();
-        noise.buffer = createNoise(ctx, 4);
-        noise.loop = true;
-        const bp = ctx.createBiquadFilter();
-        bp.type = 'bandpass';
-        bp.frequency.value = 1200;
-        bp.Q.value = 0.3;
-        // Pop/crackle LFO
-        const lfo = ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0.5;
-        const lfoGain = ctx.createGain();
-        lfoGain.gain.value = 400;
-        lfo.connect(lfoGain);
-        lfoGain.connect(bp.frequency);
-        lfo.start();
-        noise.connect(bp);
-        bp.connect(gain);
-        noise.start();
-        nodes.push(noise, bp, lfo, lfoGain);
-        break;
-      }
-      case 'keys': {
-        // Soft chord pad using detuned oscillators
-        const chordFreqs = [261.6, 329.6, 392.0, 523.3];
-        chordFreqs.forEach((freq) => {
+      switch (channelId) {
+        case 'rain': {
+          const noise = ctx.createBufferSource();
+          noise.buffer = createNoise(ctx, 4);
+          noise.loop = true;
+          const bp = ctx.createBiquadFilter();
+          bp.type = 'bandpass';
+          bp.frequency.value = 8000;
+          bp.Q.value = 0.5;
+          const hp = ctx.createBiquadFilter();
+          hp.type = 'highpass';
+          hp.frequency.value = 2000;
+          noise.connect(bp);
+          bp.connect(hp);
+          hp.connect(gain);
+          noise.start();
+          nodes.push(noise, bp, hp);
+          break;
+        }
+        case 'vinyl': {
+          const noise = ctx.createBufferSource();
+          noise.buffer = createNoise(ctx, 4);
+          noise.loop = true;
+          const bp = ctx.createBiquadFilter();
+          bp.type = 'bandpass';
+          bp.frequency.value = 1200;
+          bp.Q.value = 0.3;
+          // Pop/crackle LFO
+          const lfo = ctx.createOscillator();
+          lfo.type = 'sine';
+          lfo.frequency.value = 0.5;
+          const lfoGain = ctx.createGain();
+          lfoGain.gain.value = 400;
+          lfo.connect(lfoGain);
+          lfoGain.connect(bp.frequency);
+          lfo.start();
+          noise.connect(bp);
+          bp.connect(gain);
+          noise.start();
+          nodes.push(noise, bp, lfo, lfoGain);
+          break;
+        }
+        case 'keys': {
+          // Soft chord pad using detuned oscillators
+          const chordFreqs = [261.6, 329.6, 392.0, 523.3];
+          chordFreqs.forEach((freq) => {
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            // Gentle detune for warmth
+            osc.detune.value = (Math.random() - 0.5) * 10;
+            const oscGain = ctx.createGain();
+            oscGain.gain.value = 0.15;
+            osc.connect(oscGain);
+            oscGain.connect(gain);
+            osc.start();
+            nodes.push(osc, oscGain);
+          });
+          // Tremolo LFO for movement
+          const trem = ctx.createOscillator();
+          trem.type = 'sine';
+          trem.frequency.value = 0.3;
+          const tremGain = ctx.createGain();
+          tremGain.gain.value = 0.1;
+          trem.connect(tremGain);
+          tremGain.connect(gain.gain);
+          trem.start();
+          nodes.push(trem, tremGain);
+          break;
+        }
+        case 'bass': {
           const osc = ctx.createOscillator();
           osc.type = 'sine';
-          osc.frequency.value = freq;
-          // Gentle detune for warmth
-          osc.detune.value = (Math.random() - 0.5) * 10;
-          const oscGain = ctx.createGain();
-          oscGain.gain.value = 0.15;
-          osc.connect(oscGain);
-          oscGain.connect(gain);
+          osc.frequency.value = 55;
+          const lp = ctx.createBiquadFilter();
+          lp.type = 'lowpass';
+          lp.frequency.value = 120;
+          lp.Q.value = 1;
+          // Sub-bass LFO drift
+          const lfo = ctx.createOscillator();
+          lfo.type = 'sine';
+          lfo.frequency.value = 0.08;
+          const lfoGain = ctx.createGain();
+          lfoGain.gain.value = 5;
+          lfo.connect(lfoGain);
+          lfoGain.connect(osc.frequency);
+          lfo.start();
+          osc.connect(lp);
+          lp.connect(gain);
           osc.start();
-          nodes.push(osc, oscGain);
-        });
-        // Tremolo LFO for movement
-        const trem = ctx.createOscillator();
-        trem.type = 'sine';
-        trem.frequency.value = 0.3;
-        const tremGain = ctx.createGain();
-        tremGain.gain.value = 0.1;
-        trem.connect(tremGain);
-        tremGain.connect(gain.gain);
-        trem.start();
-        nodes.push(trem, tremGain);
-        break;
+          nodes.push(osc, lp, lfo, lfoGain);
+          break;
+        }
+        case 'fire': {
+          const noise = ctx.createBufferSource();
+          noise.buffer = createNoise(ctx, 4);
+          noise.loop = true;
+          const bp = ctx.createBiquadFilter();
+          bp.type = 'bandpass';
+          bp.frequency.value = 600;
+          bp.Q.value = 1;
+          const lfo = ctx.createOscillator();
+          lfo.type = 'sawtooth';
+          lfo.frequency.value = 3;
+          const lfoGain = ctx.createGain();
+          lfoGain.gain.value = 300;
+          lfo.connect(lfoGain);
+          lfoGain.connect(bp.frequency);
+          lfo.start();
+          noise.connect(bp);
+          bp.connect(gain);
+          noise.start();
+          nodes.push(noise, bp, lfo, lfoGain);
+          break;
+        }
+        case 'wind': {
+          const noise = ctx.createBufferSource();
+          noise.buffer = createNoise(ctx, 4);
+          noise.loop = true;
+          const lp = ctx.createBiquadFilter();
+          lp.type = 'lowpass';
+          lp.frequency.value = 400;
+          lp.Q.value = 2;
+          const lfo = ctx.createOscillator();
+          lfo.type = 'sine';
+          lfo.frequency.value = 0.12;
+          const lfoGain = ctx.createGain();
+          lfoGain.gain.value = 250;
+          lfo.connect(lfoGain);
+          lfoGain.connect(lp.frequency);
+          lfo.start();
+          noise.connect(lp);
+          lp.connect(gain);
+          noise.start();
+          nodes.push(noise, lp, lfo, lfoGain);
+          break;
+        }
+        case 'birds': {
+          const chirp = () => {
+            if (!ctxRef.current || ctxRef.current.state === 'closed') return;
+            const t = ctx.currentTime;
+            const cGain = ctx.createGain();
+            cGain.gain.setValueAtTime(0.12, t);
+            cGain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+            cGain.connect(gain);
+            const osc = ctx.createOscillator();
+            osc.type = 'sine';
+            const base = 2000 + Math.random() * 2000;
+            osc.frequency.setValueAtTime(base, t);
+            osc.frequency.exponentialRampToValueAtTime(
+              base * (0.8 + Math.random() * 0.4),
+              t + 0.1
+            );
+            osc.connect(cGain);
+            osc.start(t);
+            osc.stop(t + 0.15);
+          };
+          const interval = setInterval(
+            () => {
+              if (Math.random() < 0.35) chirp();
+            },
+            1800 + Math.random() * 2200
+          );
+          setTimeout(chirp, 400);
+          const cleanup = {
+            stop: () => clearInterval(interval),
+            disconnect: () => {},
+          };
+          nodes.push(cleanup);
+          break;
+        }
+        case 'cafe': {
+          // Brownian noise (muffled) for distant murmur
+          const noise = ctx.createBufferSource();
+          noise.buffer = createNoise(ctx, 4);
+          noise.loop = true;
+          const lp = ctx.createBiquadFilter();
+          lp.type = 'lowpass';
+          lp.frequency.value = 800;
+          lp.Q.value = 0.5;
+          const hp = ctx.createBiquadFilter();
+          hp.type = 'highpass';
+          hp.frequency.value = 200;
+          // Subtle modulation for natural feel
+          const lfo = ctx.createOscillator();
+          lfo.type = 'sine';
+          lfo.frequency.value = 0.2;
+          const lfoGain = ctx.createGain();
+          lfoGain.gain.value = 150;
+          lfo.connect(lfoGain);
+          lfoGain.connect(lp.frequency);
+          lfo.start();
+          noise.connect(lp);
+          lp.connect(hp);
+          hp.connect(gain);
+          noise.start();
+          nodes.push(noise, lp, hp, lfo, lfoGain);
+          break;
+        }
+        default:
+          break;
       }
-      case 'bass': {
-        const osc = ctx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.value = 55;
-        const lp = ctx.createBiquadFilter();
-        lp.type = 'lowpass';
-        lp.frequency.value = 120;
-        lp.Q.value = 1;
-        // Sub-bass LFO drift
-        const lfo = ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0.08;
-        const lfoGain = ctx.createGain();
-        lfoGain.gain.value = 5;
-        lfo.connect(lfoGain);
-        lfoGain.connect(osc.frequency);
-        lfo.start();
-        osc.connect(lp);
-        lp.connect(gain);
-        osc.start();
-        nodes.push(osc, lp, lfo, lfoGain);
-        break;
-      }
-      case 'fire': {
-        const noise = ctx.createBufferSource();
-        noise.buffer = createNoise(ctx, 4);
-        noise.loop = true;
-        const bp = ctx.createBiquadFilter();
-        bp.type = 'bandpass';
-        bp.frequency.value = 600;
-        bp.Q.value = 1;
-        const lfo = ctx.createOscillator();
-        lfo.type = 'sawtooth';
-        lfo.frequency.value = 3;
-        const lfoGain = ctx.createGain();
-        lfoGain.gain.value = 300;
-        lfo.connect(lfoGain);
-        lfoGain.connect(bp.frequency);
-        lfo.start();
-        noise.connect(bp);
-        bp.connect(gain);
-        noise.start();
-        nodes.push(noise, bp, lfo, lfoGain);
-        break;
-      }
-      case 'wind': {
-        const noise = ctx.createBufferSource();
-        noise.buffer = createNoise(ctx, 4);
-        noise.loop = true;
-        const lp = ctx.createBiquadFilter();
-        lp.type = 'lowpass';
-        lp.frequency.value = 400;
-        lp.Q.value = 2;
-        const lfo = ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0.12;
-        const lfoGain = ctx.createGain();
-        lfoGain.gain.value = 250;
-        lfo.connect(lfoGain);
-        lfoGain.connect(lp.frequency);
-        lfo.start();
-        noise.connect(lp);
-        lp.connect(gain);
-        noise.start();
-        nodes.push(noise, lp, lfo, lfoGain);
-        break;
-      }
-      case 'birds': {
-        const chirp = () => {
-          if (!ctxRef.current || ctxRef.current.state === 'closed') return;
-          const t = ctx.currentTime;
-          const cGain = ctx.createGain();
-          cGain.gain.setValueAtTime(0.12, t);
-          cGain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-          cGain.connect(gain);
-          const osc = ctx.createOscillator();
-          osc.type = 'sine';
-          const base = 2000 + Math.random() * 2000;
-          osc.frequency.setValueAtTime(base, t);
-          osc.frequency.exponentialRampToValueAtTime(base * (0.8 + Math.random() * 0.4), t + 0.1);
-          osc.connect(cGain);
-          osc.start(t);
-          osc.stop(t + 0.15);
-        };
-        const interval = setInterval(() => {
-          if (Math.random() < 0.35) chirp();
-        }, 1800 + Math.random() * 2200);
-        setTimeout(chirp, 400);
-        const cleanup = { stop: () => clearInterval(interval), disconnect: () => {} };
-        nodes.push(cleanup);
-        break;
-      }
-      case 'cafe': {
-        // Brownian noise (muffled) for distant murmur
-        const noise = ctx.createBufferSource();
-        noise.buffer = createNoise(ctx, 4);
-        noise.loop = true;
-        const lp = ctx.createBiquadFilter();
-        lp.type = 'lowpass';
-        lp.frequency.value = 800;
-        lp.Q.value = 0.5;
-        const hp = ctx.createBiquadFilter();
-        hp.type = 'highpass';
-        hp.frequency.value = 200;
-        // Subtle modulation for natural feel
-        const lfo = ctx.createOscillator();
-        lfo.type = 'sine';
-        lfo.frequency.value = 0.2;
-        const lfoGain = ctx.createGain();
-        lfoGain.gain.value = 150;
-        lfo.connect(lfoGain);
-        lfoGain.connect(lp.frequency);
-        lfo.start();
-        noise.connect(lp);
-        lp.connect(hp);
-        hp.connect(gain);
-        noise.start();
-        nodes.push(noise, lp, hp, lfo, lfoGain);
-        break;
-      }
-      default:
-        break;
-    }
 
-    return { gain, nodes };
-  }, [createNoise, levels]);
+      return { gain, nodes };
+    },
+    [createNoise, levels]
+  );
 
   // ─── Playback Controls ──────────────────────────────────────
 
@@ -297,9 +413,15 @@ export default function AmbientLofiMixer({ showToast }) {
         try {
           if (n.stop) n.stop();
           if (n.disconnect) n.disconnect();
-        } catch { /* already stopped */ }
+        } catch {
+          /* already stopped */
+        }
       });
-      try { gain.disconnect(); } catch { /* noop */ }
+      try {
+        gain.disconnect();
+      } catch {
+        /* noop */
+      }
     });
     channelNodesRef.current = {};
     setPlaying(false);
@@ -356,7 +478,9 @@ export default function AmbientLofiMixer({ showToast }) {
     <div className="mixer">
       <div className="card mixer-header-card">
         <h2 className="card-title">🎧 Ambient Lo-fi Mixer</h2>
-        <p className="mixer-subtitle">Layer sounds to craft your perfect atmosphere</p>
+        <p className="mixer-subtitle">
+          Layer sounds to craft your perfect atmosphere
+        </p>
       </div>
 
       <div className="mixer-presets">
@@ -378,7 +502,10 @@ export default function AmbientLofiMixer({ showToast }) {
             const level = levels[ch.id];
             const isActive = level > 0;
             return (
-              <div key={ch.id} className={`mixer-channel ${isActive ? 'active' : ''}`}>
+              <div
+                key={ch.id}
+                className={`mixer-channel ${isActive ? 'active' : ''}`}
+              >
                 <div className="mixer-channel-header">
                   <span className="mixer-channel-emoji">{ch.emoji}</span>
                   <span className="mixer-channel-name">{ch.name}</span>
@@ -398,12 +525,16 @@ export default function AmbientLofiMixer({ showToast }) {
                     max="1"
                     step="0.01"
                     value={level}
-                    onChange={(e) => setChannelLevel(ch.id, parseFloat(e.target.value))}
+                    onChange={(e) =>
+                      setChannelLevel(ch.id, parseFloat(e.target.value))
+                    }
                     className="mixer-fader"
                     title={ch.description}
                   />
                 </div>
-                <span className="mixer-channel-value">{Math.round(level * 100)}%</span>
+                <span className="mixer-channel-value">
+                  {Math.round(level * 100)}%
+                </span>
               </div>
             );
           })}
@@ -429,9 +560,7 @@ export default function AmbientLofiMixer({ showToast }) {
               })}
             </div>
           )}
-          {!playing && (
-            <div className="mixer-idle-icon">🎧</div>
-          )}
+          {!playing && <div className="mixer-idle-icon">🎧</div>}
         </div>
       </div>
 

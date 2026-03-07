@@ -26,34 +26,55 @@ export default function useAmbientSounds() {
   const ambientGainRef = useRef(null);
   const masterGainRef = useRef(null);
   const [enabled, setEnabled] = useState(() => {
-    try { return localStorage.getItem('ambient-sounds') !== 'off'; }
-    catch { return true; }
+    try {
+      return localStorage.getItem('ambient-sounds') !== 'off';
+    } catch {
+      return true;
+    }
   });
   const [ambientVolume, setAmbientVolume] = useState(() => {
-    try { return parseFloat(localStorage.getItem('ambient-volume') || '0.3'); }
-    catch { return 0.3; }
+    try {
+      return parseFloat(localStorage.getItem('ambient-volume') || '0.3');
+    } catch {
+      return 0.3;
+    }
   });
   const [uiVolume, setUiVolume] = useState(() => {
-    try { return parseFloat(localStorage.getItem('ui-volume') || '0.25'); }
-    catch { return 0.25; }
+    try {
+      return parseFloat(localStorage.getItem('ui-volume') || '0.25');
+    } catch {
+      return 0.25;
+    }
   });
 
   // Independent rain & cafe layer state
   const [rainOn, setRainOn] = useState(() => {
-    try { return localStorage.getItem('manual-rain') === 'on'; }
-    catch { return false; }
+    try {
+      return localStorage.getItem('manual-rain') === 'on';
+    } catch {
+      return false;
+    }
   });
   const [rainVolume, setRainVolume] = useState(() => {
-    try { return parseFloat(localStorage.getItem('manual-rain-volume') || '0.5'); }
-    catch { return 0.5; }
+    try {
+      return parseFloat(localStorage.getItem('manual-rain-volume') || '0.5');
+    } catch {
+      return 0.5;
+    }
   });
   const [cafeOn, setCafeOn] = useState(() => {
-    try { return localStorage.getItem('manual-cafe') === 'on'; }
-    catch { return false; }
+    try {
+      return localStorage.getItem('manual-cafe') === 'on';
+    } catch {
+      return false;
+    }
   });
   const [cafeVolume, setCafeVolume] = useState(() => {
-    try { return parseFloat(localStorage.getItem('manual-cafe-volume') || '0.5'); }
-    catch { return 0.5; }
+    try {
+      return parseFloat(localStorage.getItem('manual-cafe-volume') || '0.5');
+    } catch {
+      return 0.5;
+    }
   });
   const manualRainNodesRef = useRef([]);
   const manualRainGainRef = useRef(null);
@@ -62,38 +83,59 @@ export default function useAmbientSounds() {
 
   // Persist preferences
   useEffect(() => {
-    try { localStorage.setItem('ambient-sounds', enabled ? 'on' : 'off'); }
-    catch { /* noop */ }
+    try {
+      localStorage.setItem('ambient-sounds', enabled ? 'on' : 'off');
+    } catch {
+      /* noop */
+    }
   }, [enabled]);
 
   useEffect(() => {
-    try { localStorage.setItem('ambient-volume', String(ambientVolume)); }
-    catch { /* noop */ }
+    try {
+      localStorage.setItem('ambient-volume', String(ambientVolume));
+    } catch {
+      /* noop */
+    }
   }, [ambientVolume]);
 
   useEffect(() => {
-    try { localStorage.setItem('ui-volume', String(uiVolume)); }
-    catch { /* noop */ }
+    try {
+      localStorage.setItem('ui-volume', String(uiVolume));
+    } catch {
+      /* noop */
+    }
   }, [uiVolume]);
 
   useEffect(() => {
-    try { localStorage.setItem('manual-rain', rainOn ? 'on' : 'off'); }
-    catch { /* noop */ }
+    try {
+      localStorage.setItem('manual-rain', rainOn ? 'on' : 'off');
+    } catch {
+      /* noop */
+    }
   }, [rainOn]);
 
   useEffect(() => {
-    try { localStorage.setItem('manual-rain-volume', String(rainVolume)); }
-    catch { /* noop */ }
+    try {
+      localStorage.setItem('manual-rain-volume', String(rainVolume));
+    } catch {
+      /* noop */
+    }
   }, [rainVolume]);
 
   useEffect(() => {
-    try { localStorage.setItem('manual-cafe', cafeOn ? 'on' : 'off'); }
-    catch { /* noop */ }
+    try {
+      localStorage.setItem('manual-cafe', cafeOn ? 'on' : 'off');
+    } catch {
+      /* noop */
+    }
   }, [cafeOn]);
 
   useEffect(() => {
-    try { localStorage.setItem('manual-cafe-volume', String(cafeVolume)); }
-    catch { /* noop */ }
+    try {
+      localStorage.setItem('manual-cafe-volume', String(cafeVolume));
+    } catch {
+      /* noop */
+    }
   }, [cafeVolume]);
 
   const getCtx = useCallback(() => {
@@ -121,22 +163,25 @@ export default function useAmbientSounds() {
 
   // ─── UI Sound Primitives ────────────────────────────────────
 
-  const softPing = useCallback((freq = 880, duration = 0.12, vol = 1) => {
-    if (!enabled) return;
-    const ctx = getCtx();
-    const t = ctx.currentTime;
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(uiVolume * vol * 0.15, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
-    gain.connect(masterGainRef.current);
+  const softPing = useCallback(
+    (freq = 880, duration = 0.12, vol = 1) => {
+      if (!enabled) return;
+      const ctx = getCtx();
+      const t = ctx.currentTime;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(uiVolume * vol * 0.15, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      gain.connect(masterGainRef.current);
 
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, t);
-    osc.connect(gain);
-    osc.start(t);
-    osc.stop(t + duration);
-  }, [enabled, getCtx, uiVolume]);
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      osc.connect(gain);
+      osc.start(t);
+      osc.stop(t + duration);
+    },
+    [enabled, getCtx, uiVolume]
+  );
 
   const softClick = useCallback(() => {
     if (!enabled) return;
@@ -231,7 +276,9 @@ export default function useAmbientSounds() {
       try {
         if (node.stop) node.stop();
         if (node.disconnect) node.disconnect();
-      } catch { /* already stopped */ }
+      } catch {
+        /* already stopped */
+      }
     });
     ambientNodesRef.current = [];
   }, []);
@@ -247,102 +294,120 @@ export default function useAmbientSounds() {
     return buffer;
   }, []);
 
-  const startRain = useCallback((ctx) => {
-    const noise = ctx.createBufferSource();
-    noise.buffer = createNoise(ctx, 4);
-    noise.loop = true;
+  const startRain = useCallback(
+    (ctx) => {
+      const noise = ctx.createBufferSource();
+      noise.buffer = createNoise(ctx, 4);
+      noise.loop = true;
 
-    // Bandpass filter for rain-like texture
-    const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 8000;
-    bp.Q.value = 0.5;
+      // Bandpass filter for rain-like texture
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 8000;
+      bp.Q.value = 0.5;
 
-    // Gentle highpass to remove rumble
-    const hp = ctx.createBiquadFilter();
-    hp.type = 'highpass';
-    hp.frequency.value = 2000;
+      // Gentle highpass to remove rumble
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 2000;
 
-    const gain = ctx.createGain();
-    gain.gain.value = 0.6;
-
-    noise.connect(bp);
-    bp.connect(hp);
-    hp.connect(gain);
-    gain.connect(ambientGainRef.current);
-    noise.start();
-
-    ambientNodesRef.current.push(noise, bp, hp, gain);
-    return noise;
-  }, [createNoise]);
-
-  const startWind = useCallback((ctx) => {
-    const noise = ctx.createBufferSource();
-    noise.buffer = createNoise(ctx, 4);
-    noise.loop = true;
-
-    // Low-frequency filter for wind
-    const lp = ctx.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 400;
-    lp.Q.value = 2;
-
-    // LFO to modulate wind filter for swaying effect
-    const lfo = ctx.createOscillator();
-    lfo.type = 'sine';
-    lfo.frequency.value = 0.15;
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 200;
-    lfo.connect(lfoGain);
-    lfoGain.connect(lp.frequency);
-    lfo.start();
-
-    const gain = ctx.createGain();
-    gain.gain.value = 0.4;
-
-    noise.connect(lp);
-    lp.connect(gain);
-    gain.connect(ambientGainRef.current);
-    noise.start();
-
-    ambientNodesRef.current.push(noise, lp, lfo, lfoGain, gain);
-    return noise;
-  }, [createNoise]);
-
-  const startBirds = useCallback((ctx) => {
-    // Periodic chirps using oscillators
-    const nodes = [];
-    const chirp = () => {
-      if (!enabled) return;
-      const t = ctx.currentTime;
       const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.15, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      gain.gain.value = 0.6;
+
+      noise.connect(bp);
+      bp.connect(hp);
+      hp.connect(gain);
       gain.connect(ambientGainRef.current);
+      noise.start();
 
-      const osc = ctx.createOscillator();
-      osc.type = 'sine';
-      const baseFreq = 2000 + Math.random() * 2000;
-      osc.frequency.setValueAtTime(baseFreq, t);
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * (0.8 + Math.random() * 0.4), t + 0.1);
-      osc.connect(gain);
-      osc.start(t);
-      osc.stop(t + 0.15);
-      nodes.push(osc, gain);
-    };
+      ambientNodesRef.current.push(noise, bp, hp, gain);
+      return noise;
+    },
+    [createNoise]
+  );
 
-    // Schedule random chirps
-    const interval = setInterval(() => {
-      if (Math.random() < 0.4) chirp();
-    }, 1500 + Math.random() * 2000);
+  const startWind = useCallback(
+    (ctx) => {
+      const noise = ctx.createBufferSource();
+      noise.buffer = createNoise(ctx, 4);
+      noise.loop = true;
 
-    // Store cleanup handle
-    const cleanup = { stop: () => clearInterval(interval), disconnect: () => {} };
-    ambientNodesRef.current.push(cleanup);
-    // Initial chirp
-    setTimeout(chirp, 500);
-    return cleanup;
-  }, [enabled]);
+      // Low-frequency filter for wind
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 400;
+      lp.Q.value = 2;
+
+      // LFO to modulate wind filter for swaying effect
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 0.15;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 200;
+      lfo.connect(lfoGain);
+      lfoGain.connect(lp.frequency);
+      lfo.start();
+
+      const gain = ctx.createGain();
+      gain.gain.value = 0.4;
+
+      noise.connect(lp);
+      lp.connect(gain);
+      gain.connect(ambientGainRef.current);
+      noise.start();
+
+      ambientNodesRef.current.push(noise, lp, lfo, lfoGain, gain);
+      return noise;
+    },
+    [createNoise]
+  );
+
+  const startBirds = useCallback(
+    (ctx) => {
+      // Periodic chirps using oscillators
+      const nodes = [];
+      const chirp = () => {
+        if (!enabled) return;
+        const t = ctx.currentTime;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.15, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        gain.connect(ambientGainRef.current);
+
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        const baseFreq = 2000 + Math.random() * 2000;
+        osc.frequency.setValueAtTime(baseFreq, t);
+        osc.frequency.exponentialRampToValueAtTime(
+          baseFreq * (0.8 + Math.random() * 0.4),
+          t + 0.1
+        );
+        osc.connect(gain);
+        osc.start(t);
+        osc.stop(t + 0.15);
+        nodes.push(osc, gain);
+      };
+
+      // Schedule random chirps
+      const interval = setInterval(
+        () => {
+          if (Math.random() < 0.4) chirp();
+        },
+        1500 + Math.random() * 2000
+      );
+
+      // Store cleanup handle
+      const cleanup = {
+        stop: () => clearInterval(interval),
+        disconnect: () => {},
+      };
+      ambientNodesRef.current.push(cleanup);
+      // Initial chirp
+      setTimeout(chirp, 500);
+      return cleanup;
+    },
+    [enabled]
+  );
 
   const startCrickets = useCallback((ctx) => {
     // High-pitched rhythmic oscillation
@@ -376,37 +441,40 @@ export default function useAmbientSounds() {
     return osc;
   }, []);
 
-  const startFireplace = useCallback((ctx) => {
-    const noise = ctx.createBufferSource();
-    noise.buffer = createNoise(ctx, 4);
-    noise.loop = true;
+  const startFireplace = useCallback(
+    (ctx) => {
+      const noise = ctx.createBufferSource();
+      noise.buffer = createNoise(ctx, 4);
+      noise.loop = true;
 
-    const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 600;
-    bp.Q.value = 1;
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 600;
+      bp.Q.value = 1;
 
-    // Crackle LFO
-    const lfo = ctx.createOscillator();
-    lfo.type = 'sawtooth';
-    lfo.frequency.value = 3;
-    const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 300;
-    lfo.connect(lfoGain);
-    lfoGain.connect(bp.frequency);
-    lfo.start();
+      // Crackle LFO
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sawtooth';
+      lfo.frequency.value = 3;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 300;
+      lfo.connect(lfoGain);
+      lfoGain.connect(bp.frequency);
+      lfo.start();
 
-    const gain = ctx.createGain();
-    gain.gain.value = 0.25;
+      const gain = ctx.createGain();
+      gain.gain.value = 0.25;
 
-    noise.connect(bp);
-    bp.connect(gain);
-    gain.connect(ambientGainRef.current);
-    noise.start();
+      noise.connect(bp);
+      bp.connect(gain);
+      gain.connect(ambientGainRef.current);
+      noise.start();
 
-    ambientNodesRef.current.push(noise, bp, lfo, lfoGain, gain);
-    return noise;
-  }, [createNoise]);
+      ambientNodesRef.current.push(noise, bp, lfo, lfoGain, gain);
+      return noise;
+    },
+    [createNoise]
+  );
 
   // ─── Independent Rain & Cafe Layers ────────────────────────
 
@@ -415,11 +483,17 @@ export default function useAmbientSounds() {
       try {
         if (node.stop) node.stop();
         if (node.disconnect) node.disconnect();
-      } catch { /* already stopped */ }
+      } catch {
+        /* already stopped */
+      }
     });
     manualRainNodesRef.current = [];
     if (manualRainGainRef.current) {
-      try { manualRainGainRef.current.disconnect(); } catch { /* noop */ }
+      try {
+        manualRainGainRef.current.disconnect();
+      } catch {
+        /* noop */
+      }
       manualRainGainRef.current = null;
     }
   }, []);
@@ -429,11 +503,17 @@ export default function useAmbientSounds() {
       try {
         if (node.stop) node.stop();
         if (node.disconnect) node.disconnect();
-      } catch { /* already stopped */ }
+      } catch {
+        /* already stopped */
+      }
     });
     manualCafeNodesRef.current = [];
     if (manualCafeGainRef.current) {
-      try { manualCafeGainRef.current.disconnect(); } catch { /* noop */ }
+      try {
+        manualCafeGainRef.current.disconnect();
+      } catch {
+        /* noop */
+      }
       manualCafeGainRef.current = null;
     }
   }, []);
@@ -536,43 +616,55 @@ export default function useAmbientSounds() {
     }
   }, [cafeVolume]);
 
-  const setAmbientScene = useCallback((weather, season) => {
-    if (!enabled) {
+  const setAmbientScene = useCallback(
+    (weather, season) => {
+      if (!enabled) {
+        stopAmbient();
+        return;
+      }
       stopAmbient();
-      return;
-    }
-    stopAmbient();
-    const ctx = getCtx();
-    const w = (weather?.current_weather || '').toLowerCase();
+      const ctx = getCtx();
+      const w = (weather?.current_weather || '').toLowerCase();
 
-    // Weather-based layers
-    if (w.includes('rain') || w.includes('storm') || w.includes('drizzle')) {
-      startRain(ctx);
-      if (w.includes('storm') || w.includes('wind')) {
+      // Weather-based layers
+      if (w.includes('rain') || w.includes('storm') || w.includes('drizzle')) {
+        startRain(ctx);
+        if (w.includes('storm') || w.includes('wind')) {
+          startWind(ctx);
+        }
+      } else if (w.includes('snow') || w.includes('blizzard')) {
+        startWind(ctx);
+      } else if (w.includes('wind') || w.includes('breezy')) {
         startWind(ctx);
       }
-    } else if (w.includes('snow') || w.includes('blizzard')) {
-      startWind(ctx);
-    } else if (w.includes('wind') || w.includes('breezy')) {
-      startWind(ctx);
-    }
 
-    // Season-based layers
-    if (season === 'spring' || season === 'summer') {
-      if (!w.includes('storm') && !w.includes('blizzard')) {
-        startBirds(ctx);
+      // Season-based layers
+      if (season === 'spring' || season === 'summer') {
+        if (!w.includes('storm') && !w.includes('blizzard')) {
+          startBirds(ctx);
+        }
       }
-    }
-    if (season === 'summer') {
-      startCrickets(ctx);
-    }
-    if (season === 'winter' || season === 'autumn') {
-      // Cozy fireplace crackling in cold seasons
-      if (!w.includes('rain') && !w.includes('storm')) {
-        startFireplace(ctx);
+      if (season === 'summer') {
+        startCrickets(ctx);
       }
-    }
-  }, [enabled, getCtx, stopAmbient, startRain, startWind, startBirds, startCrickets, startFireplace]);
+      if (season === 'winter' || season === 'autumn') {
+        // Cozy fireplace crackling in cold seasons
+        if (!w.includes('rain') && !w.includes('storm')) {
+          startFireplace(ctx);
+        }
+      }
+    },
+    [
+      enabled,
+      getCtx,
+      stopAmbient,
+      startRain,
+      startWind,
+      startBirds,
+      startCrickets,
+      startFireplace,
+    ]
+  );
 
   // Cleanup on unmount
   useEffect(() => {

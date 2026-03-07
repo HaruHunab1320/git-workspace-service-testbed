@@ -6,9 +6,15 @@
   transition: all 0.25s ease;
 }
 
-.pastel-card--pad-sm { padding: 12px; }
-.pastel-card--pad-md { padding: 20px; }
-.pastel-card--pad-lg { padding: 28px; }
+.pastel-card--pad-sm {
+  padding: 12px;
+}
+.pastel-card--pad-md {
+  padding: 20px;
+}
+.pastel-card--pad-lg {
+  padding: 28px;
+}
 
 .pastel-card--hoverable:hover {
   box-shadow: var(--shadow-lg, 0 4px 16px rgba(74, 55, 40, 0.12));
