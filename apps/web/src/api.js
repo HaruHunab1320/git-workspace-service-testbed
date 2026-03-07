@@ -1,13 +1,23 @@
+import { ApiError, NetworkError, NotFoundError, ValidationError } from './errors';
+
 const BASE = '/api';
 
 async function request(path, options = {}) {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
+  let res;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+  } catch {
+    throw new NetworkError();
+  }
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || 'Request failed');
+    const body = await res.json().catch(() => ({ detail: res.statusText }));
+    const detail = body.detail || 'Request failed';
+    if (res.status === 404) throw new NotFoundError(detail);
+    if (res.status === 400) throw new ValidationError(detail);
+    throw new ApiError(detail, res.status, detail);
   }
   return res.json();
 }

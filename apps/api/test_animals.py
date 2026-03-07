@@ -20,6 +20,7 @@ from animals import (
     SPECIES_PROFILES,
     create_adoptable_pets,
 )
+from errors import DuplicateNameError
 
 
 class TestBondTier:
@@ -215,7 +216,7 @@ class TestPetManager:
     def test_adopt_duplicate_name(self):
         manager = PetManager()
         manager.adopt("Biscuit", Species.DOG, PetPersonality.LOYAL)
-        with pytest.raises(ValueError, match="already exists"):
+        with pytest.raises(DuplicateNameError, match="already exists"):
             manager.adopt("Biscuit", Species.CAT, PetPersonality.LAZY)
 
     def test_get_pet(self):

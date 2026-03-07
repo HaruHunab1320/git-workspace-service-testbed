@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional
 
@@ -29,6 +30,11 @@ from animals import (
     create_adoptable_pets,
 )
 from weather import MagicalEvent, eligible_festivals, compute_village_mood, detect_weather_streak
+from errors import (
+    CozyVillageError, ValidationError, InvalidEnumError, NotFoundError,
+    InsufficientFundsError, InsufficientQuantityError, EmptyInputError,
+    CraftingError,
+)
 
 # ---------------------------------------------------------------------------
 # App setup
@@ -42,6 +48,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(CozyVillageError)
+async def cozy_village_error_handler(request, exc: CozyVillageError):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message},
+    )
 
 # Single in-memory game instance
 game: CozyVillageGame = CozyVillageGame.create_default(seed=42)
@@ -380,7 +394,7 @@ from swarm import FireflySwarm
 from crafting import (
     Crafter, Inventory as CraftingInventory, craft as craft_item,
     ALL_RECIPES, ALL_MATERIALS, seasonal_materials,
-    Workstation, Season as CraftSeason, CraftingError,
+    Workstation, Season as CraftSeason,
 )
 
 _market = EconomyMarket()
@@ -577,7 +591,7 @@ def get_villagers():
 def get_villager(villager_id: str):
     v = game.village.get_villager(villager_id)
     if not v:
-        raise HTTPException(status_code=404, detail="Villager not found")
+        raise NotFoundError("Villager", villager_id)
     return _serialize_villager(v)
 
 
@@ -586,14 +600,11 @@ def give_gift(villager_id: str, req: GiftRequest):
     try:
         category = GiftCategory(req.category)
     except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid category. Valid: {[c.value for c in GiftCategory]}",
-        )
+        raise InvalidEnumError("category", req.category, [c.value for c in GiftCategory])
     gift = Gift(req.name, category, quality=max(1, min(5, req.quality)))
     reaction = game.give_gift_to_villager(villager_id, gift)
     if reaction is None:
-        raise HTTPException(status_code=404, detail="Villager not found")
+        raise NotFoundError("Villager", villager_id)
     return {"reaction": reaction, "gift": str(gift)}
 
 
@@ -627,7 +638,7 @@ def plant_crop(req: PlantRequest):
             crop = c
             break
     if crop is None:
-        raise HTTPException(status_code=400, detail=f"Unknown crop: {req.crop_name}")
+        raise NotFoundError("Crop", req.crop_name)
     result = game.plant_crop(req.row, req.col, crop)
     return {"message": result}
 
@@ -663,21 +674,12 @@ def adopt_pet(req: AdoptRequest):
     try:
         species = Species(req.species)
     except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid species. Valid: {[s.value for s in Species]}",
-        )
+        raise InvalidEnumError("species", req.species, [s.value for s in Species])
     try:
         personality = PetPersonality(req.personality)
     except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid personality. Valid: {[p.value for p in PetPersonality]}",
-        )
-    try:
-        pet = game.adopt_pet(req.name, species, personality)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise InvalidEnumError("personality", req.personality, [p.value for p in PetPersonality])
+    pet = game.adopt_pet(req.name, species, personality)
     return _serialize_pet(pet)
 
 
@@ -685,7 +687,7 @@ def adopt_pet(req: AdoptRequest):
 def pet_interaction(name: str):
     pet = game.pets.get_pet(name)
     if not pet:
-        raise HTTPException(status_code=404, detail="Pet not found")
+        raise NotFoundError("Pet", name)
     return {"message": pet.pet()}
 
 
@@ -693,7 +695,7 @@ def pet_interaction(name: str):
 def feed_pet(name: str):
     pet = game.pets.get_pet(name)
     if not pet:
-        raise HTTPException(status_code=404, detail="Pet not found")
+        raise NotFoundError("Pet", name)
     return {"message": pet.feed()}
 
 
@@ -701,7 +703,7 @@ def feed_pet(name: str):
 def play_with_pet(name: str):
     pet = game.pets.get_pet(name)
     if not pet:
-        raise HTTPException(status_code=404, detail="Pet not found")
+        raise NotFoundError("Pet", name)
     return {"message": pet.play()}
 
 
@@ -734,17 +736,14 @@ def economy_buy_item(req: BuyRequest):
     global _player_coins
     _sync_market()
     if req.item_key not in ECONOMY_ITEMS:
-        raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
+        raise NotFoundError("Item", req.item_key)
     if req.quantity < 1:
-        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
+        raise ValidationError("Quantity must be at least 1")
     item = ECONOMY_ITEMS[req.item_key]
     unit_price = _market.current_price(req.item_key)
     total = round(unit_price * req.quantity, 2)
     if _player_coins < total:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Not enough coins ({total} needed, you have {round(_player_coins, 2)})",
-        )
+        raise InsufficientFundsError(total, round(_player_coins, 2))
     _player_coins = round(_player_coins - total, 2)
     if req.item_key in _player_inventory:
         _player_inventory[req.item_key]["quantity"] += req.quantity
@@ -772,17 +771,14 @@ def economy_sell_item(req: SellRequest):
     global _player_coins
     _sync_market()
     if req.quantity < 1:
-        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
+        raise ValidationError("Quantity must be at least 1")
     item = ECONOMY_ITEMS.get(req.item_key)
     if item is None:
-        raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
+        raise NotFoundError("Item", req.item_key)
     slot = _player_inventory.get(req.item_key)
     if slot is None or slot["quantity"] < req.quantity:
         available = slot["quantity"] if slot else 0
-        raise HTTPException(
-            status_code=400,
-            detail=f"Not enough in inventory (have {available})",
-        )
+        raise InsufficientQuantityError(item.name, req.quantity, available)
     unit_price = _market.current_price(req.item_key)
     sell_total = round(unit_price * 0.70 * req.quantity, 2)
     # Spoiled items sell for nothing
@@ -812,7 +808,7 @@ def add_journal_entry(req: JournalEntryRequest):
     global _journal_next_id
     text = req.text.strip()
     if not text:
-        raise HTTPException(status_code=400, detail="Entry text cannot be empty")
+        raise EmptyInputError("Entry text")
     entry = {
         "id": _journal_next_id,
         "day": game.day,
@@ -832,7 +828,7 @@ def delete_journal_entry(entry_id: int):
         if entry["id"] == entry_id:
             _journal_entries.pop(i)
             return {"deleted": entry_id}
-    raise HTTPException(status_code=404, detail="Journal entry not found")
+    raise NotFoundError("Journal entry", entry_id)
 
 
 # -- Player Inventory (Cozy Shelf) -----------------------------------------
@@ -897,7 +893,7 @@ def zen_place_succulent(req: ZenPlaceSucculentRequest):
             succulent = s
             break
     if succulent is None:
-        raise HTTPException(status_code=400, detail=f"Unknown succulent: {req.succulent_name}")
+        raise NotFoundError("Succulent", req.succulent_name)
     result = _zen_garden.place_succulent(req.row, req.col, succulent)
     return {"message": result, "zen_garden": _serialize_zen_garden(_zen_garden)}
 
@@ -910,7 +906,7 @@ def zen_place_rock(req: ZenPlaceRockRequest):
             rock = r
             break
     if rock is None:
-        raise HTTPException(status_code=400, detail=f"Unknown rock: {req.rock_name}")
+        raise NotFoundError("Rock", req.rock_name)
     result = _zen_garden.place_rock(req.row, req.col, rock)
     return {"message": result, "zen_garden": _serialize_zen_garden(_zen_garden)}
 
@@ -920,10 +916,7 @@ def zen_rake(req: ZenRakeRequest):
     try:
         pattern = RakePattern(req.pattern)
     except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid pattern. Valid: {[p.value for p in RakePattern if p != RakePattern.NONE]}",
-        )
+        raise InvalidEnumError("pattern", req.pattern, [p.value for p in RakePattern if p != RakePattern.NONE])
     result = _zen_garden.rake_tile(req.row, req.col, pattern)
     return {"message": result, "zen_garden": _serialize_zen_garden(_zen_garden)}
 
@@ -997,11 +990,8 @@ def gather_material(req: GatherRequest):
             material = m
             break
     if material is None:
-        raise HTTPException(status_code=400, detail=f"Unknown material: {req.material_name}")
-    try:
-        msg = _crafter.gather(material, season, quantity=max(1, min(10, req.quantity)))
-    except CraftingError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise NotFoundError("Material", req.material_name)
+    msg = _crafter.gather(material, season, quantity=max(1, min(10, req.quantity)))
     return {
         "message": msg,
         "crafter": _serialize_crafter(_crafter),
@@ -1017,18 +1007,15 @@ def do_craft(req: CraftRequest):
             recipe = r
             break
     if recipe is None:
-        raise HTTPException(status_code=400, detail=f"Unknown recipe: {req.recipe_name}")
+        raise NotFoundError("Recipe", req.recipe_name)
     try:
         workstation = Workstation(req.workstation)
     except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid workstation. Valid: {[w.value for w in Workstation]}",
-        )
+        raise InvalidEnumError("workstation", req.workstation, [w.value for w in Workstation])
     season = _craft_season()
     result = craft_item(_crafter, recipe, available_workstation=workstation, season=season)
     if not result.success:
-        raise HTTPException(status_code=400, detail="; ".join(result.errors))
+        raise CraftingError("; ".join(result.errors))
     return {
         "message": result.summary,
         "item": {
@@ -1053,7 +1040,7 @@ def learn_recipe(req: LearnRecipeRequest):
             recipe = r
             break
     if recipe is None:
-        raise HTTPException(status_code=400, detail=f"Unknown recipe: {req.recipe_name}")
+        raise NotFoundError("Recipe", req.recipe_name)
     msg = _crafter.learn_recipe(recipe)
     return {"message": msg, "crafter": _serialize_crafter(_crafter)}
 
@@ -1063,13 +1050,10 @@ def equip_tool(tool_index: int = Query(default=0, ge=0)):
     """Equip a crafted tool by index in the crafted items list."""
     tools = [item for item in _crafter.inventory.items if item.recipe.category.name == "TOOL"]
     if not tools:
-        raise HTTPException(status_code=400, detail="No tools crafted yet.")
+        raise ValidationError("No tools crafted yet.")
     if tool_index >= len(tools):
-        raise HTTPException(status_code=400, detail=f"Tool index out of range (have {len(tools)} tools).")
-    try:
-        msg = _crafter.equip_tool(tools[tool_index])
-    except CraftingError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise ValidationError(f"Tool index out of range (have {len(tools)} tools).")
+    msg = _crafter.equip_tool(tools[tool_index])
     return {"message": msg, "crafter": _serialize_crafter(_crafter)}
 
 

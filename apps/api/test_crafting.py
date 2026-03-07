@@ -63,6 +63,7 @@ from crafting import (
     ALL_RECIPES,
     ALL_MATERIALS,
 )
+from errors import ValidationError
 
 
 # ---------------------------------------------------------------------------
@@ -268,12 +269,12 @@ class TestInventory:
 
     def test_add_material_zero_raises(self):
         inv = Inventory()
-        with pytest.raises(ValueError, match="positive"):
+        with pytest.raises(ValidationError, match="positive"):
             inv.add_material(OAK_WOOD, 0)
 
     def test_add_material_negative_raises(self):
         inv = Inventory()
-        with pytest.raises(ValueError, match="positive"):
+        with pytest.raises(ValidationError, match="positive"):
             inv.add_material(OAK_WOOD, -1)
 
     def test_remove_material(self):
