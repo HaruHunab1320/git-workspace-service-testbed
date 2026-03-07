@@ -83,6 +83,19 @@ npx turbo dev --filter=@cozy-village/cozy-companion
 - **Zen Garden** -- Interactive sand raking, succulent, and rock placement
 - **Journal** -- Personal entry system tied to in-game days
 
+## Logger
+
+A standardized logging utility is available at `src/logger.ts`. It provides configurable log levels (DEBUG, INFO, WARN, ERROR, SILENT), pluggable transports, and hierarchical child loggers with context chaining.
+
+```ts
+import { createLogger, LogLevel } from './src/logger';
+
+const logger = createLogger({ context: 'MyModule', level: LogLevel.DEBUG });
+logger.info('Hello from Willowbrook');
+```
+
+See [docs/logging.md](./docs/logging.md) for full API documentation.
+
 ## Tech Stack
 
 | Layer | Technology |

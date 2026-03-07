@@ -102,6 +102,19 @@
 
 ---
 
+## Root-Level Modules
+
+### `src/logger.ts` -- Standardized Logger
+
+- **Type:** TypeScript utility module
+- **Exports:** `Logger` class, `createLogger` factory, `LogLevel` enum, `LogEntry` interface, `LogTransport` type
+- **Features:** Configurable log levels (DEBUG/INFO/WARN/ERROR/SILENT), pluggable transports, child loggers with context chaining, dynamic level changes at runtime
+- **Default transport:** `Logger.consoleTransport` -- routes to `console.debug/info/warn/error`
+- **Tests:** `tests/logger.test.ts` -- 46 unit tests via Vitest
+- **Documentation:** `docs/logging.md`
+
+---
+
 ## Workspace Configuration
 
 | File | Purpose |
@@ -123,6 +136,7 @@
 | `FRONTEND_STATUS.md` | Frontend implementation status and details |
 | `TEA_RECIPES.md` | Tea recipe content for the tea brewing feature |
 | `CLAUDE_TEST.md` | Test marker file |
+| `docs/logging.md` | Logger utility API documentation |
 
 ---
 
