@@ -32,7 +32,7 @@ jobs:
         run: npx turbo run lint
 
       - name: Test
-        run: npx turbo run test
+        run: npx turbo run test --filter='!@cozy-village/api'
 
   test-python:
     name: Python API Tests
