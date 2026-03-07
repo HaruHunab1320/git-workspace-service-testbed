@@ -16,19 +16,19 @@ The app has no client-side routing, no state management library, no component li
 
 ## 2. Technology Stack
 
-| Layer | Choice |
-|---|---|
-| Framework | React 18.2.0 |
-| Build Tool | Vite 5.0.0 |
-| Language | JavaScript / JSX (no TypeScript) |
-| Monorepo | Turborepo (npm workspaces) |
-| Package Manager | npm 10.8.2 |
-| Styling | Plain CSS with CSS variables, per-component CSS files |
-| State Management | React hooks (useState/useEffect/useCallback) — no library |
-| Routing | None — tab-based navigation via local state |
-| Testing | None |
-| Authentication | None (single-player game, no auth) |
-| API Transport | fetch wrapper over REST (`/api` proxied to backend at `:8000`) |
+| Layer            | Choice                                                         |
+| ---------------- | -------------------------------------------------------------- |
+| Framework        | React 18.2.0                                                   |
+| Build Tool       | Vite 5.0.0                                                     |
+| Language         | JavaScript / JSX (no TypeScript)                               |
+| Monorepo         | Turborepo (npm workspaces)                                     |
+| Package Manager  | npm 10.8.2                                                     |
+| Styling          | Plain CSS with CSS variables, per-component CSS files          |
+| State Management | React hooks (useState/useEffect/useCallback) — no library      |
+| Routing          | None — tab-based navigation via local state                    |
+| Testing          | None                                                           |
+| Authentication   | None (single-player game, no auth)                             |
+| API Transport    | fetch wrapper over REST (`/api` proxied to backend at `:8000`) |
 
 ### Dependencies (apps/web)
 
@@ -138,16 +138,16 @@ All state is managed via React hooks in `App.jsx` and individual components:
 
 Several "always-on" floating components render over the main content:
 
-| Component | Purpose |
-|---|---|
-| LofiPlayer | Synthesized lo-fi radio player |
-| FocusTimer | Pomodoro timer with SVG progress ring |
+| Component     | Purpose                                           |
+| ------------- | ------------------------------------------------- |
+| LofiPlayer    | Synthesized lo-fi radio player                    |
+| FocusTimer    | Pomodoro timer with SVG progress ring             |
 | AmbientSounds | Context-aware soundscapes (rain, birds, crickets) |
-| StarryNight | Particle-based night sky canvas |
-| CozyFireplace | CSS/canvas animated fireplace |
-| WindChimes | Sound effects triggered by game events |
-| SleepingCat | Decorative animated cat |
-| SwarmBadge | Firefly particle effect |
+| StarryNight   | Particle-based night sky canvas                   |
+| CozyFireplace | CSS/canvas animated fireplace                     |
+| WindChimes    | Sound effects triggered by game events            |
+| SleepingCat   | Decorative animated cat                           |
+| SwarmBadge    | Firefly particle effect                           |
 
 ---
 
@@ -164,6 +164,7 @@ Several "always-on" floating components render over the main content:
 ```
 
 Two tabs share the `id: 'zen'`. This causes:
+
 1. The second "Zen" tab button renders but can never show as `active` (React `key` conflict).
 2. In `renderPanel()`, the second `case 'zen':` at line 171-172 is dead code — the first `case 'zen':` (line 167-168, `ZenGardenPanel`) always matches.
 3. The `ZenGarden` component from `@cozy-village/zen-garden` (the interactive canvas sand-raking experience) is imported but **never reachable**.
@@ -228,44 +229,46 @@ CSS files are imported directly (not as CSS Modules), so all class names are glo
 
 ## 7. Component Inventory
 
-| Component | Lines (est.) | Purpose | Has CSS |
-|---|---|---|---|
-| App.jsx | 242 | Root component, state, tabs, layout | Yes (App.css) |
-| Header.jsx | — | Day/season/weather/mood display | Yes |
-| ActionBar.jsx | — | Advance day/week, new game buttons | Yes |
-| EventLog.jsx | — | Sidebar with recent game reports | Yes |
-| WeatherPanel.jsx | — | Weather display, forecast, festivals | Yes |
-| VillagersPanel.jsx | — | Villager list with personality badges | Yes |
-| VillagerCard.jsx | — | Individual villager display | — |
-| GardenPanel.jsx | — | Grid-based crop planting/harvesting | Yes |
-| GardenPlot.jsx | — | Single garden tile | — |
-| PetsPanel.jsx | — | Pet list, adoption, interactions | Yes |
-| PetCard.jsx | — | Individual pet display | — |
-| EconomyPanel.jsx | — | Market prices, buy/sell interface | Yes |
-| InventoryShelf.jsx | — | Categorized item display | Yes |
-| JournalPanel.jsx | — | Text journal with date/season | Yes |
-| ZenGardenPanel.jsx | — | Server-side zen garden management | Yes |
-| ZenGardenTile.jsx | — | Single zen garden tile | — |
-| TeaBrewingStation.jsx | 250+ | Interactive tea brewing | Yes |
-| AmbientLofiMixer.jsx | Large | Multi-track audio mixer | Yes |
-| LofiPlayer.jsx | — | Floating lo-fi radio | Yes |
-| FocusTimer.jsx | — | Pomodoro timer with SVG ring | Yes |
-| AmbientSounds.jsx | — | Context-aware ambient audio | Yes |
-| StarryNight.jsx | — | Canvas particle night sky | Yes |
-| CozyFireplace.jsx | — | Animated fireplace | Yes |
-| WindChimes.jsx | — | Event-triggered sound effects | Yes |
-| SleepingCat.jsx | — | Decorative animated cat | Yes |
-| SwarmBadge.jsx | — | Firefly particle effect | Yes |
-| PlantModal.jsx | — | Crop selection dialog | — |
-| SucculentModal.jsx | — | Succulent selection dialog | — |
-| RockModal.jsx | — | Rock selection dialog | — |
-| GiftModal.jsx | — | Gift giving dialog | — |
-| AdoptModal.jsx | — | Pet adoption dialog | — |
+| Component             | Lines (est.) | Purpose                               | Has CSS       |
+| --------------------- | ------------ | ------------------------------------- | ------------- |
+| App.jsx               | 242          | Root component, state, tabs, layout   | Yes (App.css) |
+| Header.jsx            | —            | Day/season/weather/mood display       | Yes           |
+| ActionBar.jsx         | —            | Advance day/week, new game buttons    | Yes           |
+| EventLog.jsx          | —            | Sidebar with recent game reports      | Yes           |
+| WeatherPanel.jsx      | —            | Weather display, forecast, festivals  | Yes           |
+| VillagersPanel.jsx    | —            | Villager list with personality badges | Yes           |
+| VillagerCard.jsx      | —            | Individual villager display           | —             |
+| GardenPanel.jsx       | —            | Grid-based crop planting/harvesting   | Yes           |
+| GardenPlot.jsx        | —            | Single garden tile                    | —             |
+| PetsPanel.jsx         | —            | Pet list, adoption, interactions      | Yes           |
+| PetCard.jsx           | —            | Individual pet display                | —             |
+| EconomyPanel.jsx      | —            | Market prices, buy/sell interface     | Yes           |
+| InventoryShelf.jsx    | —            | Categorized item display              | Yes           |
+| JournalPanel.jsx      | —            | Text journal with date/season         | Yes           |
+| ZenGardenPanel.jsx    | —            | Server-side zen garden management     | Yes           |
+| ZenGardenTile.jsx     | —            | Single zen garden tile                | —             |
+| TeaBrewingStation.jsx | 250+         | Interactive tea brewing               | Yes           |
+| AmbientLofiMixer.jsx  | Large        | Multi-track audio mixer               | Yes           |
+| LofiPlayer.jsx        | —            | Floating lo-fi radio                  | Yes           |
+| FocusTimer.jsx        | —            | Pomodoro timer with SVG ring          | Yes           |
+| AmbientSounds.jsx     | —            | Context-aware ambient audio           | Yes           |
+| StarryNight.jsx       | —            | Canvas particle night sky             | Yes           |
+| CozyFireplace.jsx     | —            | Animated fireplace                    | Yes           |
+| WindChimes.jsx        | —            | Event-triggered sound effects         | Yes           |
+| SleepingCat.jsx       | —            | Decorative animated cat               | Yes           |
+| SwarmBadge.jsx        | —            | Firefly particle effect               | Yes           |
+| PlantModal.jsx        | —            | Crop selection dialog                 | —             |
+| SucculentModal.jsx    | —            | Succulent selection dialog            | —             |
+| RockModal.jsx         | —            | Rock selection dialog                 | —             |
+| GiftModal.jsx         | —            | Gift giving dialog                    | —             |
+| AdoptModal.jsx        | —            | Pet adoption dialog                   | —             |
 
 **Custom Hooks:**
+
 - `useAmbientSounds` (617 lines) — Web Audio API synthesis for all app sounds
 
 **Shared Package:**
+
 - `@cozy-village/zen-garden` — Canvas-based interactive sand raking (currently unreachable due to duplicate tab bug)
 
 ---
@@ -274,22 +277,23 @@ CSS files are imported directly (not as CSS Modules), so all class names are glo
 
 The frontend consumes 30 REST endpoints from a FastAPI backend:
 
-| Category | Endpoints | Methods |
-|---|---|---|
-| Game | `/status`, `/advance-day`, `/new-game` | GET, POST |
-| Weather | `/weather`, `/weather/forecast` | GET |
-| Villagers | `/villagers`, `/villagers/:id`, `/villagers/:id/gift` | GET, POST |
-| Garden | `/garden`, `/garden/crops`, `/garden/plant` | GET, POST |
-| Pets | `/pets`, `/pets/adoptable`, `/pets/adopt`, `/pets/:name/pet`, `/pets/:name/feed`, `/pets/:name/play` | GET, POST |
-| Economy | `/economy/prices`, `/economy/summary`, `/economy/wallet`, `/economy/buy`, `/economy/sell`, `/inventory` | GET, POST |
-| Zen Garden | `/zen-garden`, `/zen-garden/succulents`, `/zen-garden/rocks`, `/zen-garden/place-succulent`, `/zen-garden/place-rock`, `/zen-garden/rake`, `/zen-garden/remove` | GET, POST |
-| Journal | `/journal`, `/journal/:id` | GET, POST, DELETE |
+| Category   | Endpoints                                                                                                                                                       | Methods           |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Game       | `/status`, `/advance-day`, `/new-game`                                                                                                                          | GET, POST         |
+| Weather    | `/weather`, `/weather/forecast`                                                                                                                                 | GET               |
+| Villagers  | `/villagers`, `/villagers/:id`, `/villagers/:id/gift`                                                                                                           | GET, POST         |
+| Garden     | `/garden`, `/garden/crops`, `/garden/plant`                                                                                                                     | GET, POST         |
+| Pets       | `/pets`, `/pets/adoptable`, `/pets/adopt`, `/pets/:name/pet`, `/pets/:name/feed`, `/pets/:name/play`                                                            | GET, POST         |
+| Economy    | `/economy/prices`, `/economy/summary`, `/economy/wallet`, `/economy/buy`, `/economy/sell`, `/inventory`                                                         | GET, POST         |
+| Zen Garden | `/zen-garden`, `/zen-garden/succulents`, `/zen-garden/rocks`, `/zen-garden/place-succulent`, `/zen-garden/place-rock`, `/zen-garden/rake`, `/zen-garden/remove` | GET, POST         |
+| Journal    | `/journal`, `/journal/:id`                                                                                                                                      | GET, POST, DELETE |
 
 ---
 
 ## 9. Design System
 
 ### Color Palette (CSS Variables)
+
 - `--cream: #faf6f0` (background)
 - `--sage: #7a9e7e` (primary accent)
 - `--tan: #d4b896` (secondary accent)
@@ -298,9 +302,11 @@ The frontend consumes 30 REST endpoints from a FastAPI backend:
 - `--highlight: #e8a849` (call-to-action)
 
 ### Seasonal Themes
+
 - Spring: `#f0f7e8` | Summer: `#faf6e0` | Autumn: `#f7efe0` | Winter: `#e8eef5`
 
 ### Primitives
+
 - `.card` — white bg, shadow, rounded corners
 - `.btn` / `.btn-primary` / `.btn-secondary` / `.btn-rose` — button variants
 - `.badge-*` — personality/mood badges
@@ -309,6 +315,7 @@ The frontend consumes 30 REST endpoints from a FastAPI backend:
 - `.grid-2` / `.grid-3` — layout helpers
 
 ### Typography
+
 - Font family: Nunito (Google Fonts), sans-serif fallback
 - Responsive breakpoint: 900px
 

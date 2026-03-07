@@ -33,7 +33,9 @@ function CheckInForm({ onSubmit }) {
 
   return (
     <div className="checkin-form">
-      <p className="checkin-prompt">Good to see you! How are you feeling today?</p>
+      <p className="checkin-prompt">
+        Good to see you! How are you feeling today?
+      </p>
 
       <div className="checkin-section">
         <span className="checkin-label">Mood</span>
@@ -74,7 +76,13 @@ function CheckInForm({ onSubmit }) {
         rows={2}
       />
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          marginTop: '12px',
+        }}
+      >
         <PastelButton variant="mint" onClick={handleSubmit} disabled={!mood}>
           Check In
         </PastelButton>
@@ -96,17 +104,21 @@ function CheckInSummary({ checkIn, streak }) {
       </div>
 
       <div className="checkin-summary__details">
-        {moodInfo && <PastelBadge variant={moodInfo.variant}>{moodInfo.label}</PastelBadge>}
-        {checkIn.energy && <PastelBadge variant="mint">{checkIn.energy} energy</PastelBadge>}
+        {moodInfo && (
+          <PastelBadge variant={moodInfo.variant}>{moodInfo.label}</PastelBadge>
+        )}
+        {checkIn.energy && (
+          <PastelBadge variant="mint">{checkIn.energy} energy</PastelBadge>
+        )}
       </div>
 
-      {checkIn.note && (
-        <p className="checkin-summary__note">{checkIn.note}</p>
-      )}
+      {checkIn.note && <p className="checkin-summary__note">{checkIn.note}</p>}
 
       <div className="checkin-companion-response">
         <span className="checkin-companion-response__label">Mochi says:</span>
-        <p className="checkin-companion-response__text">{checkIn.companionResponse}</p>
+        <p className="checkin-companion-response__text">
+          {checkIn.companionResponse}
+        </p>
       </div>
     </div>
   );
@@ -131,8 +143,16 @@ function CheckInHistory({ checkIns }) {
           return (
             <div key={entry.id} className="checkin-history__item">
               <span className="checkin-history__date">{dateStr}</span>
-              {moodInfo && <PastelBadge variant={moodInfo.variant} size="sm">{moodInfo.label}</PastelBadge>}
-              {entry.energy && <PastelBadge variant="mint" size="sm">{entry.energy}</PastelBadge>}
+              {moodInfo && (
+                <PastelBadge variant={moodInfo.variant} size="sm">
+                  {moodInfo.label}
+                </PastelBadge>
+              )}
+              {entry.energy && (
+                <PastelBadge variant="mint" size="sm">
+                  {entry.energy}
+                </PastelBadge>
+              )}
             </div>
           );
         })}
@@ -141,17 +161,29 @@ function CheckInHistory({ checkIns }) {
   );
 }
 
-export default function DailyCheckIn({ todayCheckIn, hasCheckedInToday, streak, recentCheckIns, onSubmit, showToast }) {
-  const handleSubmit = useCallback((data) => {
-    const response = onSubmit(data);
-    showToast?.('Check-in complete!', 'success');
-    return response;
-  }, [onSubmit, showToast]);
+export default function DailyCheckIn({
+  todayCheckIn,
+  hasCheckedInToday,
+  streak,
+  recentCheckIns,
+  onSubmit,
+  showToast,
+}) {
+  const handleSubmit = useCallback(
+    (data) => {
+      const response = onSubmit(data);
+      showToast?.('Check-in complete!', 'success');
+      return response;
+    },
+    [onSubmit, showToast]
+  );
 
   return (
     <PastelCard title="Daily Check-in" icon=">" glow="peach" padding="lg">
       {!hasCheckedInToday && <CheckInForm onSubmit={handleSubmit} />}
-      {hasCheckedInToday && <CheckInSummary checkIn={todayCheckIn} streak={streak} />}
+      {hasCheckedInToday && (
+        <CheckInSummary checkIn={todayCheckIn} streak={streak} />
+      )}
       <CheckInHistory checkIns={recentCheckIns} />
     </PastelCard>
   );

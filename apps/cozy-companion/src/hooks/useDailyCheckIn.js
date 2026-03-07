@@ -54,41 +54,42 @@ function calculateStreak(checkIns) {
 
 const COMPANION_RESPONSES = {
   happy: [
-    "Wonderful! Your happiness is contagious!",
+    'Wonderful! Your happiness is contagious!',
     "That's great to hear! Let's make today even better.",
-    "Your joy brightens this little corner of the world.",
+    'Your joy brightens this little corner of the world.',
   ],
   calm: [
-    "A peaceful mind is a powerful thing.",
-    "Serenity looks good on you today.",
-    "What a lovely, centered way to start.",
+    'A peaceful mind is a powerful thing.',
+    'Serenity looks good on you today.',
+    'What a lovely, centered way to start.',
   ],
   tired: [
     "It's okay to take things slow today.",
-    "Rest is productive too. Be gentle with yourself.",
-    "Even on tired days, you showed up. That matters.",
+    'Rest is productive too. Be gentle with yourself.',
+    'Even on tired days, you showed up. That matters.',
   ],
   excited: [
-    "Channel that energy into something wonderful!",
-    "What an amazing vibe to carry today!",
-    "Your excitement is like sunshine on a rainy day.",
+    'Channel that energy into something wonderful!',
+    'What an amazing vibe to carry today!',
+    'Your excitement is like sunshine on a rainy day.',
   ],
   anxious: [
-    "Take a deep breath. You are safe here.",
+    'Take a deep breath. You are safe here.',
     "One step at a time. You've got this.",
     "Let's breathe together. Inhale... exhale...",
   ],
 };
 
 const ENERGY_RESPONSES = {
-  low: "Remember, even small steps count.",
-  medium: "A steady pace wins the day.",
+  low: 'Remember, even small steps count.',
+  medium: 'A steady pace wins the day.',
   high: "What a spark! Let's make the most of it.",
 };
 
 function getCompanionResponse(mood, energy) {
   const moodResponses = COMPANION_RESPONSES[mood] || COMPANION_RESPONSES.calm;
-  const moodResponse = moodResponses[Math.floor(Math.random() * moodResponses.length)];
+  const moodResponse =
+    moodResponses[Math.floor(Math.random() * moodResponses.length)];
   const energyResponse = energy ? ENERGY_RESPONSES[energy] : '';
   return energyResponse ? `${moodResponse} ${energyResponse}` : moodResponse;
 }
@@ -97,28 +98,35 @@ export default function useDailyCheckIn() {
   const [checkIns, setCheckIns] = useState(loadCheckIns);
 
   const todayKey = toDateString(new Date());
-  const todayCheckIn = checkIns.find((c) => toDateString(c.date) === todayKey) || null;
+  const todayCheckIn =
+    checkIns.find((c) => toDateString(c.date) === todayKey) || null;
   const hasCheckedInToday = !!todayCheckIn;
 
   const streak = useMemo(() => calculateStreak(checkIns), [checkIns]);
 
-  const submitCheckIn = useCallback(({ mood, energy, note }) => {
-    const response = getCompanionResponse(mood, energy);
+  const submitCheckIn = useCallback(
+    ({ mood, energy, note }) => {
+      const response = getCompanionResponse(mood, energy);
 
-    const entry = {
-      id: Date.now(),
-      date: new Date().toISOString(),
-      mood,
-      energy,
-      note: note || '',
-      companionResponse: response,
-    };
+      const entry = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        mood,
+        energy,
+        note: note || '',
+        companionResponse: response,
+      };
 
-    const updated = [entry, ...checkIns.filter((c) => toDateString(c.date) !== todayKey)];
-    setCheckIns(updated);
-    saveCheckIns(updated);
-    return response;
-  }, [checkIns, todayKey]);
+      const updated = [
+        entry,
+        ...checkIns.filter((c) => toDateString(c.date) !== todayKey),
+      ];
+      setCheckIns(updated);
+      saveCheckIns(updated);
+      return response;
+    },
+    [checkIns, todayKey]
+  );
 
   const recentCheckIns = useMemo(() => checkIns.slice(0, 7), [checkIns]);
 

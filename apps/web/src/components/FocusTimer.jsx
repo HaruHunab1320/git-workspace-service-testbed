@@ -10,8 +10,16 @@ const PRESETS = [
 const BREAK_MINUTES = 5;
 
 const PASTEL_RINGS = {
-  focus: { track: '#f0e6ef', fill: '#c8a2c8', glow: 'rgba(200, 162, 200, 0.35)' },
-  break: { track: '#e6f0e8', fill: '#a8c5ab', glow: 'rgba(168, 197, 171, 0.35)' },
+  focus: {
+    track: '#f0e6ef',
+    fill: '#c8a2c8',
+    glow: 'rgba(200, 162, 200, 0.35)',
+  },
+  break: {
+    track: '#e6f0e8',
+    fill: '#a8c5ab',
+    glow: 'rgba(168, 197, 171, 0.35)',
+  },
 };
 
 function formatTime(seconds) {
@@ -120,14 +128,17 @@ export default function FocusTimer() {
     setIsRunning(true);
   }, [stopTimer]);
 
-  const selectPreset = useCallback((idx) => {
-    stopTimer();
-    setPresetIdx(idx);
-    setIsBreak(false);
-    const secs = PRESETS[idx].minutes * 60;
-    setSecondsLeft(secs);
-    setTotalSeconds(secs);
-  }, [stopTimer]);
+  const selectPreset = useCallback(
+    (idx) => {
+      stopTimer();
+      setPresetIdx(idx);
+      setIsBreak(false);
+      const secs = PRESETS[idx].minutes * 60;
+      setSecondsLeft(secs);
+      setTotalSeconds(secs);
+    },
+    [stopTimer]
+  );
 
   const resetTimer = useCallback(() => {
     stopTimer();
@@ -312,7 +323,9 @@ export default function FocusTimer() {
                 {Array.from({ length: Math.min(sessions, 8) }, (_, i) => (
                   <span key={i} className="timer-session-dot" />
                 ))}
-                {sessions > 8 && <span className="timer-session-extra">+{sessions - 8}</span>}
+                {sessions > 8 && (
+                  <span className="timer-session-extra">+{sessions - 8}</span>
+                )}
               </span>
             )}
             <span className="timer-session-label">
@@ -331,7 +344,12 @@ export default function FocusTimer() {
           <span className="timer-fab-icon">⏳</span>
           {isRunning && (
             <>
-              <svg className="timer-fab-ring" width="56" height="56" viewBox="0 0 56 56">
+              <svg
+                className="timer-fab-ring"
+                width="56"
+                height="56"
+                viewBox="0 0 56 56"
+              >
                 <circle
                   cx="28"
                   cy="28"

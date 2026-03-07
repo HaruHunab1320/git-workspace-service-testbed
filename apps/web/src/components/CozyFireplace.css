@@ -55,8 +55,15 @@
 }
 
 @keyframes fireplace-glow-pulse {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.15); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.15);
+  }
 }
 
 /* ---- Expanded Panel ---- */
@@ -71,8 +78,14 @@
 }
 
 @keyframes fireplace-slide-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fireplace-header {
@@ -178,7 +191,8 @@
 .flame-core {
   width: 20px;
   height: 50px;
-  background: linear-gradient(to top,
+  background: linear-gradient(
+    to top,
     #ff4500 0%,
     #ff6b35 30%,
     #ffa040 60%,
@@ -192,7 +206,8 @@
 .flame-mid-left {
   width: 16px;
   height: 38px;
-  background: linear-gradient(to top,
+  background: linear-gradient(
+    to top,
     #ff4500 0%,
     #ff6b35 40%,
     #ffa040 80%,
@@ -206,7 +221,8 @@
 .flame-mid-right {
   width: 16px;
   height: 38px;
-  background: linear-gradient(to top,
+  background: linear-gradient(
+    to top,
     #ff4500 0%,
     #ff6b35 40%,
     #ffa040 80%,
@@ -220,11 +236,7 @@
 .flame-outer-left {
   width: 12px;
   height: 26px;
-  background: linear-gradient(to top,
-    #ff4500 0%,
-    #ff6b35 50%,
-    #ffa040 100%
-  );
+  background: linear-gradient(to top, #ff4500 0%, #ff6b35 50%, #ffa040 100%);
   margin-right: -4px;
   animation: flame-dance-outer 0.55s ease-in-out infinite alternate;
   opacity: 0.8;
@@ -234,11 +246,7 @@
 .flame-outer-right {
   width: 12px;
   height: 26px;
-  background: linear-gradient(to top,
-    #ff4500 0%,
-    #ff6b35 50%,
-    #ffa040 100%
-  );
+  background: linear-gradient(to top, #ff4500 0%, #ff6b35 50%, #ffa040 100%);
   margin-left: -4px;
   animation: flame-dance-outer 0.5s ease-in-out infinite alternate-reverse;
   opacity: 0.8;
@@ -246,29 +254,71 @@
 }
 
 @keyframes flame-dance-core {
-  0% { height: 50px; transform: scaleX(1) translateY(0); }
-  25% { height: 46px; transform: scaleX(0.95) translateY(2px); }
-  50% { height: 52px; transform: scaleX(1.02) translateY(-1px); }
-  75% { height: 48px; transform: scaleX(0.98) translateY(1px); }
-  100% { height: 50px; transform: scaleX(1.03) translateY(0); }
+  0% {
+    height: 50px;
+    transform: scaleX(1) translateY(0);
+  }
+  25% {
+    height: 46px;
+    transform: scaleX(0.95) translateY(2px);
+  }
+  50% {
+    height: 52px;
+    transform: scaleX(1.02) translateY(-1px);
+  }
+  75% {
+    height: 48px;
+    transform: scaleX(0.98) translateY(1px);
+  }
+  100% {
+    height: 50px;
+    transform: scaleX(1.03) translateY(0);
+  }
 }
 
 @keyframes flame-dance-left {
-  0% { height: 38px; transform: rotate(-3deg) scaleX(1); }
-  50% { height: 34px; transform: rotate(-6deg) scaleX(0.9); }
-  100% { height: 40px; transform: rotate(-2deg) scaleX(1.05); }
+  0% {
+    height: 38px;
+    transform: rotate(-3deg) scaleX(1);
+  }
+  50% {
+    height: 34px;
+    transform: rotate(-6deg) scaleX(0.9);
+  }
+  100% {
+    height: 40px;
+    transform: rotate(-2deg) scaleX(1.05);
+  }
 }
 
 @keyframes flame-dance-right {
-  0% { height: 38px; transform: rotate(3deg) scaleX(1); }
-  50% { height: 36px; transform: rotate(5deg) scaleX(0.92); }
-  100% { height: 40px; transform: rotate(2deg) scaleX(1.04); }
+  0% {
+    height: 38px;
+    transform: rotate(3deg) scaleX(1);
+  }
+  50% {
+    height: 36px;
+    transform: rotate(5deg) scaleX(0.92);
+  }
+  100% {
+    height: 40px;
+    transform: rotate(2deg) scaleX(1.04);
+  }
 }
 
 @keyframes flame-dance-outer {
-  0% { height: 26px; transform: rotate(-5deg); }
-  50% { height: 22px; transform: rotate(-8deg); }
-  100% { height: 28px; transform: rotate(-3deg); }
+  0% {
+    height: 26px;
+    transform: rotate(-5deg);
+  }
+  50% {
+    height: 22px;
+    transform: rotate(-8deg);
+  }
+  100% {
+    height: 28px;
+    transform: rotate(-3deg);
+  }
 }
 
 /* ---- Embers (floating sparks) ---- */
@@ -295,17 +345,42 @@
   opacity: 0;
 }
 
-.ember:nth-child(1) { left: 30%; animation-delay: 0s; }
-.ember:nth-child(2) { left: 50%; animation-delay: 0.4s; }
-.ember:nth-child(3) { left: 70%; animation-delay: 0.8s; }
-.ember:nth-child(4) { left: 40%; animation-delay: 1.2s; }
-.ember:nth-child(5) { left: 60%; animation-delay: 1.6s; }
+.ember:nth-child(1) {
+  left: 30%;
+  animation-delay: 0s;
+}
+.ember:nth-child(2) {
+  left: 50%;
+  animation-delay: 0.4s;
+}
+.ember:nth-child(3) {
+  left: 70%;
+  animation-delay: 0.8s;
+}
+.ember:nth-child(4) {
+  left: 40%;
+  animation-delay: 1.2s;
+}
+.ember:nth-child(5) {
+  left: 60%;
+  animation-delay: 1.6s;
+}
 
 @keyframes ember-float {
-  0% { transform: translateY(0) scale(1); opacity: 0; }
-  10% { opacity: 1; }
-  60% { opacity: 0.6; }
-  100% { transform: translateY(-50px) translateX(10px) scale(0.3); opacity: 0; }
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-50px) translateX(10px) scale(0.3);
+    opacity: 0;
+  }
 }
 
 /* ---- Warm glow on hearth ---- */
@@ -317,7 +392,8 @@
   transform: translateX(-50%);
   width: 120px;
   height: 60px;
-  background: radial-gradient(ellipse at bottom center,
+  background: radial-gradient(
+    ellipse at bottom center,
     rgba(255, 140, 40, 0.4) 0%,
     rgba(255, 100, 30, 0.2) 40%,
     transparent 70%
@@ -327,26 +403,53 @@
 }
 
 @keyframes glow-flicker {
-  0% { opacity: 0.7; }
-  50% { opacity: 1; }
-  100% { opacity: 0.75; }
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.75;
+  }
 }
 
 /* ---- Intensity Variations ---- */
 
-.intensity-embers .flame { transform: scale(0.3); opacity: 0.5; }
-.intensity-embers .fireplace-glow { opacity: 0.3; }
-.intensity-embers .ember { animation-duration: 4s; }
+.intensity-embers .flame {
+  transform: scale(0.3);
+  opacity: 0.5;
+}
+.intensity-embers .fireplace-glow {
+  opacity: 0.3;
+}
+.intensity-embers .ember {
+  animation-duration: 4s;
+}
 
-.intensity-low .flame { transform: scale(0.6); }
-.intensity-low .fireplace-glow { opacity: 0.6; }
+.intensity-low .flame {
+  transform: scale(0.6);
+}
+.intensity-low .fireplace-glow {
+  opacity: 0.6;
+}
 
-.intensity-medium .flame { transform: scale(0.85); }
-.intensity-medium .fireplace-glow { opacity: 0.85; }
+.intensity-medium .flame {
+  transform: scale(0.85);
+}
+.intensity-medium .fireplace-glow {
+  opacity: 0.85;
+}
 
-.intensity-roaring .flame { transform: scale(1.1); }
-.intensity-roaring .fireplace-glow { opacity: 1; }
-.intensity-roaring .ember { animation-duration: 1.4s; }
+.intensity-roaring .flame {
+  transform: scale(1.1);
+}
+.intensity-roaring .fireplace-glow {
+  opacity: 1;
+}
+.intensity-roaring .ember {
+  animation-duration: 1.4s;
+}
 
 /* ---- Intensity Controls ---- */
 
@@ -511,8 +614,12 @@
 }
 
 @keyframes marshmallow-sizzle {
-  from { transform: translateY(-50%) scale(1); }
-  to { transform: translateY(-50%) scale(1.04); }
+  from {
+    transform: translateY(-50%) scale(1);
+  }
+  to {
+    transform: translateY(-50%) scale(1.04);
+  }
 }
 
 .marshmallow-status {

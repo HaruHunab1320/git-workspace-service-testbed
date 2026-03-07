@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { PastelButton } from '@cozy-village/ui';
 
-export default function GentleReminders({ reminders = [], intervalMs = 30000 }) {
+export default function GentleReminders({
+  reminders = [],
+  intervalMs = 30000,
+}) {
   const [index, setIndex] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -24,7 +27,9 @@ export default function GentleReminders({ reminders = [], intervalMs = 30000 }) 
 
   return (
     <div className="gentle-reminders">
-      <div className={`reminder-card ${transitioning ? 'reminder-card--fading' : ''}`}>
+      <div
+        className={`reminder-card ${transitioning ? 'reminder-card--fading' : ''}`}
+      >
         <div className="reminder-card__icon">*</div>
         <p className="reminder-card__text">{reminders[index]}</p>
       </div>
@@ -35,14 +40,21 @@ export default function GentleReminders({ reminders = [], intervalMs = 30000 }) 
             <button
               key={i}
               className={`reminder-dot ${i === index ? 'reminder-dot--active' : ''}`}
-              onClick={() => { setIndex(i); setTransitioning(false); }}
+              onClick={() => {
+                setIndex(i);
+                setTransitioning(false);
+              }}
               aria-label={`Reminder ${i + 1}`}
             />
           ))}
         </div>
 
         <div className="reminder-actions">
-          <PastelButton variant="ghost" size="sm" onClick={() => setPaused((p) => !p)}>
+          <PastelButton
+            variant="ghost"
+            size="sm"
+            onClick={() => setPaused((p) => !p)}
+          >
             {paused ? 'Resume' : 'Pause'}
           </PastelButton>
           <PastelButton variant="ghost" size="sm" onClick={advance}>

@@ -11,9 +11,12 @@ export default function PastelModal({
   size = 'md',
   className = '',
 }) {
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Escape' && onClose) onClose();
-  }, [onClose]);
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Escape' && onClose) onClose();
+    },
+    [onClose]
+  );
 
   useEffect(() => {
     if (open) {

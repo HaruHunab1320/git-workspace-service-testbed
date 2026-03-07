@@ -1,1 +1,1 @@
-console.log("Hello from delta!");
+console.log('Hello from delta!');

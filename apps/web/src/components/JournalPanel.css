@@ -18,7 +18,9 @@
   background: var(--white);
   resize: vertical;
   line-height: 1.6;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .journal-compose textarea:focus {
@@ -57,7 +59,9 @@
   border-left: 3px solid var(--rose-light);
   position: relative;
   animation: cozy-slide-up 0.35s ease both;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .journal-entry:hover {

@@ -22,7 +22,12 @@ function CircularProgress({ value, max, size = 120, strokeWidth = 6 }) {
   const center = size / 2;
 
   return (
-    <svg className="timer-ring" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <svg
+      className="timer-ring"
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+    >
       <circle
         className="timer-ring__track"
         cx={center}
@@ -102,9 +107,16 @@ export default function FocusTimer({ showToast }) {
   return (
     <div className="focus-timer">
       <div className="focus-timer__display">
-        <CircularProgress value={elapsed} max={totalSeconds} size={140} strokeWidth={8} />
+        <CircularProgress
+          value={elapsed}
+          max={totalSeconds}
+          size={140}
+          strokeWidth={8}
+        />
         <div className="focus-timer__time-overlay">
-          <span className={`timer-time ${running ? 'timer-time--active' : ''} ${isComplete ? 'timer-time--done' : ''}`}>
+          <span
+            className={`timer-time ${running ? 'timer-time--active' : ''} ${isComplete ? 'timer-time--done' : ''}`}
+          >
             {formatTime(remaining)}
           </span>
           <span className="timer-state-label">
@@ -121,8 +133,16 @@ export default function FocusTimer({ showToast }) {
       />
 
       <div className="timer-controls">
-        <PastelButton variant={running ? 'blush' : 'mint'} size="sm" onClick={toggle}>
-          {running ? 'Pause' : remaining < totalSeconds && remaining > 0 ? 'Resume' : 'Start'}
+        <PastelButton
+          variant={running ? 'blush' : 'mint'}
+          size="sm"
+          onClick={toggle}
+        >
+          {running
+            ? 'Pause'
+            : remaining < totalSeconds && remaining > 0
+              ? 'Resume'
+              : 'Start'}
         </PastelButton>
         <PastelButton variant="ghost" size="sm" onClick={reset}>
           Reset
@@ -146,7 +166,8 @@ export default function FocusTimer({ showToast }) {
       {sessionsCompleted > 0 && (
         <div className="timer-sessions">
           <PastelBadge variant="mint" size="sm">
-            {sessionsCompleted} session{sessionsCompleted !== 1 ? 's' : ''} today
+            {sessionsCompleted} session{sessionsCompleted !== 1 ? 's' : ''}{' '}
+            today
           </PastelBadge>
         </div>
       )}

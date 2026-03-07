@@ -52,8 +52,15 @@
 }
 
 @keyframes sleepingcat-fab-zzz-float {
-  0%, 100% { opacity: 0.4; transform: translateY(0); }
-  50% { opacity: 1; transform: translateY(-4px); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
 }
 
 /* ---- Expanded Panel ---- */
@@ -68,8 +75,14 @@
 }
 
 @keyframes sleepingcat-slide-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .sleepingcat-header {
@@ -175,8 +188,13 @@
 }
 
 @keyframes sleepingcat-breathe {
-  0%, 100% { transform: scaleY(1) scaleX(1); }
-  50% { transform: scaleY(1.06) scaleX(1.02); }
+  0%,
+  100% {
+    transform: scaleY(1) scaleX(1);
+  }
+  50% {
+    transform: scaleY(1.06) scaleX(1.02);
+  }
 }
 
 /* Head */
@@ -240,15 +258,31 @@
 }
 
 @keyframes sleepingcat-ear-twitch-l {
-  0%, 90%, 100% { transform: rotate(-10deg); }
-  93% { transform: rotate(-20deg); }
-  96% { transform: rotate(-8deg); }
+  0%,
+  90%,
+  100% {
+    transform: rotate(-10deg);
+  }
+  93% {
+    transform: rotate(-20deg);
+  }
+  96% {
+    transform: rotate(-8deg);
+  }
 }
 
 @keyframes sleepingcat-ear-twitch-r {
-  0%, 90%, 100% { transform: rotate(10deg); }
-  93% { transform: rotate(20deg); }
-  96% { transform: rotate(8deg); }
+  0%,
+  90%,
+  100% {
+    transform: rotate(10deg);
+  }
+  93% {
+    transform: rotate(20deg);
+  }
+  96% {
+    transform: rotate(8deg);
+  }
 }
 
 /* Closed eyes - two curved lines */
@@ -323,9 +357,16 @@
 }
 
 @keyframes sleepingcat-tail-sway {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  25% { transform: rotate(3deg) translateY(-1px); }
-  75% { transform: rotate(-2deg) translateY(1px); }
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  25% {
+    transform: rotate(3deg) translateY(-1px);
+  }
+  75% {
+    transform: rotate(-2deg) translateY(1px);
+  }
 }
 
 /* ---- Zzz Animation ---- */
@@ -365,10 +406,20 @@
 }
 
 @keyframes sleepingcat-z-float {
-  0% { opacity: 0; transform: translateY(0) rotate(0deg); }
-  15% { opacity: 0.8; }
-  50% { opacity: 0.6; }
-  100% { opacity: 0; transform: translateY(-30px) rotate(-15deg) translateX(8px); }
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+  15% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) rotate(-15deg) translateX(8px);
+  }
 }
 
 /* ---- Status Text ---- */
@@ -401,17 +452,44 @@
   animation: sleepingcat-purr-bounce 1.2s ease-in-out infinite alternate;
 }
 
-.sleepingcat-purr-bar:nth-child(1) { animation-delay: 0s; height: 6px; }
-.sleepingcat-purr-bar:nth-child(2) { animation-delay: 0.15s; height: 10px; }
-.sleepingcat-purr-bar:nth-child(3) { animation-delay: 0.3s; height: 7px; }
-.sleepingcat-purr-bar:nth-child(4) { animation-delay: 0.45s; height: 11px; }
-.sleepingcat-purr-bar:nth-child(5) { animation-delay: 0.6s; height: 5px; }
-.sleepingcat-purr-bar:nth-child(6) { animation-delay: 0.75s; height: 9px; }
-.sleepingcat-purr-bar:nth-child(7) { animation-delay: 0.9s; height: 6px; }
+.sleepingcat-purr-bar:nth-child(1) {
+  animation-delay: 0s;
+  height: 6px;
+}
+.sleepingcat-purr-bar:nth-child(2) {
+  animation-delay: 0.15s;
+  height: 10px;
+}
+.sleepingcat-purr-bar:nth-child(3) {
+  animation-delay: 0.3s;
+  height: 7px;
+}
+.sleepingcat-purr-bar:nth-child(4) {
+  animation-delay: 0.45s;
+  height: 11px;
+}
+.sleepingcat-purr-bar:nth-child(5) {
+  animation-delay: 0.6s;
+  height: 5px;
+}
+.sleepingcat-purr-bar:nth-child(6) {
+  animation-delay: 0.75s;
+  height: 9px;
+}
+.sleepingcat-purr-bar:nth-child(7) {
+  animation-delay: 0.9s;
+  height: 6px;
+}
 
 @keyframes sleepingcat-purr-bounce {
-  0% { transform: scaleY(0.5); opacity: 0.4; }
-  100% { transform: scaleY(1); opacity: 0.9; }
+  0% {
+    transform: scaleY(0.5);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0.9;
+  }
 }
 
 .sleepingcat-purr-label {

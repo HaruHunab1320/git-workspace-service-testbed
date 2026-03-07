@@ -38,18 +38,21 @@ export class Logger {
 
   static consoleTransport: LogTransport = (entry: LogEntry) => {
     const prefix = entry.context ? `[${entry.context}]` : '';
-    const msg = prefix
-      ? `${entry.timestamp} ${LogLevel[entry.level]} ${prefix} ${entry.message}`
-      : `${entry.timestamp} ${LogLevel[entry.level]} ${entry.message}`;
-    const fn =
-      entry.level === LogLevel.DEBUG ? console.debug :
-      entry.level === LogLevel.INFO ? console.info :
-      entry.level === LogLevel.WARN ? console.warn :
-      console.error;
-    if (entry.data !== undefined) {
-      fn(msg, entry.data);
-    } else {
-      fn(msg);
+    const msg =
+      `${entry.timestamp} ${LogLevel[entry.level]} ${prefix} ${entry.message}`.trim();
+    switch (entry.level) {
+      case LogLevel.DEBUG:
+        console.debug(msg, ...(entry.data !== undefined ? [entry.data] : []));
+        break;
+      case LogLevel.INFO:
+        console.info(msg, ...(entry.data !== undefined ? [entry.data] : []));
+        break;
+      case LogLevel.WARN:
+        console.warn(msg, ...(entry.data !== undefined ? [entry.data] : []));
+        break;
+      case LogLevel.ERROR:
+        console.error(msg, ...(entry.data !== undefined ? [entry.data] : []));
+        break;
     }
   };
 

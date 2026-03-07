@@ -24,7 +24,9 @@ export default function PastelButton({
     VARIANT_MAP[variant] || VARIANT_MAP.mint,
     `pastel-btn--${size}`,
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <button className={cls} disabled={disabled} onClick={onClick} {...props}>

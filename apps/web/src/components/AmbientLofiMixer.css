@@ -91,7 +91,9 @@
   flex: 1;
   min-width: 0;
   opacity: 0.6;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 .mixer-channel.active {
@@ -141,7 +143,9 @@
   left: 0;
   right: 0;
   border-radius: var(--radius-sm);
-  transition: height 0.15s ease, opacity 0.2s;
+  transition:
+    height 0.15s ease,
+    opacity 0.2s;
 }
 
 .mixer-fader {
@@ -231,7 +235,8 @@
 }
 
 @keyframes mixerPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: var(--ring-opacity, 0.5);
   }

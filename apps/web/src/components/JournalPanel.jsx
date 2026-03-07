@@ -5,7 +5,13 @@ import './JournalPanel.css';
 
 const MOOD_MAP = Object.fromEntries(MOODS.map((m) => [m.value, m.emoji]));
 
-export default function JournalPanel({ entries, day, season, onRefresh, showToast }) {
+export default function JournalPanel({
+  entries,
+  day,
+  season,
+  onRefresh,
+  showToast,
+}) {
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async ({ mood, note }) => {
@@ -63,7 +69,9 @@ export default function JournalPanel({ entries, day, season, onRefresh, showToas
                   <div className="journal-entry-header">
                     <span>
                       {entry.mood && MOOD_MAP[entry.mood] ? (
-                        <span className="journal-entry-mood">{MOOD_MAP[entry.mood]}</span>
+                        <span className="journal-entry-mood">
+                          {MOOD_MAP[entry.mood]}
+                        </span>
                       ) : null}
                       Entry #{entry.id}
                     </span>

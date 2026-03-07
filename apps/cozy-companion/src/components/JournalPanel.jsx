@@ -41,9 +41,7 @@ export default function JournalPanel({ showToast }) {
 
   const toggleTag = (tagId) => {
     setSelectedTags((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((t) => t !== tagId)
-        : [...prev, tagId]
+      prev.includes(tagId) ? prev.filter((t) => t !== tagId) : [...prev, tagId]
     );
   };
 
@@ -82,9 +80,10 @@ export default function JournalPanel({ showToast }) {
   }, [deleteTarget, entries, showToast]);
 
   const filteredEntries = searchQuery
-    ? entries.filter((e) =>
-        e.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (e.tags || []).some((t) => t.includes(searchQuery.toLowerCase()))
+    ? entries.filter(
+        (e) =>
+          e.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (e.tags || []).some((t) => t.includes(searchQuery.toLowerCase()))
       )
     : entries;
 
@@ -114,12 +113,18 @@ export default function JournalPanel({ showToast }) {
           ))}
         </div>
         {draft.trim() && (
-          <span className="journal-word-count">{wordCount} word{wordCount !== 1 ? 's' : ''}</span>
+          <span className="journal-word-count">
+            {wordCount} word{wordCount !== 1 ? 's' : ''}
+          </span>
         )}
       </div>
 
       <div className="journal-save-row">
-        <PastelButton variant="mint" onClick={addEntry} disabled={!draft.trim()}>
+        <PastelButton
+          variant="mint"
+          onClick={addEntry}
+          disabled={!draft.trim()}
+        >
           Save Entry
         </PastelButton>
       </div>
@@ -145,7 +150,11 @@ export default function JournalPanel({ showToast }) {
               <div key={entry.id} className="journal-entry">
                 <div className="journal-entry__header">
                   <span className="journal-entry__date">{entry.date}</span>
-                  <PastelButton variant="ghost" size="sm" onClick={() => setDeleteTarget(entry.id)}>
+                  <PastelButton
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDeleteTarget(entry.id)}
+                  >
                     x
                   </PastelButton>
                 </div>
@@ -155,7 +164,11 @@ export default function JournalPanel({ showToast }) {
                     {entry.tags.map((tagId) => {
                       const tag = MOOD_TAGS.find((t) => t.id === tagId);
                       return tag ? (
-                        <PastelBadge key={tagId} variant={tag.variant} size="sm">
+                        <PastelBadge
+                          key={tagId}
+                          variant={tag.variant}
+                          size="sm"
+                        >
                           {tag.label}
                         </PastelBadge>
                       ) : null;

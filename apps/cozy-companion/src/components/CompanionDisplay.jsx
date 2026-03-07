@@ -41,10 +41,10 @@ const COMPANION_ART = {
 };
 
 const MOOD_MESSAGES = {
-  happy: "Your companion is purring contentedly!",
-  calm: "A peaceful moment together...",
+  happy: 'Your companion is purring contentedly!',
+  calm: 'A peaceful moment together...',
   tired: "Let's take it easy today.",
-  excited: "So much energy! What an adventure!",
+  excited: 'So much energy! What an adventure!',
   anxious: "It's okay. Deep breaths together.",
 };
 
@@ -88,14 +88,12 @@ export default function CompanionDisplay({ mood }) {
   }, [mood]);
 
   const art = COMPANION_ART[mood] || COMPANION_ART.default;
-  const message = mood ? MOOD_MESSAGES[mood] : "Hello! How are you today?";
+  const message = mood ? MOOD_MESSAGES[mood] : 'Hello! How are you today?';
   const badgeVariant = MOOD_BADGE_VARIANT[mood] || 'lavender';
   const particles = AMBIENT_PARTICLES[mood] || AMBIENT_PARTICLES.default;
 
   // Replace eyes during blink (patterns: o.o, ^.^, -.-, u.u, *.*)
-  const displayArt = blinking
-    ? art.replace(/[o^*u\-]\.[o^*u\-]/, '-.-')
-    : art;
+  const displayArt = blinking ? art.replace(/[o^*u-]\.[o^*u-]/, '-.-') : art;
 
   return (
     <div className="companion-display">

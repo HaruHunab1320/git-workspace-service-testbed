@@ -22,21 +22,21 @@ cozy-village/
 
 ### Apps
 
-| App | Package | Description |
-|-----|---------|-------------|
-| **API** | `@cozy-village/api` | Python/FastAPI backend powering the simulation. Handles villager AI, weather, farming, pets, economy, crafting, and zen garden logic. Exposes 40+ REST endpoints. |
-| **Web** | `@cozy-village/web` | React 18 frontend with 30+ components. Includes ambient features like a lo-fi mixer, fireplace, wind chimes, and starry night sky. |
-| **Beta** | `@cozy-village/beta` | A new React + Vite application scaffolded by agent beta, running on port 5175. |
+| App                | Package                        | Description                                                                                                                                                           |
+| ------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **API**            | `@cozy-village/api`            | Python/FastAPI backend powering the simulation. Handles villager AI, weather, farming, pets, economy, crafting, and zen garden logic. Exposes 40+ REST endpoints.     |
+| **Web**            | `@cozy-village/web`            | React 18 frontend with 30+ components. Includes ambient features like a lo-fi mixer, fireplace, wind chimes, and starry night sky.                                    |
+| **Beta**           | `@cozy-village/beta`           | A new React + Vite application scaffolded by agent beta, running on port 5175.                                                                                        |
 | **Cozy Companion** | `@cozy-village/cozy-companion` | A wellness and focus companion app with mood tracking, a focus timer, gentle reminders, and a personal journal. Uses the shared `@cozy-village/ui` component library. |
-| **Mood Journal** | `@cozy-village/mood-journal` | A minimal standalone mood tracking app with a 6-mood picker. Part of the Cozy Village universe. |
+| **Mood Journal**   | `@cozy-village/mood-journal`   | A minimal standalone mood tracking app with a 6-mood picker. Part of the Cozy Village universe.                                                                       |
 
 ### Packages
 
-| Package | Name | Description |
-|---------|------|-------------|
-| **ui** | `@cozy-village/ui` | Shared pastel-themed React component library. Includes PastelButton, PastelCard, PastelTabs, PastelModal, PastelToast, PastelInput, PastelAvatar, and more. |
-| **zen-garden** | `@cozy-village/zen-garden` | Interactive canvas drawing component with rake patterns, succulent/rock placement, and a tool palette. |
-| **utils** | `@cozy-village/utils` | Shared helpers -- Fisher-Yates shuffle, greeting generator, console utilities, and a deterministic weather forecast generator (`weather.js`) using a seeded PRNG. |
+| Package        | Name                       | Description                                                                                                                                                       |
+| -------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ui**         | `@cozy-village/ui`         | Shared pastel-themed React component library. Includes PastelButton, PastelCard, PastelTabs, PastelModal, PastelToast, PastelInput, PastelAvatar, and more.       |
+| **zen-garden** | `@cozy-village/zen-garden` | Interactive canvas drawing component with rake patterns, succulent/rock placement, and a tool palette.                                                            |
+| **utils**      | `@cozy-village/utils`      | Shared helpers -- Fisher-Yates shuffle, greeting generator, console utilities, and a deterministic weather forecast generator (`weather.js`) using a seeded PRNG. |
 
 ## Getting Started
 
@@ -98,14 +98,14 @@ See [docs/logging.md](./docs/logging.md) for full API documentation.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 18, Vite 5, CSS |
-| Backend | Python, FastAPI, Uvicorn |
-| Monorepo | Turborepo 2, npm workspaces |
+| Layer      | Technology                                    |
+| ---------- | --------------------------------------------- |
+| Frontend   | React 18, Vite 5, CSS                         |
+| Backend    | Python, FastAPI, Uvicorn                      |
+| Monorepo   | Turborepo 2, npm workspaces                   |
 | UI Library | `@cozy-village/ui` (pastel-themed components) |
-| Testing | Pytest (API), Vitest-compatible (Web) |
-| Formatting | Prettier |
+| Testing    | Pytest (API), Vitest-compatible (Web)         |
+| Formatting | Prettier                                      |
 
 ## Contributing
 

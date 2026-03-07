@@ -3,10 +3,18 @@
    ============================================================ */
 
 /* Seasonal theme accents */
-.season-theme-spring .weather-current { border-top: 3px solid #d4a7c8; }
-.season-theme-summer .weather-current { border-top: 3px solid #e8c547; }
-.season-theme-autumn .weather-current { border-top: 3px solid #c87941; }
-.season-theme-winter .weather-current { border-top: 3px solid #7eadd4; }
+.season-theme-spring .weather-current {
+  border-top: 3px solid #d4a7c8;
+}
+.season-theme-summer .weather-current {
+  border-top: 3px solid #e8c547;
+}
+.season-theme-autumn .weather-current {
+  border-top: 3px solid #c87941;
+}
+.season-theme-winter .weather-current {
+  border-top: 3px solid #7eadd4;
+}
 
 /* ---- Current Weather Card ---- */
 
@@ -72,8 +80,13 @@
 }
 
 @keyframes gentle-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
 }
 
 .weather-temp {
@@ -112,7 +125,9 @@
   background: var(--cream);
   border-radius: 16px;
   color: var(--brown-light);
-  transition: background 0.25s ease, transform 0.2s ease;
+  transition:
+    background 0.25s ease,
+    transform 0.2s ease;
 }
 
 .weather-detail:hover {
@@ -165,8 +180,13 @@
 }
 
 @keyframes shimmer {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .magical-icon {
@@ -175,8 +195,13 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .weather-magical-card strong {
@@ -296,7 +321,9 @@
   padding: 12px 8px;
   background: var(--cream);
   border-radius: var(--radius-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .forecast-day:hover {

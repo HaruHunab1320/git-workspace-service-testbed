@@ -56,9 +56,15 @@
 }
 
 @keyframes mood-select-bounce {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .daily-entry-mood-btn:disabled {
@@ -98,7 +104,9 @@
   background: var(--white);
   resize: vertical;
   line-height: 1.6;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .daily-entry-note:focus {

@@ -5,7 +5,9 @@
 }
 
 .pet-card {
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+  transition:
+    transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.3s ease;
   animation: cozy-slide-up 0.4s ease both;
 }
 
@@ -106,9 +108,17 @@
   background: var(--cream);
 }
 
-.pet-item.rarity-common { background: #f0f0f0; }
-.pet-item.rarity-uncommon { background: #d6eaff; color: #2980b9; }
-.pet-item.rarity-rare { background: #efe0ff; color: #8e44ad; }
+.pet-item.rarity-common {
+  background: #f0f0f0;
+}
+.pet-item.rarity-uncommon {
+  background: #d6eaff;
+  color: #2980b9;
+}
+.pet-item.rarity-rare {
+  background: #efe0ff;
+  color: #8e44ad;
+}
 
 .pet-actions {
   display: flex;

@@ -68,10 +68,18 @@ export default function ZenGarden({ showToast }) {
       <div className="card zen-garden-tips">
         <h3 className="card-title">How to use</h3>
         <div className="zen-tips-grid">
-          <span>🪮 <strong>Rake</strong> — drag to draw furrows</span>
-          <span>🌊 <strong>Smooth</strong> — drag to erase marks</span>
-          <span>🪨 <strong>Stone</strong> — click to place a stone</span>
-          <span>🔘 <strong>Circles</strong> — click for ring patterns</span>
+          <span>
+            🪮 <strong>Rake</strong> — drag to draw furrows
+          </span>
+          <span>
+            🌊 <strong>Smooth</strong> — drag to erase marks
+          </span>
+          <span>
+            🪨 <strong>Stone</strong> — click to place a stone
+          </span>
+          <span>
+            🔘 <strong>Circles</strong> — click for ring patterns
+          </span>
         </div>
       </div>
     </div>

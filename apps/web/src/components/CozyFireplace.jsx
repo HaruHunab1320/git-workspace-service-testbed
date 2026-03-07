@@ -3,7 +3,12 @@ import './CozyFireplace.css';
 
 const STORAGE_KEY = 'fireplace-state';
 const INTENSITIES = ['embers', 'low', 'medium', 'roaring'];
-const INTENSITY_LABELS = { embers: 'Embers', low: 'Low', medium: 'Medium', roaring: 'Roaring' };
+const INTENSITY_LABELS = {
+  embers: 'Embers',
+  low: 'Low',
+  medium: 'Medium',
+  roaring: 'Roaring',
+};
 
 const MARSHMALLOW_STAGES = ['raw', 'warming', 'golden', 'perfect', 'burnt'];
 const MARSHMALLOW_LABELS = {
@@ -19,7 +24,9 @@ function loadState() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     return {
       lit: saved?.lit ?? false,
-      intensity: INTENSITIES.includes(saved?.intensity) ? saved.intensity : 'medium',
+      intensity: INTENSITIES.includes(saved?.intensity)
+        ? saved.intensity
+        : 'medium',
       volume: typeof saved?.volume === 'number' ? saved.volume : 0.3,
     };
   } catch {
@@ -32,13 +39,18 @@ function createCrackleNode(ctx, volume, intensity) {
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const data = buffer.getChannelData(0);
 
-  const densityMap = { embers: 0.003, low: 0.008, medium: 0.015, roaring: 0.03 };
+  const densityMap = {
+    embers: 0.003,
+    low: 0.008,
+    medium: 0.015,
+    roaring: 0.03,
+  };
   const density = densityMap[intensity] || 0.015;
 
   for (let i = 0; i < bufferSize; i++) {
     if (Math.random() < density) {
       const crackleLen = Math.floor(Math.random() * 800) + 200;
-      const crackleAmp = (Math.random() * 0.4 + 0.1);
+      const crackleAmp = Math.random() * 0.4 + 0.1;
       for (let j = 0; j < crackleLen && i + j < bufferSize; j++) {
         const env = 1 - j / crackleLen;
         data[i + j] += (Math.random() * 2 - 1) * crackleAmp * env * env;
@@ -204,7 +216,9 @@ export default function CozyFireplace() {
   }, []);
 
   return (
-    <div className={`fireplace-widget ${isExpanded ? 'expanded' : 'collapsed'}`}>
+    <div
+      className={`fireplace-widget ${isExpanded ? 'expanded' : 'collapsed'}`}
+    >
       {isExpanded ? (
         <div className="fireplace-panel">
           <div className="fireplace-header">
@@ -287,7 +301,9 @@ export default function CozyFireplace() {
           {/* Marshmallow Toasting */}
           {lit && (
             <div className="fireplace-marshmallow-area">
-              <span className="fireplace-marshmallow-label">marshmallow toasting</span>
+              <span className="fireplace-marshmallow-label">
+                marshmallow toasting
+              </span>
 
               <div className="marshmallow-stick">
                 <div className="marshmallow-skewer" />
@@ -299,11 +315,10 @@ export default function CozyFireplace() {
               </span>
 
               {!isToasting ? (
-                <button
-                  className="fireplace-toast-btn"
-                  onClick={startToasting}
-                >
-                  {marshmallow === 'raw' ? 'Toast Marshmallow' : 'Toast Another'}
+                <button className="fireplace-toast-btn" onClick={startToasting}>
+                  {marshmallow === 'raw'
+                    ? 'Toast Marshmallow'
+                    : 'Toast Another'}
                 </button>
               ) : (
                 <button

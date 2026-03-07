@@ -5,73 +5,113 @@ import './TeaBrewingStation.css';
 
 const TEAS = [
   {
-    id: 'green', name: 'Green Tea', emoji: '🍵', steepTime: 12,
-    color: '#a8c5a0', darkColor: '#7a9e72',
+    id: 'green',
+    name: 'Green Tea',
+    emoji: '🍵',
+    steepTime: 12,
+    color: '#a8c5a0',
+    darkColor: '#7a9e72',
     description: 'Light and grassy with a gentle sweetness',
-    idealTemp: 175, tempLabel: 'Below boiling',
+    idealTemp: 175,
+    tempLabel: 'Below boiling',
     pairsWith: 'A light rice cracker or a quiet moment in the garden',
     origin: 'Japanese highlands',
     caffeine: 'Medium',
   },
   {
-    id: 'black', name: 'Black Tea', emoji: '🫖', steepTime: 16,
-    color: '#8b4513', darkColor: '#5c2d0e',
+    id: 'black',
+    name: 'Black Tea',
+    emoji: '🫖',
+    steepTime: 16,
+    color: '#8b4513',
+    darkColor: '#5c2d0e',
     description: 'Bold and malty, a morning classic',
-    idealTemp: 212, tempLabel: 'Full boil',
+    idealTemp: 212,
+    tempLabel: 'Full boil',
     pairsWith: 'A warm scone with clotted cream',
     origin: 'Assam valley',
     caffeine: 'High',
   },
   {
-    id: 'chamomile', name: 'Chamomile', emoji: '🌼', steepTime: 20,
-    color: '#e8d478', darkColor: '#c4a83a',
+    id: 'chamomile',
+    name: 'Chamomile',
+    emoji: '🌼',
+    steepTime: 20,
+    color: '#e8d478',
+    darkColor: '#c4a83a',
     description: 'Floral and calming, perfect for evening',
-    idealTemp: 200, tempLabel: 'Just off boil',
+    idealTemp: 200,
+    tempLabel: 'Just off boil',
     pairsWith: 'A good book and a soft blanket',
     origin: 'Meadow wildflowers',
     caffeine: 'None',
   },
   {
-    id: 'earl_grey', name: 'Earl Grey', emoji: '🫖', steepTime: 14,
-    color: '#6b5b95', darkColor: '#4a3d6b',
+    id: 'earl_grey',
+    name: 'Earl Grey',
+    emoji: '🫖',
+    steepTime: 14,
+    color: '#6b5b95',
+    darkColor: '#4a3d6b',
     description: 'Fragrant bergamot meets smooth black tea',
-    idealTemp: 208, tempLabel: 'Near boil',
+    idealTemp: 208,
+    tempLabel: 'Near boil',
     pairsWith: 'A slice of lemon cake or a rainy afternoon',
     origin: 'English tradition',
     caffeine: 'Medium-High',
   },
   {
-    id: 'matcha', name: 'Matcha', emoji: '🍃', steepTime: 10,
-    color: '#5a8a3c', darkColor: '#3d6128',
+    id: 'matcha',
+    name: 'Matcha',
+    emoji: '🍃',
+    steepTime: 10,
+    color: '#5a8a3c',
+    darkColor: '#3d6128',
     description: 'Vibrant and earthy with umami depth',
-    idealTemp: 170, tempLabel: 'Gentle heat',
+    idealTemp: 170,
+    tempLabel: 'Gentle heat',
     pairsWith: 'A small mochi or a mindful pause',
     origin: 'Uji, Japan',
     caffeine: 'High',
   },
   {
-    id: 'oolong', name: 'Oolong', emoji: '🍂', steepTime: 18,
-    color: '#c4823a', darkColor: '#96622a',
+    id: 'oolong',
+    name: 'Oolong',
+    emoji: '🍂',
+    steepTime: 18,
+    color: '#c4823a',
+    darkColor: '#96622a',
     description: 'Complex and toasty with a sweet finish',
-    idealTemp: 195, tempLabel: 'Medium-high',
+    idealTemp: 195,
+    tempLabel: 'Medium-high',
     pairsWith: 'A handful of roasted nuts or a sunset view',
     origin: 'Fujian mountains',
     caffeine: 'Medium',
   },
   {
-    id: 'peppermint', name: 'Peppermint', emoji: '🌿', steepTime: 15,
-    color: '#7ecba1', darkColor: '#4a9e6e',
+    id: 'peppermint',
+    name: 'Peppermint',
+    emoji: '🌿',
+    steepTime: 15,
+    color: '#7ecba1',
+    darkColor: '#4a9e6e',
     description: 'Cool and refreshing, clears the mind',
-    idealTemp: 200, tempLabel: 'Just off boil',
+    idealTemp: 200,
+    tempLabel: 'Just off boil',
     pairsWith: 'Dark chocolate or a crisp winter morning',
     origin: 'Herb garden',
     caffeine: 'None',
   },
   {
-    id: 'rooibos', name: 'Rooibos', emoji: '🌺', steepTime: 22,
-    color: '#c4564a', darkColor: '#963a32',
+    id: 'rooibos',
+    name: 'Rooibos',
+    emoji: '🌺',
+    steepTime: 22,
+    color: '#c4564a',
+    darkColor: '#963a32',
     description: 'Naturally sweet and nutty, caffeine-free warmth',
-    idealTemp: 212, tempLabel: 'Full boil',
+    idealTemp: 212,
+    tempLabel: 'Full boil',
     pairsWith: 'Honeyed toast or a cozy fireside chat',
     origin: 'South African bush',
     caffeine: 'None',
@@ -132,7 +172,9 @@ export default function TeaBrewingStation({ showToast }) {
   }, []);
 
   const pickCozyMessage = useCallback(() => {
-    setCozyMessage(COZY_MESSAGES[Math.floor(Math.random() * COZY_MESSAGES.length)]);
+    setCozyMessage(
+      COZY_MESSAGES[Math.floor(Math.random() * COZY_MESSAGES.length)]
+    );
   }, []);
 
   const startBrewing = (tea) => {
@@ -184,8 +226,16 @@ export default function TeaBrewingStation({ showToast }) {
       tea: selectedTea.name,
       teaId: selectedTea.id,
       emoji: selectedTea.emoji,
-      addition: addition !== 'none' ? ADDITIONS.find((a) => a.id === addition)?.label : null,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+      addition:
+        addition !== 'none'
+          ? ADDITIONS.find((a) => a.id === addition)?.label
+          : null,
+      date: new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      }),
     };
     const updated = [entry, ...journal].slice(0, 50);
     setJournal(updated);
@@ -209,20 +259,31 @@ export default function TeaBrewingStation({ showToast }) {
   const steamOpacity = brewing ? 0.3 + (progress / 100) * 0.5 : done ? 0.6 : 0;
 
   const totalCups = journal.length;
-  const favoriteTea = journal.length > 0
-    ? Object.entries(journal.reduce((acc, e) => { acc[e.tea] = (acc[e.tea] || 0) + 1; return acc; }, {}))
-        .sort((a, b) => b[1] - a[1])[0]?.[0]
-    : null;
+  const favoriteTea =
+    journal.length > 0
+      ? Object.entries(
+          journal.reduce((acc, e) => {
+            acc[e.tea] = (acc[e.tea] || 0) + 1;
+            return acc;
+          }, {})
+        ).sort((a, b) => b[1] - a[1])[0]?.[0]
+      : null;
 
   return (
     <div className="tea-station" data-agent="delta">
       <div className="card tea-header-card">
         <h2 className="card-title">🍵 Tea Brewing Station</h2>
-        <p className="tea-subtitle">Select a tea, customize your cup, and watch it steep</p>
+        <p className="tea-subtitle">
+          Select a tea, customize your cup, and watch it steep
+        </p>
         {totalCups > 0 && (
           <div className="tea-stats-row">
-            <span className="tea-stat">☕ {totalCups} cup{totalCups !== 1 ? 's' : ''} brewed</span>
-            {favoriteTea && <span className="tea-stat">❤️ Favorite: {favoriteTea}</span>}
+            <span className="tea-stat">
+              ☕ {totalCups} cup{totalCups !== 1 ? 's' : ''} brewed
+            </span>
+            {favoriteTea && (
+              <span className="tea-stat">❤️ Favorite: {favoriteTea}</span>
+            )}
           </div>
         )}
       </div>
@@ -278,7 +339,9 @@ export default function TeaBrewingStation({ showToast }) {
             <div className="teacup-body">
               <div className="tea-liquid" style={{ background: teaColor }}>
                 {milkOverlay && <div className="tea-milk-swirl" />}
-                {addition === 'lemon' && progress > 30 && <div className="tea-lemon-slice" />}
+                {addition === 'lemon' && progress > 30 && (
+                  <div className="tea-lemon-slice" />
+                )}
               </div>
               {brewing && (
                 <div className="tea-bag">
@@ -304,7 +367,12 @@ export default function TeaBrewingStation({ showToast }) {
           <div className="brew-info">
             <div className="brew-tea-name">
               {selectedTea.emoji} {selectedTea.name}
-              {addition !== 'none' && <span className="brew-addition-tag"> + {additionObj?.emoji} {additionObj?.label}</span>}
+              {addition !== 'none' && (
+                <span className="brew-addition-tag">
+                  {' '}
+                  + {additionObj?.emoji} {additionObj?.label}
+                </span>
+              )}
             </div>
             <p className="brew-description">{selectedTea.description}</p>
 
@@ -369,7 +437,9 @@ export default function TeaBrewingStation({ showToast }) {
             </div>
             <div className="note-item">
               <span className="note-label">Steep Time</span>
-              <span className="note-value">{selectedTea.steepTime}s at {selectedTea.idealTemp}°F</span>
+              <span className="note-value">
+                {selectedTea.steepTime}s at {selectedTea.idealTemp}°F
+              </span>
             </div>
             <div className="note-item">
               <span className="note-label">Caffeine</span>
@@ -378,14 +448,21 @@ export default function TeaBrewingStation({ showToast }) {
             {addition !== 'none' && (
               <div className="note-item">
                 <span className="note-label">Addition</span>
-                <span className="note-value">{additionObj?.emoji} {additionObj?.label}</span>
+                <span className="note-value">
+                  {additionObj?.emoji} {additionObj?.label}
+                </span>
               </div>
             )}
             <div className="note-item">
               <span className="note-label">Character</span>
               <span className="note-value">{selectedTea.description}</span>
             </div>
-            <div className="note-swatch" style={{ background: `linear-gradient(90deg, ${selectedTea.color}, ${selectedTea.darkColor})` }} />
+            <div
+              className="note-swatch"
+              style={{
+                background: `linear-gradient(90deg, ${selectedTea.color}, ${selectedTea.darkColor})`,
+              }}
+            />
           </div>
 
           <div className="tea-pairing">
@@ -396,7 +473,10 @@ export default function TeaBrewingStation({ showToast }) {
       )}
 
       <div className="card tea-journal-card">
-        <button className="journal-toggle" onClick={() => setShowJournal(!showJournal)}>
+        <button
+          className="journal-toggle"
+          onClick={() => setShowJournal(!showJournal)}
+        >
           <h3 className="card-title">📓 Tea Journal</h3>
           <span className="journal-chevron">{showJournal ? '▲' : '▼'}</span>
         </button>
@@ -406,7 +486,9 @@ export default function TeaBrewingStation({ showToast }) {
             {journal.length === 0 ? (
               <div className="journal-empty">
                 <span>No brews recorded yet.</span>
-                <span className="journal-empty-hint">Brew a tea and save it to start your journal!</span>
+                <span className="journal-empty-hint">
+                  Brew a tea and save it to start your journal!
+                </span>
               </div>
             ) : (
               <>
@@ -417,14 +499,22 @@ export default function TeaBrewingStation({ showToast }) {
                       <div className="journal-entry-info">
                         <span className="journal-entry-name">
                           {entry.tea}
-                          {entry.addition && <span className="journal-entry-addition"> + {entry.addition}</span>}
+                          {entry.addition && (
+                            <span className="journal-entry-addition">
+                              {' '}
+                              + {entry.addition}
+                            </span>
+                          )}
                         </span>
                         <span className="journal-entry-date">{entry.date}</span>
                       </div>
                     </div>
                   ))}
                 </div>
-                <button className="btn-text journal-clear" onClick={clearJournal}>
+                <button
+                  className="btn-text journal-clear"
+                  onClick={clearJournal}
+                >
                   Clear journal
                 </button>
               </>

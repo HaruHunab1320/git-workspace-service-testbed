@@ -12,7 +12,13 @@ const CATEGORIES = [
   { value: 'foraged', label: '🌿 Foraged' },
 ];
 
-export default function GiftModal({ villagerId, villagerName, onClose, onRefresh, showToast }) {
+export default function GiftModal({
+  villagerId,
+  villagerName,
+  onClose,
+  onRefresh,
+  showToast,
+}) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('flower');
   const [quality, setQuality] = useState(1);
@@ -53,9 +59,14 @@ export default function GiftModal({ villagerId, villagerName, onClose, onRefresh
 
         <div className="form-group">
           <label>Category</label>
-          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
             {CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>{c.label}</option>
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
             ))}
           </select>
         </div>
@@ -72,7 +83,9 @@ export default function GiftModal({ villagerId, villagerName, onClose, onRefresh
         </div>
 
         <div className="modal-actions">
-          <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn btn-secondary" onClick={onClose}>
+            Cancel
+          </button>
           <button className="btn btn-primary" onClick={handleGift}>
             🎁 Give Gift
           </button>

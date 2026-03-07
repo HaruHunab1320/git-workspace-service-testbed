@@ -22,7 +22,9 @@ export default function PastelBadge({
     VARIANT_MAP[variant] || VARIANT_MAP.lavender,
     `pastel-badge--${size}`,
     className,
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <span className={cls} {...props}>

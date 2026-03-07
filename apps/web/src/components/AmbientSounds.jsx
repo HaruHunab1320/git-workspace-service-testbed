@@ -40,7 +40,12 @@ export default function AmbientSounds({ sounds, weather, season }) {
   const sceneEmoji = () => {
     const w = weatherLabel();
     const emojis = {
-      rain: '🌧️', storm: '⛈️', snow: '❄️', wind: '🍃', fog: '🌫️', clear: '☀️',
+      rain: '🌧️',
+      storm: '⛈️',
+      snow: '❄️',
+      wind: '🍃',
+      fog: '🌫️',
+      clear: '☀️',
     };
     return emojis[w] || '☀️';
   };
@@ -56,7 +61,10 @@ export default function AmbientSounds({ sounds, weather, season }) {
         <div className="ambient-panel">
           <div className="ambient-header">
             <span className="ambient-title">ambient sounds</span>
-            <button className="ambient-collapse-btn" onClick={() => setIsExpanded(false)}>
+            <button
+              className="ambient-collapse-btn"
+              onClick={() => setIsExpanded(false)}
+            >
               &minus;
             </button>
           </div>
@@ -94,7 +102,9 @@ export default function AmbientSounds({ sounds, weather, season }) {
                 max="1"
                 step="0.01"
                 value={sounds.rainVolume}
-                onChange={(e) => sounds.setRainVolume(parseFloat(e.target.value))}
+                onChange={(e) =>
+                  sounds.setRainVolume(parseFloat(e.target.value))
+                }
                 className="ambient-slider"
                 disabled={!sounds.enabled || !sounds.rainOn}
               />
@@ -115,7 +125,9 @@ export default function AmbientSounds({ sounds, weather, season }) {
                 max="1"
                 step="0.01"
                 value={sounds.cafeVolume}
-                onChange={(e) => sounds.setCafeVolume(parseFloat(e.target.value))}
+                onChange={(e) =>
+                  sounds.setCafeVolume(parseFloat(e.target.value))
+                }
                 className="ambient-slider"
                 disabled={!sounds.enabled || !sounds.cafeOn}
               />
@@ -133,7 +145,9 @@ export default function AmbientSounds({ sounds, weather, season }) {
                 max="1"
                 step="0.01"
                 value={sounds.ambientVolume}
-                onChange={(e) => sounds.setAmbientVolume(parseFloat(e.target.value))}
+                onChange={(e) =>
+                  sounds.setAmbientVolume(parseFloat(e.target.value))
+                }
                 className="ambient-slider"
                 disabled={!sounds.enabled}
               />
@@ -153,9 +167,7 @@ export default function AmbientSounds({ sounds, weather, season }) {
             </div>
           </div>
 
-          <div className="ambient-hint">
-            Sounds adapt to weather & season
-          </div>
+          <div className="ambient-hint">Sounds adapt to weather & season</div>
         </div>
       ) : (
         <button
@@ -163,7 +175,9 @@ export default function AmbientSounds({ sounds, weather, season }) {
           onClick={() => setIsExpanded(true)}
           title="Ambient Sounds"
         >
-          <span className="ambient-fab-icon">{sounds.enabled ? '🔔' : '🔕'}</span>
+          <span className="ambient-fab-icon">
+            {sounds.enabled ? '🔔' : '🔕'}
+          </span>
           {sounds.enabled && <span className="ambient-fab-wave" />}
         </button>
       )}

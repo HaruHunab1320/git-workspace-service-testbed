@@ -55,8 +55,15 @@
 }
 
 @keyframes windchimes-ring-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.4; }
-  50% { transform: scale(1.2); opacity: 0; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
 }
 
 /* ---- Expanded Panel ---- */
@@ -72,8 +79,14 @@
 }
 
 @keyframes windchimes-slide-up {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .windchimes-header {
@@ -156,29 +169,57 @@
 }
 
 @keyframes windchimes-sway {
-  0% { transform: rotate(0deg); }
-  15% { transform: rotate(3deg); }
-  30% { transform: rotate(-2.5deg); }
-  45% { transform: rotate(2deg); }
-  60% { transform: rotate(-1.5deg); }
-  75% { transform: rotate(1deg); }
-  90% { transform: rotate(-0.5deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(3deg);
+  }
+  30% {
+    transform: rotate(-2.5deg);
+  }
+  45% {
+    transform: rotate(2deg);
+  }
+  60% {
+    transform: rotate(-1.5deg);
+  }
+  75% {
+    transform: rotate(1deg);
+  }
+  90% {
+    transform: rotate(-0.5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 .chime-tube {
   width: 4px;
   border-radius: 0 0 2px 2px;
   background: linear-gradient(to bottom, #c0c8d0, #a0aab4, #d0d8e0);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 1px 0 0 rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.5);
   transform-origin: top center;
 }
 
-.tube-1 { height: 40px; }
-.tube-2 { height: 52px; }
-.tube-3 { height: 58px; }
-.tube-4 { height: 48px; }
-.tube-5 { height: 36px; }
+.tube-1 {
+  height: 40px;
+}
+.tube-2 {
+  height: 52px;
+}
+.tube-3 {
+  height: 58px;
+}
+.tube-4 {
+  height: 48px;
+}
+.tube-5 {
+  height: 36px;
+}
 
 /* Wind sail at bottom */
 .windchimes-sail {
@@ -198,13 +239,27 @@
 }
 
 @keyframes windchimes-sail-sway {
-  0% { transform: rotate(0deg) translateX(0); }
-  15% { transform: rotate(4deg) translateX(3px); }
-  30% { transform: rotate(-3deg) translateX(-2px); }
-  45% { transform: rotate(2.5deg) translateX(2px); }
-  60% { transform: rotate(-2deg) translateX(-1.5px); }
-  75% { transform: rotate(1deg) translateX(1px); }
-  100% { transform: rotate(0deg) translateX(0); }
+  0% {
+    transform: rotate(0deg) translateX(0);
+  }
+  15% {
+    transform: rotate(4deg) translateX(3px);
+  }
+  30% {
+    transform: rotate(-3deg) translateX(-2px);
+  }
+  45% {
+    transform: rotate(2.5deg) translateX(2px);
+  }
+  60% {
+    transform: rotate(-2deg) translateX(-1.5px);
+  }
+  75% {
+    transform: rotate(1deg) translateX(1px);
+  }
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
 }
 
 /* Subtle breeze lines (decorative) */
@@ -233,11 +288,25 @@
 }
 
 @keyframes breeze-line {
-  0%, 100% { opacity: 0; transform: translateX(0); }
-  30% { opacity: 0.6; }
-  50% { opacity: 0.4; transform: translateX(8px); }
-  70% { opacity: 0.6; }
-  100% { opacity: 0; transform: translateX(16px); }
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  30% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.4;
+    transform: translateX(8px);
+  }
+  70% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(16px);
+  }
 }
 
 /* ---- Toggle Row ---- */

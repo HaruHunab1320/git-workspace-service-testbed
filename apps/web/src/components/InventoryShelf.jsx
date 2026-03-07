@@ -98,7 +98,9 @@ export default function InventoryShelf({ economy, onRefresh, showToast }) {
           <div className="shelf-empty">
             <span className="shelf-empty-icon">🏪</span>
             <span className="shelf-empty-text">Your shelf is empty</span>
-            <span className="shelf-empty-hint">Buy items from the shop below to fill it up!</span>
+            <span className="shelf-empty-hint">
+              Buy items from the shop below to fill it up!
+            </span>
           </div>
         ) : (
           <>
@@ -116,7 +118,9 @@ export default function InventoryShelf({ economy, onRefresh, showToast }) {
                         <span className="shelf-item-qty">{item.quantity}</span>
                       )}
                       <span className="shelf-item-emoji">
-                        {ITEM_EMOJI[item.key] || CATEGORY_EMOJI[item.category] || '📦'}
+                        {ITEM_EMOJI[item.key] ||
+                          CATEGORY_EMOJI[item.category] ||
+                          '📦'}
                       </span>
                       <span className="shelf-item-name">{item.name}</span>
                       {item.shelf_life !== 'infinite' && (
@@ -161,7 +165,9 @@ export default function InventoryShelf({ economy, onRefresh, showToast }) {
                         <span className="shelf-item-qty">{item.quantity}</span>
                       )}
                       <span className="shelf-item-emoji">
-                        {ITEM_EMOJI[item.key] || CATEGORY_EMOJI[item.category] || '📦'}
+                        {ITEM_EMOJI[item.key] ||
+                          CATEGORY_EMOJI[item.category] ||
+                          '📦'}
                       </span>
                       <span className="shelf-item-name">{item.name}</span>
                       <button
@@ -188,13 +194,19 @@ export default function InventoryShelf({ economy, onRefresh, showToast }) {
             return (
               <div key={item.key} className="shop-item">
                 <span className="shop-item-emoji">
-                  {ITEM_EMOJI[item.key] || CATEGORY_EMOJI[item.category] || '📦'}
+                  {ITEM_EMOJI[item.key] ||
+                    CATEGORY_EMOJI[item.category] ||
+                    '📦'}
                 </span>
                 <div className="shop-item-info">
                   <div className="shop-item-name">{item.name}</div>
-                  <div className="shop-item-price">{item.price.toFixed(2)} coins</div>
+                  <div className="shop-item-price">
+                    {item.price.toFixed(2)} coins
+                  </div>
                   <div className="shop-item-life">
-                    {item.shelf_life === 'infinite' ? 'Never spoils' : `${item.shelf_life}d shelf life`}
+                    {item.shelf_life === 'infinite'
+                      ? 'Never spoils'
+                      : `${item.shelf_life}d shelf life`}
                   </div>
                 </div>
                 <button
