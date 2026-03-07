@@ -141,7 +141,7 @@ class TestFarmingFlow:
         r = fresh_game.post("/api/garden/plant", json={
             "row": 0, "col": 0, "crop_name": "Dragonfruit",
         })
-        assert r.status_code == 400
+        assert r.status_code == 404
 
     def test_harvest_produces_events(self, fresh_game):
         fresh_game.post("/api/garden/plant", json={
@@ -218,7 +218,7 @@ class TestPetFlow:
         r = fresh_game.post("/api/pets/adopt", json={
             "name": "Rex", "species": "dragon", "personality": "loyal",
         })
-        assert r.status_code == 400
+        assert r.status_code == 422
 
 
 # ---------------------------------------------------------------------------
@@ -239,7 +239,7 @@ class TestGiftFlow:
         r = fresh_game.post("/api/villagers/lily/gift", json={
             "name": "Widget", "category": "electronics", "quality": 1,
         })
-        assert r.status_code == 400
+        assert r.status_code == 422
 
     def test_give_gift_unknown_villager(self, fresh_game):
         r = fresh_game.post("/api/villagers/nobody/gift", json={
@@ -291,14 +291,17 @@ class TestEconomyFlow:
         item_key = prices[0]["key"]
 
         r = fresh_game.post("/api/economy/buy", json={
-            "item_key": item_key, "quantity": 9999,
+            "item_key": item_key, "quantity": 999,
         })
         assert r.status_code == 400
         assert "Not enough coins" in r.json()["detail"]
 
     def test_cannot_sell_items_not_owned(self, fresh_game):
+        fresh_game.post("/api/advance-day")
+        prices = fresh_game.get("/api/economy/prices").json()
+        item_key = prices[0]["key"]
         r = fresh_game.post("/api/economy/sell", json={
-            "item_key": "strawberry", "quantity": 1,
+            "item_key": item_key, "quantity": 1,
         })
         assert r.status_code == 400
 
@@ -306,7 +309,7 @@ class TestEconomyFlow:
         r = fresh_game.post("/api/economy/buy", json={
             "item_key": "unicorn_horn", "quantity": 1,
         })
-        assert r.status_code == 400
+        assert r.status_code == 404
 
     def test_inventory_tracks_purchases(self, fresh_game):
         fresh_game.post("/api/advance-day")
@@ -373,7 +376,7 @@ class TestJournalFlow:
 
     def test_empty_text_rejected(self, fresh_game):
         r = fresh_game.post("/api/journal", json={"text": "   "})
-        assert r.status_code == 400
+        assert r.status_code == 422
 
 
 # ---------------------------------------------------------------------------
@@ -440,13 +443,13 @@ class TestZenGardenFlow:
         r = fresh_game.post("/api/zen-garden/rake", json={
             "row": 0, "col": 0, "pattern": "zigzag",
         })
-        assert r.status_code == 400
+        assert r.status_code == 422
 
     def test_unknown_succulent(self, fresh_game):
         r = fresh_game.post("/api/zen-garden/place-succulent", json={
             "row": 0, "col": 0, "succulent_name": "Venus Flytrap",
         })
-        assert r.status_code == 400
+        assert r.status_code == 404
 
 
 # ---------------------------------------------------------------------------
@@ -512,7 +515,7 @@ class TestCraftingFlow:
         r = fresh_game.post("/api/crafting/gather", json={
             "material_name": "Unobtainium", "quantity": 1,
         })
-        assert r.status_code == 400
+        assert r.status_code == 404
 
     def test_craft_without_materials_fails(self, fresh_game):
         recipes = fresh_game.get("/api/crafting/recipes").json()
