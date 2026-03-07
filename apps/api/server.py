@@ -7,9 +7,9 @@ frontend can query and mutate game state via JSON.
 
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
 from game import CozyVillageGame, DailyReport
@@ -62,74 +62,224 @@ _zen_garden: ZenGarden = ZenGarden(5, 7)
 # Pydantic request bodies
 # ---------------------------------------------------------------------------
 
+# -- eta: Input validation schemas for all public API request bodies ---------
+
+_VALID_GIFT_CATEGORIES = ["flower", "food", "book", "tool", "gemstone", "handmade", "fish", "foraged"]
+_VALID_SPECIES = ["cat", "dog", "rabbit", "owl", "fox", "hedgehog"]
+_VALID_PET_PERSONALITIES = ["playful", "lazy", "curious", "loyal", "mischievous", "gentle"]
+_VALID_RAKE_PATTERNS = ["circles", "waves", "lines", "spiral"]  # excludes "none"
+_VALID_WORKSTATIONS = ["hand-crafted", "workbench", "forge", "loom", "kiln", "enchanting table"]
+_VALID_MOODS = ["happy", "sad", "calm", "excited", "anxious", "grateful", "nostalgic", ""]
+
+
 class PlantRequest(BaseModel):
-    row: int
-    col: int
-    crop_name: str
+    row: int = Field(..., ge=0, le=19, description="Garden row index")
+    col: int = Field(..., ge=0, le=19, description="Garden column index")
+    crop_name: str = Field(
+        ..., min_length=1, max_length=50,
+        description="Name of the crop to plant",
+    )
+
+    @field_validator("crop_name")
+    @classmethod
+    def strip_crop_name(cls, v: str) -> str:
+        return v.strip()
 
 
 class GiftRequest(BaseModel):
-    name: str
-    category: str
-    quality: int = 1
+    name: str = Field(
+        ..., min_length=1, max_length=100,
+        description="Name of the gift item",
+    )
+    category: str = Field(
+        ..., min_length=1, max_length=20,
+        description=f"Gift category, one of: {_VALID_GIFT_CATEGORIES}",
+    )
+    quality: int = Field(default=1, ge=1, le=5, description="Gift quality (1-5)")
+
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, v: str) -> str:
+        return v.strip()
+
+    @field_validator("category")
+    @classmethod
+    def validate_category(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in _VALID_GIFT_CATEGORIES:
+            raise ValueError(f"Invalid category '{v}'. Must be one of: {_VALID_GIFT_CATEGORIES}")
+        return v
 
 
 class AdoptRequest(BaseModel):
-    name: str
-    species: str
-    personality: str
+    name: str = Field(
+        ..., min_length=1, max_length=50,
+        pattern=r"^[a-zA-Z][a-zA-Z0-9 _-]*$",
+        description="Pet name (alphanumeric, starts with letter)",
+    )
+    species: str = Field(
+        ..., min_length=1, max_length=20,
+        description=f"Pet species, one of: {_VALID_SPECIES}",
+    )
+    personality: str = Field(
+        ..., min_length=1, max_length=20,
+        description=f"Pet personality, one of: {_VALID_PET_PERSONALITIES}",
+    )
+
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, v: str) -> str:
+        return v.strip()
+
+    @field_validator("species")
+    @classmethod
+    def validate_species(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in _VALID_SPECIES:
+            raise ValueError(f"Invalid species '{v}'. Must be one of: {_VALID_SPECIES}")
+        return v
+
+    @field_validator("personality")
+    @classmethod
+    def validate_personality(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in _VALID_PET_PERSONALITIES:
+            raise ValueError(f"Invalid personality '{v}'. Must be one of: {_VALID_PET_PERSONALITIES}")
+        return v
 
 
 class JournalEntryRequest(BaseModel):
-    text: str
-    mood: str = ""
+    text: str = Field(
+        ..., min_length=1, max_length=2000,
+        description="Journal entry text (1-2000 chars)",
+    )
+    mood: str = Field(
+        default="", max_length=20,
+        description="Optional mood tag for the entry",
+    )
+
+    @field_validator("text")
+    @classmethod
+    def strip_text(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Entry text cannot be empty or whitespace-only")
+        return v
 
 
 class BuyRequest(BaseModel):
-    item_key: str
-    quantity: int = 1
+    item_key: str = Field(
+        ..., min_length=1, max_length=50,
+        description="Economy item key to purchase",
+    )
+    quantity: int = Field(default=1, ge=1, le=999, description="Number of items to buy (1-999)")
 
 
 class SellRequest(BaseModel):
-    item_key: str
-    quantity: int = 1
+    item_key: str = Field(
+        ..., min_length=1, max_length=50,
+        description="Economy item key to sell",
+    )
+    quantity: int = Field(default=1, ge=1, le=999, description="Number of items to sell (1-999)")
 
 
 class ZenPlaceSucculentRequest(BaseModel):
-    row: int
-    col: int
-    succulent_name: str
+    row: int = Field(..., ge=0, le=4, description="Zen garden row (0-4)")
+    col: int = Field(..., ge=0, le=6, description="Zen garden column (0-6)")
+    succulent_name: str = Field(
+        ..., min_length=1, max_length=50,
+        description="Name of the succulent type to place",
+    )
+
+    @field_validator("succulent_name")
+    @classmethod
+    def strip_succulent_name(cls, v: str) -> str:
+        return v.strip()
 
 
 class ZenPlaceRockRequest(BaseModel):
-    row: int
-    col: int
-    rock_name: str
+    row: int = Field(..., ge=0, le=4, description="Zen garden row (0-4)")
+    col: int = Field(..., ge=0, le=6, description="Zen garden column (0-6)")
+    rock_name: str = Field(
+        ..., min_length=1, max_length=50,
+        description="Name of the rock type to place",
+    )
+
+    @field_validator("rock_name")
+    @classmethod
+    def strip_rock_name(cls, v: str) -> str:
+        return v.strip()
 
 
 class ZenRakeRequest(BaseModel):
-    row: int
-    col: int
-    pattern: str
+    row: int = Field(..., ge=0, le=4, description="Zen garden row (0-4)")
+    col: int = Field(..., ge=0, le=6, description="Zen garden column (0-6)")
+    pattern: str = Field(
+        ..., min_length=1, max_length=20,
+        description=f"Rake pattern, one of: {_VALID_RAKE_PATTERNS}",
+    )
+
+    @field_validator("pattern")
+    @classmethod
+    def validate_pattern(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in _VALID_RAKE_PATTERNS:
+            raise ValueError(f"Invalid pattern '{v}'. Must be one of: {_VALID_RAKE_PATTERNS}")
+        return v
 
 
 class ZenRemoveRequest(BaseModel):
-    row: int
-    col: int
+    row: int = Field(..., ge=0, le=4, description="Zen garden row (0-4)")
+    col: int = Field(..., ge=0, le=6, description="Zen garden column (0-6)")
 
 
 class GatherRequest(BaseModel):
-    material_name: str
-    quantity: int = 1
+    material_name: str = Field(
+        ..., min_length=1, max_length=50,
+        description="Name of the material to gather",
+    )
+    quantity: int = Field(default=1, ge=1, le=10, description="Amount to gather (1-10)")
+
+    @field_validator("material_name")
+    @classmethod
+    def strip_material_name(cls, v: str) -> str:
+        return v.strip()
 
 
 class CraftRequest(BaseModel):
-    recipe_name: str
-    workstation: str = "hand-crafted"
+    recipe_name: str = Field(
+        ..., min_length=1, max_length=100,
+        description="Name of the recipe to craft",
+    )
+    workstation: str = Field(
+        default="hand-crafted", max_length=30,
+        description=f"Workstation to use, one of: {_VALID_WORKSTATIONS}",
+    )
+
+    @field_validator("recipe_name")
+    @classmethod
+    def strip_recipe_name(cls, v: str) -> str:
+        return v.strip()
+
+    @field_validator("workstation")
+    @classmethod
+    def validate_workstation(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in _VALID_WORKSTATIONS:
+            raise ValueError(f"Invalid workstation '{v}'. Must be one of: {_VALID_WORKSTATIONS}")
+        return v
 
 
 class LearnRecipeRequest(BaseModel):
-    recipe_name: str
+    recipe_name: str = Field(
+        ..., min_length=1, max_length=100,
+        description="Name of the recipe to learn",
+    )
+
+    @field_validator("recipe_name")
+    @classmethod
+    def strip_recipe_name(cls, v: str) -> str:
+        return v.strip()
 
 
 # ---------------------------------------------------------------------------
@@ -527,7 +677,7 @@ def advance_day():
 
 
 @app.post("/api/new-game")
-def new_game(seed: int = Query(default=42)):
+def new_game(seed: int = Query(default=42, ge=0, le=2**31 - 1, description="Random seed for world generation")):
     global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory, _zen_garden, _crafter
     game = CozyVillageGame.create_default(seed=seed)
     _market = EconomyMarket()
@@ -558,7 +708,7 @@ def get_weather():
 
 
 @app.get("/api/weather/forecast")
-def get_forecast(days: int = Query(default=5, ge=1, le=14)):
+def get_forecast(days: int = Query(default=5, ge=1, le=14, description="Number of forecast days (1-14)")):
     forecasts = game.weather.forecast_ahead(days)
     return [_serialize_forecast(f, include_festivals=True) for f in forecasts]
 
@@ -574,7 +724,7 @@ def get_villagers():
 
 
 @app.get("/api/villagers/{villager_id}")
-def get_villager(villager_id: str):
+def get_villager(villager_id: str = Path(..., min_length=1, max_length=50, description="Villager identifier")):
     v = game.village.get_villager(villager_id)
     if not v:
         raise HTTPException(status_code=404, detail="Villager not found")
@@ -582,15 +732,9 @@ def get_villager(villager_id: str):
 
 
 @app.post("/api/villagers/{villager_id}/gift")
-def give_gift(villager_id: str, req: GiftRequest):
-    try:
-        category = GiftCategory(req.category)
-    except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid category. Valid: {[c.value for c in GiftCategory]}",
-        )
-    gift = Gift(req.name, category, quality=max(1, min(5, req.quality)))
+def give_gift(req: GiftRequest, villager_id: str = Path(..., min_length=1, max_length=50, description="Villager identifier")):
+    category = GiftCategory(req.category)
+    gift = Gift(req.name, category, quality=req.quality)
     reaction = game.give_gift_to_villager(villager_id, gift)
     if reaction is None:
         raise HTTPException(status_code=404, detail="Villager not found")
@@ -660,20 +804,8 @@ def get_adoptable():
 
 @app.post("/api/pets/adopt")
 def adopt_pet(req: AdoptRequest):
-    try:
-        species = Species(req.species)
-    except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid species. Valid: {[s.value for s in Species]}",
-        )
-    try:
-        personality = PetPersonality(req.personality)
-    except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid personality. Valid: {[p.value for p in PetPersonality]}",
-        )
+    species = Species(req.species)
+    personality = PetPersonality(req.personality)
     try:
         pet = game.adopt_pet(req.name, species, personality)
     except ValueError as e:
@@ -682,7 +814,7 @@ def adopt_pet(req: AdoptRequest):
 
 
 @app.post("/api/pets/{name}/pet")
-def pet_interaction(name: str):
+def pet_interaction(name: str = Path(..., min_length=1, max_length=50, description="Pet name")):
     pet = game.pets.get_pet(name)
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
@@ -690,7 +822,7 @@ def pet_interaction(name: str):
 
 
 @app.post("/api/pets/{name}/feed")
-def feed_pet(name: str):
+def feed_pet(name: str = Path(..., min_length=1, max_length=50, description="Pet name")):
     pet = game.pets.get_pet(name)
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
@@ -698,7 +830,7 @@ def feed_pet(name: str):
 
 
 @app.post("/api/pets/{name}/play")
-def play_with_pet(name: str):
+def play_with_pet(name: str = Path(..., min_length=1, max_length=50, description="Pet name")):
     pet = game.pets.get_pet(name)
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
@@ -735,8 +867,6 @@ def economy_buy_item(req: BuyRequest):
     _sync_market()
     if req.item_key not in ECONOMY_ITEMS:
         raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
-    if req.quantity < 1:
-        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
     item = ECONOMY_ITEMS[req.item_key]
     unit_price = _market.current_price(req.item_key)
     total = round(unit_price * req.quantity, 2)
@@ -771,8 +901,6 @@ def economy_sell_item(req: SellRequest):
     """Sell items from the economy panel."""
     global _player_coins
     _sync_market()
-    if req.quantity < 1:
-        raise HTTPException(status_code=400, detail="Quantity must be at least 1")
     item = ECONOMY_ITEMS.get(req.item_key)
     if item is None:
         raise HTTPException(status_code=400, detail=f"Unknown item: {req.item_key}")
@@ -810,14 +938,11 @@ def get_journal():
 @app.post("/api/journal")
 def add_journal_entry(req: JournalEntryRequest):
     global _journal_next_id
-    text = req.text.strip()
-    if not text:
-        raise HTTPException(status_code=400, detail="Entry text cannot be empty")
     entry = {
         "id": _journal_next_id,
         "day": game.day,
         "season": game.season.value,
-        "text": text,
+        "text": req.text,
         "mood": req.mood,
     }
     _journal_next_id += 1
@@ -826,7 +951,7 @@ def add_journal_entry(req: JournalEntryRequest):
 
 
 @app.delete("/api/journal/{entry_id}")
-def delete_journal_entry(entry_id: int):
+def delete_journal_entry(entry_id: int = Path(..., ge=1, description="Journal entry ID")):
     global _journal_entries
     for i, entry in enumerate(_journal_entries):
         if entry["id"] == entry_id:
@@ -917,13 +1042,7 @@ def zen_place_rock(req: ZenPlaceRockRequest):
 
 @app.post("/api/zen-garden/rake")
 def zen_rake(req: ZenRakeRequest):
-    try:
-        pattern = RakePattern(req.pattern)
-    except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid pattern. Valid: {[p.value for p in RakePattern if p != RakePattern.NONE]}",
-        )
+    pattern = RakePattern(req.pattern)
     result = _zen_garden.rake_tile(req.row, req.col, pattern)
     return {"message": result, "zen_garden": _serialize_zen_garden(_zen_garden)}
 
@@ -999,7 +1118,7 @@ def gather_material(req: GatherRequest):
     if material is None:
         raise HTTPException(status_code=400, detail=f"Unknown material: {req.material_name}")
     try:
-        msg = _crafter.gather(material, season, quantity=max(1, min(10, req.quantity)))
+        msg = _crafter.gather(material, season, quantity=req.quantity)
     except CraftingError as e:
         raise HTTPException(status_code=400, detail=str(e))
     return {
@@ -1018,13 +1137,7 @@ def do_craft(req: CraftRequest):
             break
     if recipe is None:
         raise HTTPException(status_code=400, detail=f"Unknown recipe: {req.recipe_name}")
-    try:
-        workstation = Workstation(req.workstation)
-    except ValueError:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid workstation. Valid: {[w.value for w in Workstation]}",
-        )
+    workstation = Workstation(req.workstation)
     season = _craft_season()
     result = craft_item(_crafter, recipe, available_workstation=workstation, season=season)
     if not result.success:
@@ -1059,7 +1172,7 @@ def learn_recipe(req: LearnRecipeRequest):
 
 
 @app.post("/api/crafting/equip")
-def equip_tool(tool_index: int = Query(default=0, ge=0)):
+def equip_tool(tool_index: int = Query(default=0, ge=0, le=99, description="Index of crafted tool to equip")):
     """Equip a crafted tool by index in the crafted items list."""
     tools = [item for item in _crafter.inventory.items if item.recipe.category.name == "TOOL"]
     if not tools:
@@ -1087,7 +1200,7 @@ def get_swarm():
 
 
 @app.post("/api/swarm/tick")
-def swarm_tick(steps: int = Query(default=1, ge=1, le=50)):
+def swarm_tick(steps: int = Query(default=1, ge=1, le=50, description="Number of simulation ticks (1-50)")):
     """Advance the firefly swarm by one or more ticks."""
     for _ in range(steps):
         _firefly_swarm.tick()
