@@ -22,6 +22,8 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Optional
 
+from errors import CraftingError, InsufficientMaterialError, SeasonRestrictionError, ValidationError
+
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -166,7 +168,7 @@ class Inventory:
 
     def add_material(self, material: Material, quantity: int = 1) -> None:
         if quantity <= 0:
-            raise ValueError("Quantity must be positive.")
+            raise ValidationError("Quantity must be positive.")
         self._materials[material.name] = (
             self._materials.get(material.name, 0) + quantity
         )
@@ -823,33 +825,6 @@ ALL_MATERIALS: tuple[Material, ...] = (
     COTTON, CLAY, WOOL, STONE, SILVER_ORE,
     MOONSTONE, GOLDEN_AMBER, ENCHANTED_VINE, STARDUST,
 )
-
-
-# ---------------------------------------------------------------------------
-# Exceptions
-# ---------------------------------------------------------------------------
-
-class CraftingError(Exception):
-    """Base exception for crafting-related errors."""
-
-
-class InsufficientMaterialError(CraftingError):
-    def __init__(self, material: str, needed: int, have: int) -> None:
-        self.material = material
-        self.needed = needed
-        self.have = have
-        super().__init__(
-            f"Not enough {material}: need {needed}, have {have}."
-        )
-
-
-class SeasonRestrictionError(CraftingError):
-    def __init__(self, material: str, season: Season) -> None:
-        self.material = material
-        self.season = season
-        super().__init__(
-            f"{material} cannot be gathered in {season.name}."
-        )
 
 
 # ---------------------------------------------------------------------------

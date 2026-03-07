@@ -7,6 +7,8 @@
  */
 
 const SEASONS = ['spring', 'summer', 'autumn', 'winter'];
+const SEASON_SET = new Set(SEASONS);
+const SEASON_INDEX = new Map(SEASONS.map((s, i) => [s, i]));
 
 const WEATHER_TYPES = {
   spring: ['sunny', 'cloudy', 'rainy', 'misty', 'breezy', 'rainbow'],
@@ -51,11 +53,11 @@ function createRng(seed) {
  */
 export function getForecast(day, season) {
   const s = season.toLowerCase();
-  if (!SEASONS.includes(s)) {
+  if (!SEASON_SET.has(s)) {
     throw new Error(`Invalid season "${season}". Must be one of: ${SEASONS.join(', ')}`);
   }
 
-  const seed = day * 2654435761 + SEASONS.indexOf(s) * 7919;
+  const seed = day * 2654435761 + SEASON_INDEX.get(s) * 7919;
   const rng = createRng(seed);
 
   const types = WEATHER_TYPES[s];
@@ -78,9 +80,9 @@ export function getForecast(day, season) {
  * @returns {Array} Array of 7 forecast objects.
  */
 export function getWeeklyForecast(startDay, season) {
-  const forecasts = [];
+  const forecasts = new Array(7);
   for (let i = 0; i < 7; i++) {
-    forecasts.push(getForecast(startDay + i, season));
+    forecasts[i] = getForecast(startDay + i, season);
   }
   return forecasts;
 }
