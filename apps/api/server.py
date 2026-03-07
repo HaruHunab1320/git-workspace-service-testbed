@@ -83,7 +83,7 @@ _zen_garden: ZenGarden = ZenGarden(5, 7)
 # Pydantic request bodies
 # ---------------------------------------------------------------------------
 
-# -- eta: Input validation schemas for all public API request bodies ---------
+# -- Input validation schemas for all public API request bodies ---------
 
 _VALID_GIFT_CATEGORIES = ["flower", "food", "book", "tool", "gemstone", "handmade", "fish", "foraged"]
 _VALID_SPECIES = ["cat", "dog", "rabbit", "owl", "fox", "hedgehog"]
@@ -551,7 +551,7 @@ from swarm import FireflySwarm
 from crafting import (
     Crafter, Inventory as CraftingInventory, craft as craft_item,
     ALL_RECIPES, ALL_MATERIALS, seasonal_materials,
-    Workstation, Season as CraftSeason, CraftingError as CraftingErrorExc,
+    Workstation, Season as CraftSeason,
 )
 
 _market = EconomyMarket()
@@ -758,7 +758,7 @@ def give_gift(req: GiftRequest, villager_id: str = Path(..., min_length=1, max_l
         category = GiftCategory(req.category)
     except ValueError:
         raise InvalidEnumError("category", req.category, [c.value for c in GiftCategory])
-    gift = Gift(req.name, category, quality=req.quality)
+    gift = Gift(req.name, category, quality=max(1, min(5, req.quality)))
     reaction = game.give_gift_to_villager(villager_id, gift)
     if reaction is None:
         raise NotFoundError("Villager", villager_id)
@@ -894,6 +894,8 @@ def economy_buy_item(req: BuyRequest):
     _sync_market()
     if req.item_key not in ECONOMY_ITEMS:
         raise NotFoundError("Item", req.item_key)
+    if req.quantity < 1:
+        raise ValidationError("Quantity must be at least 1")
     item = ECONOMY_ITEMS[req.item_key]
     unit_price = _market.current_price(req.item_key)
     total = round(unit_price * req.quantity, 2)
@@ -925,6 +927,8 @@ def economy_sell_item(req: SellRequest):
     """Sell items from the economy panel."""
     global _player_coins
     _sync_market()
+    if req.quantity < 1:
+        raise ValidationError("Quantity must be at least 1")
     item = ECONOMY_ITEMS.get(req.item_key)
     if item is None:
         raise NotFoundError("Item", req.item_key)
@@ -1144,10 +1148,7 @@ def gather_material(req: GatherRequest):
             break
     if material is None:
         raise NotFoundError("Material", req.material_name)
-    try:
-        msg = _crafter.gather(material, season, quantity=req.quantity)
-    except CraftingErrorExc as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    msg = _crafter.gather(material, season, quantity=max(1, min(10, req.quantity)))
     return {
         "message": msg,
         "crafter": _serialize_crafter(_crafter),
@@ -1209,10 +1210,7 @@ def equip_tool(tool_index: int = Query(default=0, ge=0, le=99, description="Inde
         raise ValidationError("No tools crafted yet.")
     if tool_index >= len(tools):
         raise ValidationError(f"Tool index out of range (have {len(tools)} tools).")
-    try:
-        msg = _crafter.equip_tool(tools[tool_index])
-    except CraftingErrorExc as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    msg = _crafter.equip_tool(tools[tool_index])
     return {"message": msg, "crafter": _serialize_crafter(_crafter)}
 
 
@@ -1241,3 +1239,4 @@ def swarm_tick(steps: int = Query(default=1, ge=1, le=50, description="Number of
         "brightest": _firefly_swarm.brightest(),
         "fireflies": _firefly_swarm.snapshot(),
     }
+
