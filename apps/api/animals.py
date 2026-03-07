@@ -14,6 +14,8 @@ import random
 from dataclasses import dataclass, field
 from typing import Optional
 
+from errors import DuplicateNameError
+
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -677,7 +679,7 @@ class PetManager:
     ) -> Pet:
         """Adopt a new pet and add it to the village."""
         if name in self.pets:
-            raise ValueError(f"A pet named {name} already exists!")
+            raise DuplicateNameError("pet", name)
         pet = Pet(name, species, personality, owner=owner)
         self.pets[name] = pet
         self.adoption_log.append(
