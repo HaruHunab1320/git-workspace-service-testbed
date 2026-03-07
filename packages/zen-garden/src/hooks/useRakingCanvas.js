@@ -28,12 +28,13 @@ export default function useRakingCanvas({ tool, rakeWidth, stoneColor }) {
 
   const generateSand = useCallback((ctx, w, h) => {
     const imageData = ctx.createImageData(w, h);
-    const { data } = imageData;
-    for (let i = 0; i < data.length; i += 4) {
+    const data = imageData.data;
+    const len = data.length;
+    for (let i = 0; i < len; i += 4) {
       const n = (Math.random() - 0.5) * SAND_NOISE;
-      data[i] = Math.min(255, Math.max(0, SAND_R + n));
-      data[i + 1] = Math.min(255, Math.max(0, SAND_G + n));
-      data[i + 2] = Math.min(255, Math.max(0, SAND_B + n));
+      data[i] = SAND_R + n;
+      data[i + 1] = SAND_G + n;
+      data[i + 2] = SAND_B + n;
       data[i + 3] = 255;
     }
     ctx.putImageData(imageData, 0, 0);
