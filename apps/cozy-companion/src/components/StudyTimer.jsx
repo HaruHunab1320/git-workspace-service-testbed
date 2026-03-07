@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { PastelButton, PastelBadge, PastelProgress } from '@cozy-village/ui';
 
 const STUDY_DURATION = 25 * 60;
 const BREAK_DURATION = 5 * 60;
@@ -9,9 +10,19 @@ function formatTime(seconds) {
   return `${m}:${s}`;
 }
 
+const STATE_CONFIG = {
+  idle: { label: 'Ready when you are', variant: 'lavender', progress: 'lavender' },
+  studying: { label: 'Focus time', variant: 'mint', progress: 'mint' },
+  break: { label: 'Break time', variant: 'peach', progress: 'peach' },
+};
+
 function StudyTimer({ studyState, onStateChange }) {
   const [timeLeft, setTimeLeft] = useState(STUDY_DURATION);
   const intervalRef = useRef(null);
+
+  const totalTime = studyState === 'break' ? BREAK_DURATION : STUDY_DURATION;
+  const elapsed = totalTime - timeLeft;
+  const config = STATE_CONFIG[studyState] || STATE_CONFIG.idle;
 
   useEffect(() => {
     if (studyState === 'idle') {
@@ -50,22 +61,27 @@ function StudyTimer({ studyState, onStateChange }) {
 
   return (
     <div className="study-timer">
-      <h2 className="section-title">Study Timer</h2>
-      <div className="timer-display">{formatTime(timeLeft)}</div>
-      <div className="timer-label">
-        {studyState === 'studying' && 'Focus time'}
-        {studyState === 'break' && 'Break time'}
-        {studyState === 'idle' && 'Ready when you are'}
+      <div className="study-timer__display">
+        <span className="timer-time">{formatTime(timeLeft)}</span>
+        <PastelBadge variant={config.variant} size="sm">{config.label}</PastelBadge>
       </div>
+
+      <PastelProgress
+        value={elapsed}
+        max={totalTime}
+        variant={config.progress}
+        size="sm"
+      />
+
       <div className="timer-controls">
         {studyState === 'idle' ? (
-          <button className="btn btn--primary" onClick={handleStart}>
+          <PastelButton variant="mint" onClick={handleStart}>
             Start Studying
-          </button>
+          </PastelButton>
         ) : (
-          <button className="btn btn--secondary" onClick={handleStop}>
+          <PastelButton variant="blush" onClick={handleStop}>
             Stop
-          </button>
+          </PastelButton>
         )}
       </div>
     </div>
