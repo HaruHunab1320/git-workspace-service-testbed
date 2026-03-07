@@ -77,6 +77,25 @@ export const api = {
     body: JSON.stringify({ row, col }),
   }),
 
+  getCrafting: () => request('/crafting'),
+  getRecipes: () => request('/crafting/recipes'),
+  getMaterials: () => request('/crafting/materials'),
+  gatherMaterial: (materialName, quantity = 1) => request('/crafting/gather', {
+    method: 'POST',
+    body: JSON.stringify({ material_name: materialName, quantity }),
+  }),
+  craftItem: (recipeName, workstation = 'hand-crafted') => request('/crafting/craft', {
+    method: 'POST',
+    body: JSON.stringify({ recipe_name: recipeName, workstation }),
+  }),
+  learnRecipe: (recipeName) => request('/crafting/learn', {
+    method: 'POST',
+    body: JSON.stringify({ recipe_name: recipeName }),
+  }),
+  equipTool: (toolIndex = 0) => request(`/crafting/equip?tool_index=${toolIndex}`, {
+    method: 'POST',
+  }),
+
   getJournal: () => request('/journal'),
   addJournalEntry: (text, mood = '') => request('/journal', {
     method: 'POST',
