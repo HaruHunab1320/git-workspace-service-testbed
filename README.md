@@ -81,6 +81,7 @@ npx turbo dev --filter=@cozy-village/cozy-companion
 - **Economy** -- Market with supply/demand pricing and seasonal fluctuations
 - **Crafting** -- Tiered recipe discovery using gathered materials
 - **Zen Garden** -- Interactive sand raking, succulent, and rock placement
+- **Constellation Gazer** -- Seasonal stargazing with 12 discoverable constellations tied to Willowbrook lore
 - **Journal** -- Personal entry system tied to in-game days
 
 ## Logger
