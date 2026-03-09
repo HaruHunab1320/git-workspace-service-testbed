@@ -250,6 +250,7 @@ CSS files are imported directly (not as CSS Modules), so all class names are glo
 | ZenGardenTile.jsx     | —            | Single zen garden tile                | —             |
 | ConstellationGazer.jsx| 199          | Seasonal stargazing discovery panel   | Yes           |
 | TeaBrewingStation.jsx | 250+         | Interactive tea brewing               | Yes           |
+| CandleWorkshop.jsx  | 265          | Candle crafting with animated flames  | Yes           |
 | AmbientLofiMixer.jsx  | Large        | Multi-track audio mixer               | Yes           |
 | LofiPlayer.jsx        | —            | Floating lo-fi radio                  | Yes           |
 | FocusTimer.jsx        | —            | Pomodoro timer with SVG ring          | Yes           |
@@ -289,6 +290,7 @@ The frontend consumes 30 REST endpoints from a FastAPI backend:
 | Economy         | `/economy/prices`, `/economy/summary`, `/economy/wallet`, `/economy/buy`, `/economy/sell`, `/inventory`                                                         | GET, POST         |
 | Zen Garden      | `/zen-garden`, `/zen-garden/succulents`, `/zen-garden/rocks`, `/zen-garden/place-succulent`, `/zen-garden/place-rock`, `/zen-garden/rake`, `/zen-garden/remove` | GET, POST         |
 | Constellations  | `/constellations`, `/constellations/all`, `/constellations/discover`, `/constellations/note`                                                                     | GET, POST         |
+| Candles         | `/candles`, `/candles/scents`, `/candles/craft`, `/candles/light`, `/candles/extinguish`, `/candles/remove`                                                      | GET, POST         |
 | Journal         | `/journal`, `/journal/:id`                                                                                                                                      | GET, POST, DELETE |
 
 ---

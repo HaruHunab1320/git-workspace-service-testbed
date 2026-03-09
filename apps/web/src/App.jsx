@@ -25,6 +25,7 @@ import WindChimes from './components/WindChimes';
 import SleepingCat from './components/SleepingCat';
 import SwarmBadge from './components/SwarmBadge';
 import GentleReminders from './components/GentleReminders';
+import CandleWorkshop from './components/CandleWorkshop';
 import useAmbientSounds from './hooks/useAmbientSounds';
 
 const TABS = [
@@ -38,6 +39,7 @@ const TABS = [
   { id: 'journal', label: 'Journal', emoji: '📓' },
   { id: 'zen', label: 'Zen Garden', emoji: '🧘' },
   { id: 'tea', label: 'Tea', emoji: '🍵' },
+  { id: 'candles', label: 'Candles', emoji: '🕯️' },
   { id: 'zen', label: 'Zen', emoji: '🪨' },
   { id: 'stars', label: 'Stars', emoji: '🌌' },
   { id: 'mixer', label: 'Mixer', emoji: '🎧' },
@@ -244,6 +246,13 @@ export default function App() {
         );
       case 'tea':
         return <TeaBrewingStation showToast={showToast} />;
+      case 'candles':
+        return (
+          <CandleWorkshop
+            showToast={showToast}
+            season={gameState.season}
+          />
+        );
       case 'mixer':
         return <AmbientLofiMixer showToast={showToast} />;
       default:

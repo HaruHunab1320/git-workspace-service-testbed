@@ -119,6 +119,29 @@ export const api = {
       method: 'POST',
     }),
 
+  getCandleWorkshop: () => request('/candles'),
+  getCandleScents: () => request('/candles/scents'),
+  craftCandle: (scent) =>
+    request('/candles/craft', {
+      method: 'POST',
+      body: JSON.stringify({ scent }),
+    }),
+  lightCandle: (candleId) =>
+    request('/candles/light', {
+      method: 'POST',
+      body: JSON.stringify({ candle_id: candleId }),
+    }),
+  extinguishCandle: (candleId) =>
+    request('/candles/extinguish', {
+      method: 'POST',
+      body: JSON.stringify({ candle_id: candleId }),
+    }),
+  removeCandle: (candleId) =>
+    request('/candles/remove', {
+      method: 'POST',
+      body: JSON.stringify({ candle_id: candleId }),
+    }),
+
   getConstellations: () => request('/constellations'),
   getAllConstellations: () => request('/constellations/all'),
   discoverConstellation: (name, note = '') =>

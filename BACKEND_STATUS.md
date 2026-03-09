@@ -39,6 +39,7 @@ All state lives in module-level globals in `server.py`:
 - `_zen_garden: ZenGarden` — 5x7 zen garden grid
 - `_market: EconomyMarket` — market prices synced to game season
 - `_firefly_swarm: FireflySwarm` — particle simulation (20 fireflies)
+- `_candle_workshop: CandleWorkshop` — candle crafting and burn tracking
 - `_constellation_tracker: ConstellationTracker` — player's constellation discovery progress
 
 State resets on process restart. The `/api/new-game` endpoint resets all globals in-place.
@@ -59,6 +60,7 @@ The backend is split into eight well-separated simulation subsystems:
 | `zen_garden.py`     | Zen garden: succulents, rocks, raking patterns, harmony scoring              | Medium |
 | `constellations.py` | Seasonal constellation discovery with lore, star maps, and player tracking   | Medium |
 | `swarm.py`          | Firefly particle physics simulation                                          | Small  |
+| `candles.py`        | Candle workshop: scented candle crafting, burn mechanics, mood effects        | Medium |
 | `math_utils.py` | Single `clamp()` utility                                                     | Tiny   |
 
 ### Game Loop
@@ -77,7 +79,7 @@ The backend is split into eight well-separated simulation subsystems:
 
 ## API Surface
 
-**39 endpoints** across 10 domains, all under `/api/`:
+**45 endpoints** across 11 domains, all under `/api/`:
 
 ### Game Management (3)
 
@@ -147,6 +149,15 @@ The backend is split into eight well-separated simulation subsystems:
 - `GET /api/swarm` — current state
 - `POST /api/swarm/tick?steps=1` — advance 1–50 ticks
 
+### Candle Workshop (6)
+
+- `GET /api/candles` — workshop state (candles, summary, mood effects)
+- `GET /api/candles/scents` — available scent profiles (8 scents)
+- `POST /api/candles/craft` — craft a new scented candle
+- `POST /api/candles/light` — light an unlit candle
+- `POST /api/candles/extinguish` — extinguish a lit candle
+- `POST /api/candles/remove` — remove a spent candle
+
 ### Inventory (1)
 
 - `GET /api/inventory` — player coins + items with freshness
@@ -163,8 +174,9 @@ Seven test files cover all simulation domains:
 | `test_garden.py`     | garden     | Seasonal crops, growth, watering, harvesting, companion planting     |
 | `test_villagers.py`  | villagers  | Schedules (full year), weather integration, birthday gifts           |
 | `test_weather.py`    | weather    | Calendar, temperature, sky, magical events, festivals, mood, streaks |
-| `test_zen_garden.py`    | zen_garden     | Succulents, rocks, tiles, raking, harmony                            |
-| `test_constellations.py`| constellations | Data integrity, discovery logic, season gating, serialization        |
+| `test_zen_garden.py`     | zen_garden     | Succulents, rocks, tiles, raking, harmony                            |
+| `test_constellations.py` | constellations | Data integrity, discovery logic, season gating, serialization        |
+| `test_candles.py`        | candles        | Crafting, lighting, burn-down, mood effects, workshop state          |
 
 **Not tested:** `server.py` endpoints (no integration/API tests), `crafting.py`, `swarm.py`, `math_utils.py`.
 
@@ -187,7 +199,7 @@ allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 5. **No API tests** — unit tests cover domain logic but no integration tests exercise the FastAPI endpoints.
 6. **Dual Season enums** — each module defines its own `Season` enum, requiring mapping functions in `game.py` (`_to_weather_season`, `_to_garden_season`, `_to_animal_season`).
 7. **Economy market sync** — `_market` in `server.py` is a separate instance from the game, manually synced via `_sync_market()` before economy endpoints.
-8. **No crafting endpoint** — `crafting.py` exists as a module but has no corresponding API routes in `server.py`.
+8. **Crafting and candle workshop** — both `crafting.py` and `candles.py` now have full API route coverage in `server.py`.
 9. **No deployment config** — no Dockerfile, CI/CD, or cloud configuration.
 10. **Zen garden not connected to game loop** — `_zen_garden.advance_day()` is called in the `advance_day` endpoint but the zen garden is a separate instance from the game engine, not integrated into `CozyVillageGame`.
 
@@ -217,7 +229,9 @@ apps/api/
 ├── test_villagers.py   # Villager tests
 ├── test_weather.py          # Weather tests
 ├── test_zen_garden.py       # Zen garden tests
-└── test_constellations.py   # Constellation discovery tests
+├── test_constellations.py   # Constellation discovery tests
+├── candles.py               # Candle workshop system
+└── test_candles.py          # Candle workshop tests
 ```
 
 ## Summary

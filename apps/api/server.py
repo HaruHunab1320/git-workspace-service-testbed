@@ -303,6 +303,28 @@ class LearnRecipeRequest(BaseModel):
         return v.strip()
 
 
+_VALID_SCENTS = ["lavender", "vanilla", "pine", "cinnamon", "ocean breeze", "honey", "rose", "cedar"]
+
+
+class CraftCandleRequest(BaseModel):
+    scent: str = Field(
+        ..., min_length=1, max_length=30,
+        description=f"Candle scent, one of: {_VALID_SCENTS}",
+    )
+
+    @field_validator("scent")
+    @classmethod
+    def validate_scent(cls, v: str) -> str:
+        v = v.strip().lower()
+        if v not in _VALID_SCENTS:
+            raise ValueError(f"Invalid scent '{v}'. Must be one of: {_VALID_SCENTS}")
+        return v
+
+
+class CandleActionRequest(BaseModel):
+    candle_id: int = Field(..., ge=1, description="ID of the candle")
+
+
 class DiscoverConstellationRequest(BaseModel):
     name: str = Field(
         ..., min_length=1, max_length=100,
@@ -589,6 +611,7 @@ from crafting import (
     ALL_RECIPES, ALL_MATERIALS, seasonal_materials,
     Workstation, Season as CraftSeason,
 )
+from candles import CandleWorkshop, ALL_SCENTS, SCENT_MAP
 
 _market = EconomyMarket()
 _firefly_swarm = FireflySwarm.spawn(count=20, seed=42)
@@ -597,6 +620,9 @@ _crafter = Crafter(name="Player")
 for _r in ALL_RECIPES:
     if _r.unlocked_by_default:
         _crafter.known_recipes.add(_r.name)
+
+# Candle workshop instance
+_candle_workshop = CandleWorkshop(seed=42)
 
 _constellation_tracker = ConstellationTracker()
 
@@ -720,6 +746,7 @@ def advance_day():
     report = game.advance_day()
     _sync_market()
     _zen_garden.advance_day()
+    _candle_workshop.advance_day()
     # Age player inventory items and remove spoiled ones
     spoiled_keys = []
     for key, slot in _player_inventory.items():
@@ -737,7 +764,7 @@ def advance_day():
 
 @app.post("/api/new-game")
 def new_game(seed: int = Query(default=42, ge=0, le=2**31 - 1, description="Random seed for world generation")):
-    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory, _zen_garden, _crafter, _constellation_tracker
+    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory, _zen_garden, _crafter, _candle_workshop, _constellation_tracker
     game = CozyVillageGame.create_default(seed=seed)
     _market = EconomyMarket()
     _journal_entries = []
@@ -749,6 +776,7 @@ def new_game(seed: int = Query(default=42, ge=0, le=2**31 - 1, description="Rand
     for _r in ALL_RECIPES:
         if _r.unlocked_by_default:
             _crafter.known_recipes.add(_r.name)
+    _candle_workshop = CandleWorkshop(seed=seed)
     _constellation_tracker = ConstellationTracker()
     _sync_market()
     return get_status()
@@ -1278,6 +1306,99 @@ def swarm_tick(steps: int = Query(default=1, ge=1, le=50, description="Number of
         "brightest": _firefly_swarm.brightest(),
         "fireflies": _firefly_swarm.snapshot(),
     }
+
+
+# -- Candle Workshop -------------------------------------------------------
+
+def _serialize_candle(c):
+    return {
+        "id": c.id,
+        "name": c.scent.name,
+        "emoji": c.scent.emoji,
+        "scent": c.scent.scent.value,
+        "color": c.scent.color,
+        "dark_color": c.scent.dark_color,
+        "status": c.status,
+        "burn_remaining": c.burn_remaining,
+        "burn_days": c.scent.burn_days,
+        "burn_fraction": round(c.burn_fraction, 2),
+        "mood_boost": c.scent.mood_boost,
+        "crafted_day": c.crafted_day,
+    }
+
+
+def _serialize_scent(s):
+    return {
+        "scent": s.scent.value,
+        "name": s.name,
+        "emoji": s.emoji,
+        "color": s.color,
+        "dark_color": s.dark_color,
+        "burn_days": s.burn_days,
+        "mood_boost": s.mood_boost,
+        "description": s.description,
+        "season_bonus": s.season_bonus,
+    }
+
+
+@app.get("/api/candles")
+def get_candle_workshop():
+    """Return candle workshop state."""
+    season = game.season.value if game.season else ""
+    return {
+        "candles": [_serialize_candle(c) for c in _candle_workshop.candles],
+        "summary": _candle_workshop.summary(),
+        "mood_effects": _candle_workshop.mood_effects(season),
+    }
+
+
+@app.get("/api/candles/scents")
+def get_candle_scents():
+    """Return all available candle scents."""
+    return [_serialize_scent(s) for s in ALL_SCENTS]
+
+
+@app.post("/api/candles/craft")
+def craft_candle(req: CraftCandleRequest):
+    """Craft a new scented candle."""
+    try:
+        candle, message = _candle_workshop.craft(req.scent, day=game.day)
+    except ValueError as e:
+        raise NotFoundError("Scent", req.scent)
+    return {
+        "message": message,
+        "candle": _serialize_candle(candle),
+    }
+
+
+@app.post("/api/candles/light")
+def light_candle(req: CandleActionRequest):
+    """Light an unlit candle."""
+    try:
+        message = _candle_workshop.light(req.candle_id)
+    except ValueError:
+        raise NotFoundError("Candle", req.candle_id)
+    return {"message": message}
+
+
+@app.post("/api/candles/extinguish")
+def extinguish_candle(req: CandleActionRequest):
+    """Extinguish a lit candle."""
+    try:
+        message = _candle_workshop.extinguish(req.candle_id)
+    except ValueError:
+        raise NotFoundError("Candle", req.candle_id)
+    return {"message": message}
+
+
+@app.post("/api/candles/remove")
+def remove_candle(req: CandleActionRequest):
+    """Remove a spent candle."""
+    try:
+        message = _candle_workshop.remove(req.candle_id)
+    except ValueError:
+        raise NotFoundError("Candle", req.candle_id)
+    return {"message": message}
 
 
 # -- Constellations ---------------------------------------------------------
