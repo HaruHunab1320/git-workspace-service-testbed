@@ -303,6 +303,38 @@ class LearnRecipeRequest(BaseModel):
         return v.strip()
 
 
+class DiscoverConstellationRequest(BaseModel):
+    name: str = Field(
+        ..., min_length=1, max_length=100,
+        description="Name of the constellation to discover",
+    )
+    note: str = Field(
+        default="", max_length=500,
+        description="Optional player note about the discovery",
+    )
+
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, v: str) -> str:
+        return v.strip()
+
+
+class ConstellationNoteRequest(BaseModel):
+    name: str = Field(
+        ..., min_length=1, max_length=100,
+        description="Name of the constellation",
+    )
+    note: str = Field(
+        ..., min_length=1, max_length=500,
+        description="Player note to save",
+    )
+
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, v: str) -> str:
+        return v.strip()
+
+
 # ---------------------------------------------------------------------------
 # Serialization helpers
 # ---------------------------------------------------------------------------
@@ -548,6 +580,10 @@ def _full_status():
 
 from economy import Market as EconomyMarket, ITEMS as ECONOMY_ITEMS
 from swarm import FireflySwarm
+from constellations import (
+    ConstellationTracker, CONSTELLATIONS, CONSTELLATION_BY_NAME,
+    Season as ConstellationSeason, serialize_constellation,
+)
 from crafting import (
     Crafter, Inventory as CraftingInventory, craft as craft_item,
     ALL_RECIPES, ALL_MATERIALS, seasonal_materials,
@@ -561,6 +597,8 @@ _crafter = Crafter(name="Player")
 for _r in ALL_RECIPES:
     if _r.unlocked_by_default:
         _crafter.known_recipes.add(_r.name)
+
+_constellation_tracker = ConstellationTracker()
 
 
 def _sync_market():
@@ -699,7 +737,7 @@ def advance_day():
 
 @app.post("/api/new-game")
 def new_game(seed: int = Query(default=42, ge=0, le=2**31 - 1, description="Random seed for world generation")):
-    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory, _zen_garden, _crafter
+    global game, _market, _journal_entries, _journal_next_id, _player_coins, _player_inventory, _zen_garden, _crafter, _constellation_tracker
     game = CozyVillageGame.create_default(seed=seed)
     _market = EconomyMarket()
     _journal_entries = []
@@ -711,6 +749,7 @@ def new_game(seed: int = Query(default=42, ge=0, le=2**31 - 1, description="Rand
     for _r in ALL_RECIPES:
         if _r.unlocked_by_default:
             _crafter.known_recipes.add(_r.name)
+    _constellation_tracker = ConstellationTracker()
     _sync_market()
     return get_status()
 
@@ -1239,4 +1278,79 @@ def swarm_tick(steps: int = Query(default=1, ge=1, le=50, description="Number of
         "brightest": _firefly_swarm.brightest(),
         "fireflies": _firefly_swarm.snapshot(),
     }
+
+
+# -- Constellations ---------------------------------------------------------
+
+def _constellation_season() -> ConstellationSeason:
+    season_map = {
+        "spring": ConstellationSeason.SPRING,
+        "summer": ConstellationSeason.SUMMER,
+        "autumn": ConstellationSeason.AUTUMN,
+        "winter": ConstellationSeason.WINTER,
+    }
+    return season_map.get(game.season.value, ConstellationSeason.SPRING)
+
+
+@app.get("/api/constellations")
+def get_constellations():
+    """Return constellations visible this season with discovery status."""
+    season = _constellation_season()
+    visible = _constellation_tracker.visible_constellations(season)
+    return {
+        "season": season.value,
+        "catalog": _constellation_tracker.catalog_summary(),
+        "constellations": [
+            serialize_constellation(
+                c,
+                discovered=_constellation_tracker.is_discovered(c.name),
+                discovery=_constellation_tracker.discoveries.get(c.name),
+            )
+            for c in visible
+        ],
+    }
+
+
+@app.get("/api/constellations/all")
+def get_all_constellations():
+    """Return all constellations across all seasons."""
+    return {
+        "catalog": _constellation_tracker.catalog_summary(),
+        "constellations": [
+            serialize_constellation(
+                c,
+                discovered=_constellation_tracker.is_discovered(c.name),
+                discovery=_constellation_tracker.discoveries.get(c.name),
+            )
+            for c in CONSTELLATIONS
+        ],
+    }
+
+
+@app.post("/api/constellations/discover")
+def discover_constellation(req: DiscoverConstellationRequest):
+    """Discover a constellation by name."""
+    if req.name not in CONSTELLATION_BY_NAME:
+        raise NotFoundError("Constellation", req.name)
+    season = _constellation_season()
+    message = _constellation_tracker.discover(req.name, game.day, season, note=req.note)
+    constellation = CONSTELLATION_BY_NAME[req.name]
+    return {
+        "message": message,
+        "constellation": serialize_constellation(
+            constellation,
+            discovered=_constellation_tracker.is_discovered(req.name),
+            discovery=_constellation_tracker.discoveries.get(req.name),
+        ),
+        "catalog": _constellation_tracker.catalog_summary(),
+    }
+
+
+@app.post("/api/constellations/note")
+def constellation_note(req: ConstellationNoteRequest):
+    """Add a personal note to a discovered constellation."""
+    if req.name not in CONSTELLATION_BY_NAME:
+        raise NotFoundError("Constellation", req.name)
+    message = _constellation_tracker.add_note(req.name, req.note)
+    return {"message": message}
 
