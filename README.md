@@ -84,6 +84,7 @@ npx turbo dev --filter=@cozy-village/cozy-companion
 - **Constellation Gazer** -- Seasonal stargazing with 12 discoverable constellations tied to Willowbrook lore
 - **Candle Workshop** -- Craft scented candles (8 scents) that burn down over game days and boost village mood
 - **Journal** -- Personal entry system tied to in-game days
+- **Cozy Break** -- A wellness utility with relaxation timers and comforting messages for developers. See [docs/cozy_feature.md](./docs/cozy_feature.md)
 
 ## Logger
 
