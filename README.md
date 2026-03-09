@@ -24,7 +24,7 @@ cozy-village/
 
 | App                | Package                        | Description                                                                                                                                                           |
 | ------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **API**            | `@cozy-village/api`            | Python/FastAPI backend powering the simulation. Handles villager AI, weather, farming, pets, economy, crafting, and zen garden logic. Exposes 40+ REST endpoints.     |
+| **API**            | `@cozy-village/api`            | Python/FastAPI backend powering the simulation. Handles villager AI, weather, farming, pets, economy, crafting, candle workshop, and zen garden logic. Exposes 40+ REST endpoints. |
 | **Web**            | `@cozy-village/web`            | React 18 frontend with 30+ components. Includes ambient features like a lo-fi mixer, fireplace, wind chimes, and starry night sky.                                    |
 | **Beta**           | `@cozy-village/beta`           | A new React + Vite application scaffolded by agent beta, running on port 5175.                                                                                        |
 | **Cozy Companion** | `@cozy-village/cozy-companion` | A wellness and focus companion app with mood tracking, a focus timer, gentle reminders, and a personal journal. Uses the shared `@cozy-village/ui` component library. |
@@ -81,6 +81,7 @@ npx turbo dev --filter=@cozy-village/cozy-companion
 - **Economy** -- Market with supply/demand pricing and seasonal fluctuations
 - **Crafting** -- Tiered recipe discovery using gathered materials
 - **Zen Garden** -- Interactive sand raking, succulent, and rock placement
+- **Candle Workshop** -- Craft scented candles (8 scents) that burn down over game days and boost village mood
 - **Journal** -- Personal entry system tied to in-game days
 
 ## Logger
