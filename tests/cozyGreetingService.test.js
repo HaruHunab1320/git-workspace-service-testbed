@@ -1,26 +1,28 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { CozyGreetingService } from '../src/services/cozyGreetingService.js';
+const {
+  CozyGreetingService,
+  COZY_QUOTES,
+  TIME_PERIODS,
+} = require('../src/services/cozyGreetingService.js');
 
 /**
  * Helper to set the system clock to a specific hour (0-23) on a fixed date.
- * Uses vi.useFakeTimers to freeze Date so CozyGreetingService sees a
+ * Uses jest.useFakeTimers to freeze Date so CozyGreetingService sees a
  * deterministic time of day.
  */
 function setHour(hour) {
-  const date = new Date(2026, 2, 9, hour, 0, 0); // March 9, 2026
-  vi.setSystemTime(date);
+  jest.setSystemTime(new Date(2026, 2, 9, hour, 0, 0)); // March 9, 2026
 }
 
 describe('CozyGreetingService', () => {
   let service;
 
   beforeEach(() => {
-    vi.useFakeTimers();
+    jest.useFakeTimers();
     service = new CozyGreetingService();
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    jest.useRealTimers();
   });
 
   // ------------------------------------------------------------------
@@ -92,129 +94,136 @@ describe('CozyGreetingService', () => {
   });
 
   // ------------------------------------------------------------------
-  // Time-of-day logic: Morning
+  // Time-of-day logic: Morning (5:00 – 11:59)
   // ------------------------------------------------------------------
-  describe('morning greetings (5:00 - 11:59)', () => {
-    it('returns a morning greeting at 5:00 AM', () => {
+  describe('morning greetings (5:00 – 11:59)', () => {
+    it('returns a morning greeting at 5:00 AM (start boundary)', () => {
       setHour(5);
       const { message } = service.getCozyGreeting('Fern');
       expect(message.toLowerCase()).toContain('morning');
     });
 
-    it('returns a morning greeting at 8:00 AM', () => {
+    it('returns a morning greeting at 8:00 AM (mid-morning)', () => {
       setHour(8);
       const { message } = service.getCozyGreeting('Fern');
       expect(message.toLowerCase()).toContain('morning');
     });
 
-    it('returns a morning greeting at 11:00 AM', () => {
+    it('returns a morning greeting at 11:00 AM (end boundary)', () => {
       setHour(11);
       const { message } = service.getCozyGreeting('Fern');
       expect(message.toLowerCase()).toContain('morning');
     });
 
-    it('includes a cozy morning icon', () => {
+    it('uses the ☕ icon for morning', () => {
       setHour(8);
       const { icon } = service.getCozyGreeting('Fern');
-      expect(icon).toBeTruthy();
+      expect(icon).toBe('☕');
     });
 
     it('includes the coffee emoji in the morning message', () => {
       setHour(8);
-      const result = service.getCozyGreeting('Fern');
-      // The spec says morning messages should include ☕
-      expect(result.message + result.icon).toContain('☕');
+      const { message } = service.getCozyGreeting('Fern');
+      expect(message).toContain('☕');
     });
   });
 
   // ------------------------------------------------------------------
-  // Time-of-day logic: Afternoon
+  // Time-of-day logic: Afternoon (12:00 – 16:59)
   // ------------------------------------------------------------------
-  describe('afternoon greetings (12:00 - 17:59)', () => {
-    it('returns an afternoon greeting at 12:00 PM', () => {
+  describe('afternoon greetings (12:00 – 16:59)', () => {
+    it('returns an afternoon greeting at 12:00 PM (start boundary)', () => {
       setHour(12);
       const { message } = service.getCozyGreeting('Cedar');
       expect(message.toLowerCase()).toContain('afternoon');
     });
 
-    it('returns an afternoon greeting at 15:00', () => {
-      setHour(15);
+    it('returns an afternoon greeting at 14:00 (mid-afternoon)', () => {
+      setHour(14);
       const { message } = service.getCozyGreeting('Cedar');
       expect(message.toLowerCase()).toContain('afternoon');
     });
 
-    it('returns an afternoon greeting at 17:00', () => {
-      setHour(17);
+    it('returns an afternoon greeting at 16:00 (end boundary)', () => {
+      setHour(16);
       const { message } = service.getCozyGreeting('Cedar');
       expect(message.toLowerCase()).toContain('afternoon');
     });
 
-    it('includes a cozy afternoon icon', () => {
+    it('uses the 🧸 icon for afternoon', () => {
       setHour(14);
       const { icon } = service.getCozyGreeting('Cedar');
-      expect(icon).toBeTruthy();
+      expect(icon).toBe('🧸');
     });
   });
 
   // ------------------------------------------------------------------
-  // Time-of-day logic: Evening
+  // Time-of-day logic: Evening (17:00 – 20:59)
   // ------------------------------------------------------------------
-  describe('evening greetings (18:00 - 21:59)', () => {
-    it('returns an evening greeting at 18:00', () => {
-      setHour(18);
+  describe('evening greetings (17:00 – 20:59)', () => {
+    it('returns an evening greeting at 17:00 (start boundary)', () => {
+      setHour(17);
       const { message } = service.getCozyGreeting('Willow');
       expect(message.toLowerCase()).toContain('evening');
     });
 
-    it('returns an evening greeting at 20:00', () => {
+    it('returns an evening greeting at 19:00 (mid-evening)', () => {
+      setHour(19);
+      const { message } = service.getCozyGreeting('Willow');
+      expect(message.toLowerCase()).toContain('evening');
+    });
+
+    it('returns an evening greeting at 20:00 (end boundary)', () => {
       setHour(20);
       const { message } = service.getCozyGreeting('Willow');
       expect(message.toLowerCase()).toContain('evening');
     });
 
-    it('includes a cozy evening icon', () => {
+    it('uses the 🕯️ icon for evening', () => {
       setHour(19);
       const { icon } = service.getCozyGreeting('Willow');
-      expect(icon).toBeTruthy();
+      expect(icon).toBe('🕯️');
     });
   });
 
   // ------------------------------------------------------------------
-  // Time-of-day logic: Night
+  // Time-of-day logic: Night (21:00 – 4:59)
   // ------------------------------------------------------------------
-  describe('night greetings (22:00 - 4:59)', () => {
-    it('returns a night/rest greeting at 22:00', () => {
-      setHour(22);
+  describe('night greetings (21:00 – 4:59)', () => {
+    it('returns a night greeting at 21:00 (start boundary)', () => {
+      setHour(21);
       const { message } = service.getCozyGreeting('Luna');
-      // The spec says night messages use "Rest well" and 🌙
-      expect(
-        message.toLowerCase().includes('rest') ||
-          message.toLowerCase().includes('night')
-      ).toBe(true);
+      expect(message.toLowerCase()).toContain('rest well');
     });
 
-    it('returns a night/rest greeting at midnight (0:00)', () => {
+    it('returns a night greeting at midnight (0:00)', () => {
       setHour(0);
       const { message } = service.getCozyGreeting('Luna');
-      expect(
-        message.toLowerCase().includes('rest') ||
-          message.toLowerCase().includes('night')
-      ).toBe(true);
+      expect(message.toLowerCase()).toContain('rest well');
     });
 
-    it('returns a night/rest greeting at 3:00 AM', () => {
+    it('returns a night greeting at 3:00 AM', () => {
       setHour(3);
       const { message } = service.getCozyGreeting('Luna');
-      expect(
-        message.toLowerCase().includes('rest') ||
-          message.toLowerCase().includes('night')
-      ).toBe(true);
+      expect(message.toLowerCase()).toContain('rest well');
+    });
+
+    it('returns a night greeting at 4:00 AM (end boundary)', () => {
+      setHour(4);
+      const { message } = service.getCozyGreeting('Luna');
+      expect(message.toLowerCase()).toContain('rest well');
+    });
+
+    it('uses the 🌙 icon for night', () => {
+      setHour(23);
+      const { icon } = service.getCozyGreeting('Luna');
+      expect(icon).toBe('🌙');
     });
 
     it('includes the moon emoji in the night message', () => {
-      setHour(23);
-      const result = service.getCozyGreeting('Luna');
-      expect(result.message + result.icon).toContain('🌙');
+      setHour(22);
+      const { message } = service.getCozyGreeting('Luna');
+      expect(message).toContain('🌙');
     });
   });
 
@@ -228,10 +237,7 @@ describe('CozyGreetingService', () => {
       setHour(5);
       const morningResult = service.getCozyGreeting('Dawn');
 
-      expect(
-        nightResult.message.toLowerCase().includes('rest') ||
-          nightResult.message.toLowerCase().includes('night')
-      ).toBe(true);
+      expect(nightResult.message.toLowerCase()).toContain('rest well');
       expect(morningResult.message.toLowerCase()).toContain('morning');
     });
 
@@ -245,27 +251,24 @@ describe('CozyGreetingService', () => {
       expect(afternoonResult.message.toLowerCase()).toContain('afternoon');
     });
 
-    it('transitions from afternoon to evening at 18:00', () => {
-      setHour(17);
+    it('transitions from afternoon to evening at 17:00', () => {
+      setHour(16);
       const afternoonResult = service.getCozyGreeting('Dusk');
-      setHour(18);
+      setHour(17);
       const eveningResult = service.getCozyGreeting('Dusk');
 
       expect(afternoonResult.message.toLowerCase()).toContain('afternoon');
       expect(eveningResult.message.toLowerCase()).toContain('evening');
     });
 
-    it('transitions from evening to night at 22:00', () => {
-      setHour(21);
+    it('transitions from evening to night at 21:00', () => {
+      setHour(20);
       const eveningResult = service.getCozyGreeting('Star');
-      setHour(22);
+      setHour(21);
       const nightResult = service.getCozyGreeting('Star');
 
       expect(eveningResult.message.toLowerCase()).toContain('evening');
-      expect(
-        nightResult.message.toLowerCase().includes('rest') ||
-          nightResult.message.toLowerCase().includes('night')
-      ).toBe(true);
+      expect(nightResult.message.toLowerCase()).toContain('rest well');
     });
   });
 
@@ -279,12 +282,60 @@ describe('CozyGreetingService', () => {
       expect(quote.length).toBeGreaterThan(0);
     });
 
+    it('returns a quote from the COZY_QUOTES array', () => {
+      setHour(10);
+      const { quote } = service.getCozyGreeting('Sage');
+      expect(COZY_QUOTES).toContain(quote);
+    });
+
     it('returns a quote for every time period', () => {
-      for (const hour of [2, 8, 14, 20]) {
+      for (const hour of [2, 8, 14, 19]) {
         setHour(hour);
         const { quote } = service.getCozyGreeting('Sage');
         expect(typeof quote).toBe('string');
         expect(quote.length).toBeGreaterThan(0);
+      }
+    });
+
+    it('selects quotes using Math.random', () => {
+      setHour(10);
+      const spy = jest.spyOn(Math, 'random').mockReturnValue(0);
+      const { quote } = service.getCozyGreeting('Sage');
+      expect(quote).toBe(COZY_QUOTES[0]);
+      spy.mockRestore();
+    });
+
+    it('selects the last quote when Math.random is near 1', () => {
+      setHour(10);
+      const spy = jest.spyOn(Math, 'random').mockReturnValue(0.999);
+      const { quote } = service.getCozyGreeting('Sage');
+      expect(quote).toBe(COZY_QUOTES[COZY_QUOTES.length - 1]);
+      spy.mockRestore();
+    });
+  });
+
+  // ------------------------------------------------------------------
+  // Exported constants
+  // ------------------------------------------------------------------
+  describe('exported constants', () => {
+    it('exports COZY_QUOTES as a non-empty array', () => {
+      expect(Array.isArray(COZY_QUOTES)).toBe(true);
+      expect(COZY_QUOTES.length).toBeGreaterThan(0);
+    });
+
+    it('exports TIME_PERIODS with morning, afternoon, evening, and night', () => {
+      expect(TIME_PERIODS).toHaveProperty('morning');
+      expect(TIME_PERIODS).toHaveProperty('afternoon');
+      expect(TIME_PERIODS).toHaveProperty('evening');
+      expect(TIME_PERIODS).toHaveProperty('night');
+    });
+
+    it('each TIME_PERIOD has range, icon, and template', () => {
+      for (const key of ['morning', 'afternoon', 'evening', 'night']) {
+        expect(TIME_PERIODS[key]).toHaveProperty('range');
+        expect(TIME_PERIODS[key]).toHaveProperty('icon');
+        expect(TIME_PERIODS[key]).toHaveProperty('template');
+        expect(typeof TIME_PERIODS[key].template).toBe('function');
       }
     });
   });
@@ -293,13 +344,15 @@ describe('CozyGreetingService', () => {
   // Consistency and idempotency
   // ------------------------------------------------------------------
   describe('consistency', () => {
-    it('returns the same time-period greeting when called twice at the same time', () => {
+    it('returns the same greeting message when called twice at the same time', () => {
       setHour(9);
+      jest.spyOn(Math, 'random').mockReturnValue(0.5);
       const result1 = service.getCozyGreeting('Echo');
       const result2 = service.getCozyGreeting('Echo');
 
       expect(result1.message).toBe(result2.message);
       expect(result1.icon).toBe(result2.icon);
+      jest.restoreAllMocks();
     });
 
     it('produces different messages for different users at the same time', () => {
@@ -307,7 +360,6 @@ describe('CozyGreetingService', () => {
       const result1 = service.getCozyGreeting('Alice');
       const result2 = service.getCozyGreeting('Bob');
 
-      // Messages should differ because the name is interpolated
       expect(result1.message).not.toBe(result2.message);
     });
   });
