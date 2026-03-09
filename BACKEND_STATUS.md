@@ -39,6 +39,7 @@ All state lives in module-level globals in `server.py`:
 - `_zen_garden: ZenGarden` — 5x7 zen garden grid
 - `_market: EconomyMarket` — market prices synced to game season
 - `_firefly_swarm: FireflySwarm` — particle simulation (20 fireflies)
+- `_constellation_tracker: ConstellationTracker` — tracks discovered constellations and player notes
 
 State resets on process restart. The `/api/new-game` endpoint resets all globals in-place.
 
@@ -56,6 +57,7 @@ The backend is split into eight well-separated simulation subsystems:
 | `economy.py`    | Market trading: items, seasonal pricing, spoilage, recipes                   | Large  |
 | `crafting.py`   | Recipe and material crafting system                                          | Medium |
 | `zen_garden.py` | Zen garden: succulents, rocks, raking patterns, harmony scoring              | Medium |
+| `constellations.py` | Seasonal constellation catalog (12 constellations), discovery tracker, lore | Medium |
 | `swarm.py`      | Firefly particle physics simulation                                          | Small  |
 | `math_utils.py` | Single `clamp()` utility                                                     | Tiny   |
 
@@ -75,7 +77,7 @@ The backend is split into eight well-separated simulation subsystems:
 
 ## API Surface
 
-**35 endpoints** across 9 domains, all under `/api/`:
+**39 endpoints** across 10 domains, all under `/api/`:
 
 ### Game Management (3)
 
@@ -133,6 +135,13 @@ The backend is split into eight well-separated simulation subsystems:
 - `POST /api/zen-garden/rake` — rake pattern
 - `POST /api/zen-garden/remove` — remove tile item
 
+### Constellations (4)
+
+- `GET /api/constellations` — visible constellations for current season with discovery status
+- `GET /api/constellations/all` — full catalog of all 12 constellations
+- `POST /api/constellations/discover` — discover a constellation (season-gated)
+- `POST /api/constellations/note` — add a personal note to a discovered constellation
+
 ### Firefly Swarm (2)
 
 - `GET /api/swarm` — current state
@@ -155,6 +164,7 @@ Seven test files cover all simulation domains:
 | `test_villagers.py`  | villagers  | Schedules (full year), weather integration, birthday gifts           |
 | `test_weather.py`    | weather    | Calendar, temperature, sky, magical events, festivals, mood, streaks |
 | `test_zen_garden.py` | zen_garden | Succulents, rocks, tiles, raking, harmony                            |
+| `test_constellations.py` | constellations | Data integrity, discovery logic, season gating, serialization, edge cases |
 
 **Not tested:** `server.py` endpoints (no integration/API tests), `crafting.py`, `swarm.py`, `math_utils.py`.
 
@@ -192,6 +202,7 @@ apps/api/
 ├── garden.py           # Farming system
 ├── animals.py          # Pet companion system
 ├── economy.py          # Market and trading
+├── constellations.py   # Constellation catalog, discovery tracker, lore
 ├── crafting.py         # Recipe crafting (no API routes)
 ├── zen_garden.py       # Zen garden gameplay
 ├── swarm.py            # Firefly particle simulation
@@ -205,6 +216,7 @@ apps/api/
 ├── test_garden.py      # Garden tests
 ├── test_villagers.py   # Villager tests
 ├── test_weather.py     # Weather tests
+├── test_constellations.py # Constellation discovery tests
 └── test_zen_garden.py  # Zen garden tests
 ```
 

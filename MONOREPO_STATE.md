@@ -16,7 +16,8 @@
 - **Role:** Simulation engine and REST API server powering all game logic
 - **Source size:** ~9,400 lines across 18 Python files (including tests)
 - **Core modules:**
-  - `server.py` -- FastAPI app with 40+ REST endpoints, CORS middleware, in-memory game state
+  - `server.py` -- FastAPI app with 40+ REST endpoints (including 4 constellation endpoints), CORS middleware, in-memory game state
+  - `constellations.py` -- Seasonal constellation catalog (12 constellations), `ConstellationTracker` discovery state, lore system
   - `game.py` -- `CozyVillageGame` orchestrator class and `DailyReport` model
   - `villagers.py` -- 6 NPC villagers with personalities, moods, friendship tiers, gift system
   - `weather.py` -- Seasonal temperature cycles, rain/snow/fog, magical events (aurora borealis), festivals
@@ -27,7 +28,7 @@
   - `zen_garden.py` -- Sand raking patterns, succulent/rock placement logic
   - `swarm.py` -- Swarm-related utilities
   - `math_utils.py` -- Minimal math helpers
-- **Tests:** 7 test files (`test_animals.py`, `test_economy.py`, `test_game.py`, `test_garden.py`, `test_villagers.py`, `test_weather.py`, `test_zen_garden.py`)
+- **Tests:** 8 test files (`test_animals.py`, `test_constellations.py`, `test_economy.py`, `test_game.py`, `test_garden.py`, `test_villagers.py`, `test_weather.py`, `test_zen_garden.py`)
 - **Dependencies:** `fastapi`, `uvicorn[standard]`
 - **Scripts:** `dev` (uvicorn with reload), `test` (pytest)
 
@@ -37,11 +38,11 @@
 - **Framework:** React 18 + Vite 5
 - **Role:** Interactive village UI -- the main player-facing application
 - **Components:** 27 component files in `src/components/`, including:
-  - Game panels: `WeatherPanel`, `VillagersPanel`, `GardenPanel`, `PetsPanel`, `EconomyPanel`, `InventoryShelf`, `JournalPanel`, `ZenGardenPanel`, `TeaBrewingStation`
+  - Game panels: `WeatherPanel`, `VillagersPanel`, `GardenPanel`, `PetsPanel`, `EconomyPanel`, `InventoryShelf`, `JournalPanel`, `ZenGardenPanel`, `TeaBrewingStation`, `ConstellationGazer`
   - Ambient/cozy features: `AmbientLofiMixer`, `LofiPlayer`, `AmbientSounds`, `CozyFireplace`, `StarryNight`, `WindChimes`, `SleepingCat`, `FocusTimer`
   - UI structure: `Header`, `ActionBar`, `EventLog`, `SwarmBadge`, `DailyEntry`
   - Modals: `AdoptModal`, `GiftModal`, `PlantModal`, `RockModal`
-- **Tabs:** Weather, Villagers, Garden, Pets, Economy, Shelf, Journal, Zen Garden, Tea, Mixer
+- **Tabs:** Weather, Villagers, Garden, Pets, Economy, Shelf, Journal, Zen Garden, Tea, Mixer, Stars
 - **Internal dependency:** `@cozy-village/zen-garden` package
 - **Scripts:** `dev` (vite), `build` (vite build), `preview` (vite preview)
 
@@ -97,7 +98,7 @@
 ### 3. `packages/utils` -- Shared Utilities (`@cozy-village/utils`)
 
 - **Type:** Utility library
-- **Contents:** `greet.js` (greeting generator), `shuffle.js` (Fisher-Yates shuffle), `hello.js` (console utility), `weather.js` (deterministic weather forecast generator using seeded PRNG / mulberry32)
+- **Contents:** `greet.js` (greeting generator), `shuffle.js` (Fisher-Yates shuffle), `hello.js` (console utility), `weather.js` (deterministic weather forecast generator using seeded PRNG / mulberry32), `starfield.js` (deterministic night-sky and constellation generator using seeded PRNG)
 - **No framework dependencies**
 
 ---

@@ -36,7 +36,7 @@ cozy-village/
 | -------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **ui**         | `@cozy-village/ui`         | Shared pastel-themed React component library. Includes PastelButton, PastelCard, PastelTabs, PastelModal, PastelToast, PastelInput, PastelAvatar, and more.       |
 | **zen-garden** | `@cozy-village/zen-garden` | Interactive canvas drawing component with rake patterns, succulent/rock placement, and a tool palette.                                                            |
-| **utils**      | `@cozy-village/utils`      | Shared helpers -- Fisher-Yates shuffle, greeting generator, console utilities, and a deterministic weather forecast generator (`weather.js`) using a seeded PRNG. |
+| **utils**      | `@cozy-village/utils`      | Shared helpers -- Fisher-Yates shuffle, greeting generator, console utilities, a deterministic weather forecast generator (`weather.js`), and a starfield/constellation generator (`starfield.js`) using a seeded PRNG. |
 
 ## Getting Started
 
@@ -82,6 +82,7 @@ npx turbo dev --filter=@cozy-village/cozy-companion
 - **Crafting** -- Tiered recipe discovery using gathered materials
 - **Zen Garden** -- Interactive sand raking, succulent, and rock placement
 - **Journal** -- Personal entry system tied to in-game days
+- **Constellation Gazer** -- Seasonal stargazing with 12 discoverable constellations, village lore, and a personal notes catalog
 
 ## Logger
 
