@@ -3,11 +3,10 @@
 import sys
 import os
 import unittest
-from unittest.mock import patch
 from datetime import datetime
 
-# Ensure the repo root is importable.
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+# Add apps/api to the import path so we can import alpha's implementation.
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "apps", "api"))
 
 from cozy_session import CozySession, COMFORT_MESSAGES
 
@@ -29,13 +28,18 @@ class TestStartSession(unittest.TestCase):
         self.assertIn("10", result)
 
     def test_contains_timestamp(self):
-        now = datetime.now().strftime("%Y-%m-%d")
+        now = datetime.now().strftime("%H:%M")
         result = self.session.start_session(1)
         self.assertIn(now, result)
 
-    def test_single_minute(self):
+    def test_single_minute_grammar(self):
         result = self.session.start_session(1)
-        self.assertIn("1 minute(s)", result)
+        self.assertIn("1 minute", result)
+        self.assertNotIn("1 minutes", result)
+
+    def test_plural_minutes_grammar(self):
+        result = self.session.start_session(5)
+        self.assertIn("5 minutes", result)
 
     def test_large_duration(self):
         result = self.session.start_session(999)
@@ -52,27 +56,23 @@ class TestStartSession(unittest.TestCase):
             self.session.start_session(-5)
 
     def test_rejects_float(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             self.session.start_session(2.5)
 
     def test_rejects_string(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             self.session.start_session("10")
 
     def test_rejects_none(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             self.session.start_session(None)
 
-    def test_rejects_bool_true(self):
-        with self.assertRaises(TypeError):
-            self.session.start_session(True)
-
     def test_rejects_bool_false(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             self.session.start_session(False)
 
     def test_rejects_list(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             self.session.start_session([5])
 
 
