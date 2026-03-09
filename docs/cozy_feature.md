@@ -6,10 +6,10 @@ A gentle wellness utility for developers. Cozy Break helps you step away from th
 
 The `CozySession` class lives in `cozy_session.py` and provides two simple methods:
 
-| Method | Description |
-| --- | --- |
+| Method                            | Description                                                              |
+| --------------------------------- | ------------------------------------------------------------------------ |
 | `start_session(duration_minutes)` | Begins a timed relaxation break and returns a timestamped start message. |
-| `get_comfort_message()` | Returns a random comforting prompt from a curated list. |
+| `get_comfort_message()`           | Returns a random comforting prompt from a curated list.                  |
 
 No external dependencies are required — Cozy Break uses only the Python standard library.
 

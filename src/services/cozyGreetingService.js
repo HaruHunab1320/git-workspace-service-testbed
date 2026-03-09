@@ -1,30 +1,30 @@
 const COZY_QUOTES = [
-  "A cup of warmth makes everything better. ☕",
-  "Take it slow — the world can wait. 🧸",
-  "You belong here, just as you are. 🕯️",
-  "Wrap yourself in kindness today. 🧸",
-  "Every small moment is worth savoring. ☕",
+  'A cup of warmth makes everything better. ☕',
+  'Take it slow — the world can wait. 🧸',
+  'You belong here, just as you are. 🕯️',
+  'Wrap yourself in kindness today. 🧸',
+  'Every small moment is worth savoring. ☕',
 ];
 
 const TIME_PERIODS = {
   morning: {
     range: [5, 12],
-    icon: "☕",
+    icon: '☕',
     template: (name) => `Good morning, ${name}! Rise and shine ☕`,
   },
   afternoon: {
     range: [12, 17],
-    icon: "🧸",
+    icon: '🧸',
     template: (name) => `Good afternoon, ${name}! Hope your day is cozy 🧸`,
   },
   evening: {
     range: [17, 21],
-    icon: "🕯️",
+    icon: '🕯️',
     template: (name) => `Good evening, ${name}! Time to unwind 🕯️`,
   },
   night: {
     range: [21, 5],
-    icon: "🌙",
+    icon: '🌙',
     template: (name) => `Rest well, ${name}! Sweet dreams 🌙`,
   },
 };

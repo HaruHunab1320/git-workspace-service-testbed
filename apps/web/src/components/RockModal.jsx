@@ -12,7 +12,7 @@ export default function RockModal({ row, col, onClose, onRefresh, showToast }) {
         const data = await api.getAvailableRocks();
         setRocks(data);
         if (data.length > 0) setSelected(data[0].name);
-      } catch (err) {
+      } catch (_err) {
         showToast('Failed to load rocks');
       }
       setLoading(false);

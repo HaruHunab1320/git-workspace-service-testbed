@@ -20,7 +20,7 @@ export default function JournalPanel({
       await api.addJournalEntry(note, mood);
       await onRefresh();
       showToast('Journal entry saved!');
-    } catch (err) {
+    } catch (_err) {
       showToast('Failed to save entry');
     }
     setSubmitting(false);
@@ -30,7 +30,7 @@ export default function JournalPanel({
     try {
       await api.deleteJournalEntry(id);
       await onRefresh();
-    } catch (err) {
+    } catch (_err) {
       showToast('Failed to delete entry');
     }
   };

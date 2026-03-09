@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../api';
 import './ConstellationGazer.css';
 
-function StarField({ constellations, selected, onSelect, season }) {
+function StarField({ constellations, selected, onSelect, _season }) {
   const containerRef = useRef(null);
 
   const renderLine = (c, lineIdx, pair) => {
@@ -32,7 +32,7 @@ function StarField({ constellations, selected, onSelect, season }) {
     <div className="constellation-sky" ref={containerRef}>
       <div className="constellation-sky-shimmer" />
       {constellations.map((c) => {
-        const isSelected = selected?.name === c.name;
+        const _isSelected = selected?.name === c.name;
         if (c.discovered && c.lines) {
           return c.lines.map((pair, i) => renderLine(c, i, pair));
         }
@@ -76,7 +76,7 @@ function DifficultyDots({ level }) {
   );
 }
 
-export default function ConstellationGazer({ showToast, season }) {
+export default function ConstellationGazer({ showToast, _season }) {
   const [data, setData] = useState(null);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -100,11 +100,8 @@ export default function ConstellationGazer({ showToast, season }) {
       const result = await api.discoverConstellation(name);
       showToast(result.message);
       await fetchData();
-      setSelected(
-        (prev) =>
-          prev?.name === name
-            ? result.constellation
-            : prev
+      setSelected((prev) =>
+        prev?.name === name ? result.constellation : prev
       );
     } catch (err) {
       showToast(err.message || 'Could not discover constellation');
@@ -122,7 +119,8 @@ export default function ConstellationGazer({ showToast, season }) {
       <div className="constellation-header">
         <h2>Constellation Gazer</h2>
         <span className="constellation-catalog">
-          {catalog.discovered}/{catalog.total} discovered ({catalog.completion}%)
+          {catalog.discovered}/{catalog.total} discovered ({catalog.completion}
+          %)
         </span>
       </div>
 
@@ -165,7 +163,13 @@ export default function ConstellationGazer({ showToast, season }) {
             </button>
           )}
           {selected.discovered && selected.player_note !== undefined && (
-            <div style={{ marginTop: 8, fontSize: '0.85rem', color: 'var(--brown-light)' }}>
+            <div
+              style={{
+                marginTop: 8,
+                fontSize: '0.85rem',
+                color: 'var(--brown-light)',
+              }}
+            >
               {selected.player_note
                 ? `Your note: "${selected.player_note}"`
                 : 'No personal note yet.'}

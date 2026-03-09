@@ -5,8 +5,14 @@
  * verifying they work correctly when composed together.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Logger, createLogger, LogLevel, LogTransport, LogEntry } from '../src/logger';
+import { describe, it, expect, vi, beforeEach as _beforeEach } from 'vitest';
+import {
+  Logger,
+  createLogger,
+  LogLevel,
+  LogTransport,
+  LogEntry,
+} from '../src/logger';
 
 // ---------------------------------------------------------------------------
 // E2E: Logger used as an application logging pipeline
@@ -162,7 +168,9 @@ describe('Logger E2E: Application logging pipeline', () => {
     expect(infoSpy).toHaveBeenCalledOnce();
     expect(warnSpy).toHaveBeenCalledOnce();
     expect(errorSpy).toHaveBeenCalledOnce();
-    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('failure'), { stack: 'trace' });
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('failure'), {
+      stack: 'trace',
+    });
 
     vi.restoreAllMocks();
   });

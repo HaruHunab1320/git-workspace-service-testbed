@@ -38,11 +38,11 @@ status = get_cozy_status("")
 
 `get_cozy_status(user_name: str) -> dict` returns a dictionary with the following keys:
 
-| Key          | Type   | Description                                                                 |
-|--------------|--------|-----------------------------------------------------------------------------|
-| `greeting`   | `str`  | A warm, personalized welcome message (e.g., `"Welcome back to your nook, Maple"`). Defaults to `"Friend"` when `user_name` is empty. |
-| `suggestion` | `str`  | A gentle, cozy activity suggestion (e.g., `"How about a cup of chamomile?"`). |
-| `timestamp`  | `str`  | An ISO 8601 timestamp indicating when the status was generated.             |
+| Key          | Type  | Description                                                                                                                          |
+| ------------ | ----- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `greeting`   | `str` | A warm, personalized welcome message (e.g., `"Welcome back to your nook, Maple"`). Defaults to `"Friend"` when `user_name` is empty. |
+| `suggestion` | `str` | A gentle, cozy activity suggestion (e.g., `"How about a cup of chamomile?"`).                                                        |
+| `timestamp`  | `str` | An ISO 8601 timestamp indicating when the status was generated.                                                                      |
 
 ## Module Reference
 

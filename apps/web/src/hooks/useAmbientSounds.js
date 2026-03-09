@@ -9,7 +9,7 @@ import { useRef, useCallback, useEffect, useState } from 'react';
 const PENTATONIC = [261.6, 293.7, 329.6, 392.0, 440.0, 523.3, 587.3];
 
 // Seasonal mood → base frequencies
-const SEASON_TUNING = {
+const _SEASON_TUNING = {
   spring: { base: 523.3, warmth: 0.3 },
   summer: { base: 440.0, warmth: 0.5 },
   autumn: { base: 349.2, warmth: 0.4 },

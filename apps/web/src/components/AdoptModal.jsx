@@ -19,7 +19,7 @@ export default function AdoptModal({ onClose, onRefresh, showToast }) {
       try {
         const data = await api.getAdoptable();
         setAdoptable(data);
-      } catch (err) {
+      } catch (_err) {
         showToast('Failed to load adoptable pets');
       }
       setLoading(false);

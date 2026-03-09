@@ -230,41 +230,41 @@ CSS files are imported directly (not as CSS Modules), so all class names are glo
 
 ## 7. Component Inventory
 
-| Component             | Lines (est.) | Purpose                               | Has CSS       |
-| --------------------- | ------------ | ------------------------------------- | ------------- |
-| App.jsx               | 242          | Root component, state, tabs, layout   | Yes (App.css) |
-| Header.jsx            | —            | Day/season/weather/mood display       | Yes           |
-| ActionBar.jsx         | —            | Advance day/week, new game buttons    | Yes           |
-| EventLog.jsx          | —            | Sidebar with recent game reports      | Yes           |
-| WeatherPanel.jsx      | —            | Weather display, forecast, festivals  | Yes           |
-| VillagersPanel.jsx    | —            | Villager list with personality badges | Yes           |
-| VillagerCard.jsx      | —            | Individual villager display           | —             |
-| GardenPanel.jsx       | —            | Grid-based crop planting/harvesting   | Yes           |
-| GardenPlot.jsx        | —            | Single garden tile                    | —             |
-| PetsPanel.jsx         | —            | Pet list, adoption, interactions      | Yes           |
-| PetCard.jsx           | —            | Individual pet display                | —             |
-| EconomyPanel.jsx      | —            | Market prices, buy/sell interface     | Yes           |
-| InventoryShelf.jsx    | —            | Categorized item display              | Yes           |
-| JournalPanel.jsx      | —            | Text journal with date/season         | Yes           |
-| ZenGardenPanel.jsx    | —            | Server-side zen garden management     | Yes           |
-| ZenGardenTile.jsx     | —            | Single zen garden tile                | —             |
-| ConstellationGazer.jsx| 199          | Seasonal stargazing discovery panel   | Yes           |
-| TeaBrewingStation.jsx | 250+         | Interactive tea brewing               | Yes           |
-| CandleWorkshop.jsx  | 265          | Candle crafting with animated flames  | Yes           |
-| AmbientLofiMixer.jsx  | Large        | Multi-track audio mixer               | Yes           |
-| LofiPlayer.jsx        | —            | Floating lo-fi radio                  | Yes           |
-| FocusTimer.jsx        | —            | Pomodoro timer with SVG ring          | Yes           |
-| AmbientSounds.jsx     | —            | Context-aware ambient audio           | Yes           |
-| StarryNight.jsx       | —            | Canvas particle night sky             | Yes           |
-| CozyFireplace.jsx     | —            | Animated fireplace                    | Yes           |
-| WindChimes.jsx        | —            | Event-triggered sound effects         | Yes           |
-| SleepingCat.jsx       | —            | Decorative animated cat               | Yes           |
-| SwarmBadge.jsx        | —            | Firefly particle effect               | Yes           |
-| PlantModal.jsx        | —            | Crop selection dialog                 | —             |
-| SucculentModal.jsx    | —            | Succulent selection dialog            | —             |
-| RockModal.jsx         | —            | Rock selection dialog                 | —             |
-| GiftModal.jsx         | —            | Gift giving dialog                    | —             |
-| AdoptModal.jsx        | —            | Pet adoption dialog                   | —             |
+| Component              | Lines (est.) | Purpose                               | Has CSS       |
+| ---------------------- | ------------ | ------------------------------------- | ------------- |
+| App.jsx                | 242          | Root component, state, tabs, layout   | Yes (App.css) |
+| Header.jsx             | —            | Day/season/weather/mood display       | Yes           |
+| ActionBar.jsx          | —            | Advance day/week, new game buttons    | Yes           |
+| EventLog.jsx           | —            | Sidebar with recent game reports      | Yes           |
+| WeatherPanel.jsx       | —            | Weather display, forecast, festivals  | Yes           |
+| VillagersPanel.jsx     | —            | Villager list with personality badges | Yes           |
+| VillagerCard.jsx       | —            | Individual villager display           | —             |
+| GardenPanel.jsx        | —            | Grid-based crop planting/harvesting   | Yes           |
+| GardenPlot.jsx         | —            | Single garden tile                    | —             |
+| PetsPanel.jsx          | —            | Pet list, adoption, interactions      | Yes           |
+| PetCard.jsx            | —            | Individual pet display                | —             |
+| EconomyPanel.jsx       | —            | Market prices, buy/sell interface     | Yes           |
+| InventoryShelf.jsx     | —            | Categorized item display              | Yes           |
+| JournalPanel.jsx       | —            | Text journal with date/season         | Yes           |
+| ZenGardenPanel.jsx     | —            | Server-side zen garden management     | Yes           |
+| ZenGardenTile.jsx      | —            | Single zen garden tile                | —             |
+| ConstellationGazer.jsx | 199          | Seasonal stargazing discovery panel   | Yes           |
+| TeaBrewingStation.jsx  | 250+         | Interactive tea brewing               | Yes           |
+| CandleWorkshop.jsx     | 265          | Candle crafting with animated flames  | Yes           |
+| AmbientLofiMixer.jsx   | Large        | Multi-track audio mixer               | Yes           |
+| LofiPlayer.jsx         | —            | Floating lo-fi radio                  | Yes           |
+| FocusTimer.jsx         | —            | Pomodoro timer with SVG ring          | Yes           |
+| AmbientSounds.jsx      | —            | Context-aware ambient audio           | Yes           |
+| StarryNight.jsx        | —            | Canvas particle night sky             | Yes           |
+| CozyFireplace.jsx      | —            | Animated fireplace                    | Yes           |
+| WindChimes.jsx         | —            | Event-triggered sound effects         | Yes           |
+| SleepingCat.jsx        | —            | Decorative animated cat               | Yes           |
+| SwarmBadge.jsx         | —            | Firefly particle effect               | Yes           |
+| PlantModal.jsx         | —            | Crop selection dialog                 | —             |
+| SucculentModal.jsx     | —            | Succulent selection dialog            | —             |
+| RockModal.jsx          | —            | Rock selection dialog                 | —             |
+| GiftModal.jsx          | —            | Gift giving dialog                    | —             |
+| AdoptModal.jsx         | —            | Pet adoption dialog                   | —             |
 
 **Custom Hooks:**
 
@@ -280,18 +280,18 @@ CSS files are imported directly (not as CSS Modules), so all class names are glo
 
 The frontend consumes 30 REST endpoints from a FastAPI backend:
 
-| Category        | Endpoints                                                                                                                                                       | Methods           |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| Game            | `/status`, `/advance-day`, `/new-game`                                                                                                                          | GET, POST         |
-| Weather         | `/weather`, `/weather/forecast`                                                                                                                                 | GET               |
-| Villagers       | `/villagers`, `/villagers/:id`, `/villagers/:id/gift`                                                                                                           | GET, POST         |
-| Garden          | `/garden`, `/garden/crops`, `/garden/plant`                                                                                                                     | GET, POST         |
-| Pets            | `/pets`, `/pets/adoptable`, `/pets/adopt`, `/pets/:name/pet`, `/pets/:name/feed`, `/pets/:name/play`                                                            | GET, POST         |
-| Economy         | `/economy/prices`, `/economy/summary`, `/economy/wallet`, `/economy/buy`, `/economy/sell`, `/inventory`                                                         | GET, POST         |
-| Zen Garden      | `/zen-garden`, `/zen-garden/succulents`, `/zen-garden/rocks`, `/zen-garden/place-succulent`, `/zen-garden/place-rock`, `/zen-garden/rake`, `/zen-garden/remove` | GET, POST         |
-| Constellations  | `/constellations`, `/constellations/all`, `/constellations/discover`, `/constellations/note`                                                                     | GET, POST         |
-| Candles         | `/candles`, `/candles/scents`, `/candles/craft`, `/candles/light`, `/candles/extinguish`, `/candles/remove`                                                      | GET, POST         |
-| Journal         | `/journal`, `/journal/:id`                                                                                                                                      | GET, POST, DELETE |
+| Category       | Endpoints                                                                                                                                                       | Methods           |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Game           | `/status`, `/advance-day`, `/new-game`                                                                                                                          | GET, POST         |
+| Weather        | `/weather`, `/weather/forecast`                                                                                                                                 | GET               |
+| Villagers      | `/villagers`, `/villagers/:id`, `/villagers/:id/gift`                                                                                                           | GET, POST         |
+| Garden         | `/garden`, `/garden/crops`, `/garden/plant`                                                                                                                     | GET, POST         |
+| Pets           | `/pets`, `/pets/adoptable`, `/pets/adopt`, `/pets/:name/pet`, `/pets/:name/feed`, `/pets/:name/play`                                                            | GET, POST         |
+| Economy        | `/economy/prices`, `/economy/summary`, `/economy/wallet`, `/economy/buy`, `/economy/sell`, `/inventory`                                                         | GET, POST         |
+| Zen Garden     | `/zen-garden`, `/zen-garden/succulents`, `/zen-garden/rocks`, `/zen-garden/place-succulent`, `/zen-garden/place-rock`, `/zen-garden/rake`, `/zen-garden/remove` | GET, POST         |
+| Constellations | `/constellations`, `/constellations/all`, `/constellations/discover`, `/constellations/note`                                                                    | GET, POST         |
+| Candles        | `/candles`, `/candles/scents`, `/candles/craft`, `/candles/light`, `/candles/extinguish`, `/candles/remove`                                                     | GET, POST         |
+| Journal        | `/journal`, `/journal/:id`                                                                                                                                      | GET, POST, DELETE |
 
 ---
 

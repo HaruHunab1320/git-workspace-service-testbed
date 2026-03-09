@@ -135,7 +135,9 @@
 
 .candle-item.lit {
   border-color: #e8c44a;
-  box-shadow: 0 0 20px rgba(232, 196, 74, 0.15), 0 0 40px rgba(232, 196, 74, 0.05);
+  box-shadow:
+    0 0 20px rgba(232, 196, 74, 0.15),
+    0 0 40px rgba(232, 196, 74, 0.05);
 }
 
 .candle-item.spent {

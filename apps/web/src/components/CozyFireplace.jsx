@@ -10,7 +10,7 @@ const INTENSITY_LABELS = {
   roaring: 'Roaring',
 };
 
-const MARSHMALLOW_STAGES = ['raw', 'warming', 'golden', 'perfect', 'burnt'];
+const _MARSHMALLOW_STAGES = ['raw', 'warming', 'golden', 'perfect', 'burnt'];
 const MARSHMALLOW_LABELS = {
   raw: 'Ready to toast',
   warming: 'Warming up...',
