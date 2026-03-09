@@ -82,6 +82,7 @@ npx turbo dev --filter=@cozy-village/cozy-companion
 - **Crafting** -- Tiered recipe discovery using gathered materials
 - **Zen Garden** -- Interactive sand raking, succulent, and rock placement
 - **Journal** -- Personal entry system tied to in-game days
+- **Cozy Break** -- A wellness utility with relaxation timers and comforting messages for developers. See [docs/cozy_feature.md](./docs/cozy_feature.md)
 
 ## Logger
 
