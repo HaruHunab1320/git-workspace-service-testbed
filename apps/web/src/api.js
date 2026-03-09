@@ -142,6 +142,19 @@ export const api = {
       body: JSON.stringify({ candle_id: candleId }),
     }),
 
+  getConstellations: () => request('/constellations'),
+  getAllConstellations: () => request('/constellations/all'),
+  discoverConstellation: (name, note = '') =>
+    request('/constellations/discover', {
+      method: 'POST',
+      body: JSON.stringify({ name, note }),
+    }),
+  addConstellationNote: (name, note) =>
+    request('/constellations/note', {
+      method: 'POST',
+      body: JSON.stringify({ name, note }),
+    }),
+
   getJournal: () => request('/journal'),
   addJournalEntry: (text, mood = '') =>
     request('/journal', {

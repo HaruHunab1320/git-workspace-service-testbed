@@ -25,9 +25,10 @@
   - `economy.py` -- Market system with supply/demand pricing and seasonal fluctuations
   - `crafting.py` -- Tiered recipe discovery using gathered materials
   - `zen_garden.py` -- Sand raking patterns, succulent/rock placement logic
+  - `constellations.py` -- Seasonal constellation discovery with 12 constellations, star maps, village lore, and player tracking
   - `swarm.py` -- Swarm-related utilities
   - `math_utils.py` -- Minimal math helpers
-- **Tests:** 7 test files (`test_animals.py`, `test_economy.py`, `test_game.py`, `test_garden.py`, `test_villagers.py`, `test_weather.py`, `test_zen_garden.py`)
+- **Tests:** 8 test files (`test_animals.py`, `test_constellations.py`, `test_economy.py`, `test_game.py`, `test_garden.py`, `test_villagers.py`, `test_weather.py`, `test_zen_garden.py`)
 - **Dependencies:** `fastapi`, `uvicorn[standard]`
 - **Scripts:** `dev` (uvicorn with reload), `test` (pytest)
 
@@ -37,11 +38,11 @@
 - **Framework:** React 18 + Vite 5
 - **Role:** Interactive village UI -- the main player-facing application
 - **Components:** 27 component files in `src/components/`, including:
-  - Game panels: `WeatherPanel`, `VillagersPanel`, `GardenPanel`, `PetsPanel`, `EconomyPanel`, `InventoryShelf`, `JournalPanel`, `ZenGardenPanel`, `TeaBrewingStation`
+  - Game panels: `WeatherPanel`, `VillagersPanel`, `GardenPanel`, `PetsPanel`, `EconomyPanel`, `InventoryShelf`, `JournalPanel`, `ZenGardenPanel`, `ConstellationGazer`, `TeaBrewingStation`
   - Ambient/cozy features: `AmbientLofiMixer`, `LofiPlayer`, `AmbientSounds`, `CozyFireplace`, `StarryNight`, `WindChimes`, `SleepingCat`, `FocusTimer`
   - UI structure: `Header`, `ActionBar`, `EventLog`, `SwarmBadge`, `DailyEntry`
   - Modals: `AdoptModal`, `GiftModal`, `PlantModal`, `RockModal`
-- **Tabs:** Weather, Villagers, Garden, Pets, Economy, Shelf, Journal, Zen Garden, Tea, Mixer
+- **Tabs:** Weather, Villagers, Garden, Pets, Economy, Shelf, Journal, Zen Garden, Tea, Stars, Mixer
 - **Internal dependency:** `@cozy-village/zen-garden` package
 - **Scripts:** `dev` (vite), `build` (vite build), `preview` (vite preview)
 

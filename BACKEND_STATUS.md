@@ -40,6 +40,7 @@ All state lives in module-level globals in `server.py`:
 - `_market: EconomyMarket` — market prices synced to game season
 - `_firefly_swarm: FireflySwarm` — particle simulation (20 fireflies)
 - `_candle_workshop: CandleWorkshop` — candle crafting and burn tracking
+- `_constellation_tracker: ConstellationTracker` — player's constellation discovery progress
 
 State resets on process restart. The `/api/new-game` endpoint resets all globals in-place.
 
@@ -56,9 +57,10 @@ The backend is split into eight well-separated simulation subsystems:
 | `animals.py`    | Pet companions: adoption, bonding, foraging, species profiles                | Large  |
 | `economy.py`    | Market trading: items, seasonal pricing, spoilage, recipes                   | Large  |
 | `crafting.py`   | Recipe and material crafting system                                          | Medium |
-| `zen_garden.py` | Zen garden: succulents, rocks, raking patterns, harmony scoring              | Medium |
-| `swarm.py`      | Firefly particle physics simulation                                          | Small  |
-| `candles.py`    | Candle workshop: scented candle crafting, burn mechanics, mood effects        | Medium |
+| `zen_garden.py`     | Zen garden: succulents, rocks, raking patterns, harmony scoring              | Medium |
+| `constellations.py` | Seasonal constellation discovery with lore, star maps, and player tracking   | Medium |
+| `swarm.py`          | Firefly particle physics simulation                                          | Small  |
+| `candles.py`        | Candle workshop: scented candle crafting, burn mechanics, mood effects        | Medium |
 | `math_utils.py` | Single `clamp()` utility                                                     | Tiny   |
 
 ### Game Loop
@@ -77,7 +79,7 @@ The backend is split into eight well-separated simulation subsystems:
 
 ## API Surface
 
-**41 endpoints** across 10 domains, all under `/api/`:
+**45 endpoints** across 11 domains, all under `/api/`:
 
 ### Game Management (3)
 
@@ -135,6 +137,13 @@ The backend is split into eight well-separated simulation subsystems:
 - `POST /api/zen-garden/rake` — rake pattern
 - `POST /api/zen-garden/remove` — remove tile item
 
+### Constellations (4)
+
+- `GET /api/constellations` — visible constellations for the current season with discovery state and catalog progress
+- `GET /api/constellations/all` — all 12 constellations across all seasons
+- `POST /api/constellations/discover` — discover a constellation (must be visible in the current season)
+- `POST /api/constellations/note` — save a personal note on a discovered constellation
+
 ### Firefly Swarm (2)
 
 - `GET /api/swarm` — current state
@@ -165,8 +174,9 @@ Seven test files cover all simulation domains:
 | `test_garden.py`     | garden     | Seasonal crops, growth, watering, harvesting, companion planting     |
 | `test_villagers.py`  | villagers  | Schedules (full year), weather integration, birthday gifts           |
 | `test_weather.py`    | weather    | Calendar, temperature, sky, magical events, festivals, mood, streaks |
-| `test_zen_garden.py` | zen_garden | Succulents, rocks, tiles, raking, harmony                            |
-| `test_candles.py`    | candles    | Crafting, lighting, burn-down, mood effects, workshop state          |
+| `test_zen_garden.py`     | zen_garden     | Succulents, rocks, tiles, raking, harmony                            |
+| `test_constellations.py` | constellations | Data integrity, discovery logic, season gating, serialization        |
+| `test_candles.py`        | candles        | Crafting, lighting, burn-down, mood effects, workshop state          |
 
 **Not tested:** `server.py` endpoints (no integration/API tests), `crafting.py`, `swarm.py`, `math_utils.py`.
 
@@ -205,6 +215,7 @@ apps/api/
 ├── animals.py          # Pet companion system
 ├── economy.py          # Market and trading
 ├── crafting.py         # Recipe crafting (no API routes)
+├── constellations.py   # Seasonal constellation discovery system
 ├── zen_garden.py       # Zen garden gameplay
 ├── swarm.py            # Firefly particle simulation
 ├── math_utils.py       # clamp() utility
@@ -216,10 +227,11 @@ apps/api/
 ├── test_game.py        # Game engine tests
 ├── test_garden.py      # Garden tests
 ├── test_villagers.py   # Villager tests
-├── test_weather.py     # Weather tests
-├── test_zen_garden.py  # Zen garden tests
-├── candles.py          # Candle workshop system
-└── test_candles.py     # Candle workshop tests
+├── test_weather.py          # Weather tests
+├── test_zen_garden.py       # Zen garden tests
+├── test_constellations.py   # Constellation discovery tests
+├── candles.py               # Candle workshop system
+└── test_candles.py          # Candle workshop tests
 ```
 
 ## Summary

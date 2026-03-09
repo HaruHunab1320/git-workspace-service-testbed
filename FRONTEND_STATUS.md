@@ -63,6 +63,7 @@ apps/web/
     │   ├── InventoryShelf.jsx
     │   ├── JournalPanel.jsx
     │   ├── ZenGardenPanel.jsx / ZenGardenTile.jsx
+    │   ├── ConstellationGazer.jsx
     │   ├── TeaBrewingStation.jsx
     │   ├── AmbientLofiMixer.jsx
     │   ├── LofiPlayer.jsx
@@ -96,7 +97,7 @@ packages/zen-garden/
 
 `App.jsx` is the single root component. It manages all top-level state and orchestrates the entire UI:
 
-- **Tab navigation:** An 11-item `TABS` array drives tab buttons; `activeTab` state selects which panel renders via a `switch` statement in `renderPanel()`.
+- **Tab navigation:** A 12-item `TABS` array drives tab buttons; `activeTab` state selects which panel renders via a `switch` statement in `renderPanel()`.
 - **Game state:** Fetched from `/api/status` on mount, stored in a single `gameState` useState.
 - **Side effects:** Three `useCallback` fetchers (`fetchStatus`, `fetchForecast`, `fetchJournal`) called on mount and after mutations.
 - **Toast notifications:** Simple `showToast()` function with a 3-second timeout, passed as a prop to child components.
@@ -247,6 +248,7 @@ CSS files are imported directly (not as CSS Modules), so all class names are glo
 | JournalPanel.jsx      | —            | Text journal with date/season         | Yes           |
 | ZenGardenPanel.jsx    | —            | Server-side zen garden management     | Yes           |
 | ZenGardenTile.jsx     | —            | Single zen garden tile                | —             |
+| ConstellationGazer.jsx| 199          | Seasonal stargazing discovery panel   | Yes           |
 | TeaBrewingStation.jsx | 250+         | Interactive tea brewing               | Yes           |
 | CandleWorkshop.jsx  | 265          | Candle crafting with animated flames  | Yes           |
 | AmbientLofiMixer.jsx  | Large        | Multi-track audio mixer               | Yes           |
@@ -278,17 +280,18 @@ CSS files are imported directly (not as CSS Modules), so all class names are glo
 
 The frontend consumes 30 REST endpoints from a FastAPI backend:
 
-| Category   | Endpoints                                                                                                                                                       | Methods           |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| Game       | `/status`, `/advance-day`, `/new-game`                                                                                                                          | GET, POST         |
-| Weather    | `/weather`, `/weather/forecast`                                                                                                                                 | GET               |
-| Villagers  | `/villagers`, `/villagers/:id`, `/villagers/:id/gift`                                                                                                           | GET, POST         |
-| Garden     | `/garden`, `/garden/crops`, `/garden/plant`                                                                                                                     | GET, POST         |
-| Pets       | `/pets`, `/pets/adoptable`, `/pets/adopt`, `/pets/:name/pet`, `/pets/:name/feed`, `/pets/:name/play`                                                            | GET, POST         |
-| Economy    | `/economy/prices`, `/economy/summary`, `/economy/wallet`, `/economy/buy`, `/economy/sell`, `/inventory`                                                         | GET, POST         |
-| Zen Garden | `/zen-garden`, `/zen-garden/succulents`, `/zen-garden/rocks`, `/zen-garden/place-succulent`, `/zen-garden/place-rock`, `/zen-garden/rake`, `/zen-garden/remove` | GET, POST         |
-| Journal    | `/journal`, `/journal/:id`                                                                                                                                      | GET, POST, DELETE |
-| Candles    | `/candles`, `/candles/scents`, `/candles/craft`, `/candles/light`, `/candles/extinguish`, `/candles/remove`                                                      | GET, POST         |
+| Category        | Endpoints                                                                                                                                                       | Methods           |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Game            | `/status`, `/advance-day`, `/new-game`                                                                                                                          | GET, POST         |
+| Weather         | `/weather`, `/weather/forecast`                                                                                                                                 | GET               |
+| Villagers       | `/villagers`, `/villagers/:id`, `/villagers/:id/gift`                                                                                                           | GET, POST         |
+| Garden          | `/garden`, `/garden/crops`, `/garden/plant`                                                                                                                     | GET, POST         |
+| Pets            | `/pets`, `/pets/adoptable`, `/pets/adopt`, `/pets/:name/pet`, `/pets/:name/feed`, `/pets/:name/play`                                                            | GET, POST         |
+| Economy         | `/economy/prices`, `/economy/summary`, `/economy/wallet`, `/economy/buy`, `/economy/sell`, `/inventory`                                                         | GET, POST         |
+| Zen Garden      | `/zen-garden`, `/zen-garden/succulents`, `/zen-garden/rocks`, `/zen-garden/place-succulent`, `/zen-garden/place-rock`, `/zen-garden/rake`, `/zen-garden/remove` | GET, POST         |
+| Constellations  | `/constellations`, `/constellations/all`, `/constellations/discover`, `/constellations/note`                                                                     | GET, POST         |
+| Candles         | `/candles`, `/candles/scents`, `/candles/craft`, `/candles/light`, `/candles/extinguish`, `/candles/remove`                                                      | GET, POST         |
+| Journal         | `/journal`, `/journal/:id`                                                                                                                                      | GET, POST, DELETE |
 
 ---
 

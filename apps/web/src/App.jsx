@@ -14,6 +14,7 @@ import JournalPanel from './components/JournalPanel';
 import TeaBrewingStation from './components/TeaBrewingStation';
 import ZenGardenPanel from './components/ZenGardenPanel';
 import CraftingPanel from './components/CraftingPanel';
+import ConstellationGazer from './components/ConstellationGazer';
 import AmbientLofiMixer from './components/AmbientLofiMixer';
 import LofiPlayer from './components/LofiPlayer';
 import FocusTimer from './components/FocusTimer';
@@ -40,6 +41,7 @@ const TABS = [
   { id: 'tea', label: 'Tea', emoji: '🍵' },
   { id: 'candles', label: 'Candles', emoji: '🕯️' },
   { id: 'zen', label: 'Zen', emoji: '🪨' },
+  { id: 'stars', label: 'Stars', emoji: '🌌' },
   { id: 'mixer', label: 'Mixer', emoji: '🎧' },
 ];
 
@@ -233,6 +235,13 @@ export default function App() {
             zenGarden={gameState.zen_garden}
             onRefresh={refresh}
             showToast={showToast}
+          />
+        );
+      case 'stars':
+        return (
+          <ConstellationGazer
+            showToast={showToast}
+            season={gameState.season}
           />
         );
       case 'tea':
