@@ -26,3 +26,4 @@ Thumbs.db
 *.log
 coverage/
 .nyc_output/
+.git-workspace/
