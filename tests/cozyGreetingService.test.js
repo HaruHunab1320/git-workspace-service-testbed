@@ -10,19 +10,19 @@ const {
  * deterministic time of day.
  */
 function setHour(hour) {
-  jest.setSystemTime(new Date(2026, 2, 9, hour, 0, 0)); // March 9, 2026
+  vi.setSystemTime(new Date(2026, 2, 9, hour, 0, 0)); // March 9, 2026
 }
 
 describe('CozyGreetingService', () => {
   let service;
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     service = new CozyGreetingService();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // ------------------------------------------------------------------
@@ -299,7 +299,7 @@ describe('CozyGreetingService', () => {
 
     it('selects quotes using Math.random', () => {
       setHour(10);
-      const spy = jest.spyOn(Math, 'random').mockReturnValue(0);
+      const spy = vi.spyOn(Math, 'random').mockReturnValue(0);
       const { quote } = service.getCozyGreeting('Sage');
       expect(quote).toBe(COZY_QUOTES[0]);
       spy.mockRestore();
@@ -307,7 +307,7 @@ describe('CozyGreetingService', () => {
 
     it('selects the last quote when Math.random is near 1', () => {
       setHour(10);
-      const spy = jest.spyOn(Math, 'random').mockReturnValue(0.999);
+      const spy = vi.spyOn(Math, 'random').mockReturnValue(0.999);
       const { quote } = service.getCozyGreeting('Sage');
       expect(quote).toBe(COZY_QUOTES[COZY_QUOTES.length - 1]);
       spy.mockRestore();
@@ -346,13 +346,13 @@ describe('CozyGreetingService', () => {
   describe('consistency', () => {
     it('returns the same greeting message when called twice at the same time', () => {
       setHour(9);
-      jest.spyOn(Math, 'random').mockReturnValue(0.5);
+      vi.spyOn(Math, 'random').mockReturnValue(0.5);
       const result1 = service.getCozyGreeting('Echo');
       const result2 = service.getCozyGreeting('Echo');
 
       expect(result1.message).toBe(result2.message);
       expect(result1.icon).toBe(result2.icon);
-      jest.restoreAllMocks();
+      vi.restoreAllMocks();
     });
 
     it('produces different messages for different users at the same time', () => {
