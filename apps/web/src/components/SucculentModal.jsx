@@ -18,7 +18,7 @@ export default function SucculentModal({
         const data = await api.getAvailableSucculents();
         setSucculents(data);
         if (data.length > 0) setSelected(data[0].name);
-      } catch (err) {
+      } catch (_err) {
         showToast('Failed to load succulents');
       }
       setLoading(false);

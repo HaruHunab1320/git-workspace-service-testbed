@@ -21,12 +21,12 @@ Thank you for your interest in contributing to Cozy Village! This guide covers e
 
 ## Prerequisites
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| Node.js | 20+ | JavaScript runtime |
-| npm | 10+ | Package manager (ships with Node) |
-| Python | 3.10+ | Backend runtime |
-| Git | 2.30+ | Version control |
+| Tool    | Version | Purpose                           |
+| ------- | ------- | --------------------------------- |
+| Node.js | 20+     | JavaScript runtime                |
+| npm     | 10+     | Package manager (ships with Node) |
+| Python  | 3.10+   | Backend runtime                   |
+| Git     | 2.30+   | Version control                   |
 
 ## Local Development Setup
 
@@ -60,11 +60,11 @@ npx turbo dev --filter=@cozy-village/api
 npx turbo dev --filter=@cozy-village/cozy-companion
 ```
 
-| Service | URL |
-|---------|-----|
-| Web app | `http://localhost:5173` |
-| Beta app | `http://localhost:5175` |
-| API | `http://localhost:8000` (proxied via `/api` on the web app) |
+| Service  | URL                                                         |
+| -------- | ----------------------------------------------------------- |
+| Web app  | `http://localhost:5173`                                     |
+| Beta app | `http://localhost:5175`                                     |
+| API      | `http://localhost:8000` (proxied via `/api` on the web app) |
 
 ### 4. Verify Your Setup
 
@@ -102,12 +102,12 @@ cozy-village/
 
 ### Turborepo Tasks
 
-| Task | Command | Description |
-|------|---------|-------------|
-| `dev` | `npx turbo dev` | Start all dev servers (not cached) |
+| Task    | Command           | Description                             |
+| ------- | ----------------- | --------------------------------------- |
+| `dev`   | `npx turbo dev`   | Start all dev servers (not cached)      |
 | `build` | `npx turbo build` | Build all packages (outputs to `dist/`) |
-| `test` | `npx turbo test` | Run all test suites |
-| `lint` | `npx turbo lint` | Lint all packages |
+| `test`  | `npx turbo test`  | Run all test suites                     |
+| `lint`  | `npx turbo lint`  | Lint all packages                       |
 
 Filter to a specific workspace with `--filter`:
 
@@ -121,6 +121,7 @@ npx turbo lint --filter=@cozy-village/web
 ## Development Workflow
 
 1. **Create a branch** from `main`:
+
    ```bash
    git checkout main
    git pull origin main
@@ -130,6 +131,7 @@ npx turbo lint --filter=@cozy-village/web
 2. **Make your changes** in small, focused commits.
 
 3. **Run tests and lint** before pushing:
+
    ```bash
    npx turbo test lint
    ```
@@ -138,14 +140,14 @@ npx turbo lint --filter=@cozy-village/web
 
 ### Branch Naming Conventions
 
-| Prefix | Use Case | Example |
-|--------|----------|---------|
-| `feat/` | New feature | `feat/pet-grooming` |
-| `fix/` | Bug fix | `fix/weather-crash` |
-| `refactor/` | Code restructuring | `refactor/error-handling` |
-| `docs/` | Documentation only | `docs/api-endpoints` |
-| `chore/` | Tooling, CI, dependencies | `chore/upgrade-vite` |
-| `security/` | Security fix or audit | `security/input-validation` |
+| Prefix      | Use Case                  | Example                     |
+| ----------- | ------------------------- | --------------------------- |
+| `feat/`     | New feature               | `feat/pet-grooming`         |
+| `fix/`      | Bug fix                   | `fix/weather-crash`         |
+| `refactor/` | Code restructuring        | `refactor/error-handling`   |
+| `docs/`     | Documentation only        | `docs/api-endpoints`        |
+| `chore/`    | Tooling, CI, dependencies | `chore/upgrade-vite`        |
+| `security/` | Security fix or audit     | `security/input-validation` |
 
 ---
 
@@ -310,7 +312,7 @@ Consistent error handling improves reliability and debugging. Follow these patte
 ### PR Requirements
 
 - **Title**: Use a clear, descriptive title (e.g., "Add pet grooming system" not "Updates").
-- **Description**: Explain *what* changed and *why*. Include:
+- **Description**: Explain _what_ changed and _why_. Include:
   - Summary of the changes
   - Related issue number (if applicable)
   - Screenshots for UI changes

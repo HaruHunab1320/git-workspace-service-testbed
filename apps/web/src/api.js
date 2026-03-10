@@ -1,4 +1,9 @@
-import { ApiError, NetworkError, NotFoundError, ValidationError } from './errors';
+import {
+  ApiError,
+  NetworkError,
+  NotFoundError,
+  ValidationError,
+} from './errors';
 
 const BASE = '/api';
 

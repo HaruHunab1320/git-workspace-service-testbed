@@ -19,7 +19,7 @@ export default function PlantModal({
         const data = await api.getAvailableCrops();
         setCrops(data);
         if (data.length > 0) setSelected(data[0].name);
-      } catch (err) {
+      } catch (_err) {
         showToast('Failed to load crops');
       }
       setLoading(false);

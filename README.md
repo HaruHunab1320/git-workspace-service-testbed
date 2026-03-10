@@ -22,13 +22,13 @@ cozy-village/
 
 ### Apps
 
-| App                | Package                        | Description                                                                                                                                                           |
-| ------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App                | Package                        | Description                                                                                                                                                                        |
+| ------------------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **API**            | `@cozy-village/api`            | Python/FastAPI backend powering the simulation. Handles villager AI, weather, farming, pets, economy, crafting, candle workshop, and zen garden logic. Exposes 40+ REST endpoints. |
-| **Web**            | `@cozy-village/web`            | React 18 frontend with 30+ components. Includes ambient features like a lo-fi mixer, fireplace, wind chimes, and starry night sky.                                    |
-| **Beta**           | `@cozy-village/beta`           | A new React + Vite application scaffolded by agent beta, running on port 5175.                                                                                        |
-| **Cozy Companion** | `@cozy-village/cozy-companion` | A wellness and focus companion app with mood tracking, a focus timer, gentle reminders, and a personal journal. Uses the shared `@cozy-village/ui` component library. |
-| **Mood Journal**   | `@cozy-village/mood-journal`   | A minimal standalone mood tracking app with a 6-mood picker. Part of the Cozy Village universe.                                                                       |
+| **Web**            | `@cozy-village/web`            | React 18 frontend with 30+ components. Includes ambient features like a lo-fi mixer, fireplace, wind chimes, and starry night sky.                                                 |
+| **Beta**           | `@cozy-village/beta`           | A new React + Vite application scaffolded by agent beta, running on port 5175.                                                                                                     |
+| **Cozy Companion** | `@cozy-village/cozy-companion` | A wellness and focus companion app with mood tracking, a focus timer, gentle reminders, and a personal journal. Uses the shared `@cozy-village/ui` component library.              |
+| **Mood Journal**   | `@cozy-village/mood-journal`   | A minimal standalone mood tracking app with a 6-mood picker. Part of the Cozy Village universe.                                                                                    |
 
 ### Packages
 

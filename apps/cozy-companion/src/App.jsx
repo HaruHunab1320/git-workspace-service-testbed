@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import {
   PastelCard,
-  PastelButton,
   PastelTabs,
   PastelToast,
   PastelDivider,

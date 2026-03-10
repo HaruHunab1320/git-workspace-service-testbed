@@ -114,7 +114,7 @@ export default function App() {
       await api.advanceDay();
       await fetchStatus();
       await fetchForecast();
-    } catch (err) {
+    } catch (_err) {
       showToast('Failed to advance day');
     }
     setAdvancing(false);
@@ -129,7 +129,7 @@ export default function App() {
       }
       await fetchStatus();
       await fetchForecast();
-    } catch (err) {
+    } catch (_err) {
       showToast('Failed to advance week');
     }
     setAdvancing(false);
@@ -146,7 +146,7 @@ export default function App() {
       await fetchStatus();
       await fetchForecast();
       sounds.success();
-    } catch (err) {
+    } catch (_err) {
       showToast('Failed to start new game');
     }
     setLoading(false);
@@ -239,19 +239,13 @@ export default function App() {
         );
       case 'stars':
         return (
-          <ConstellationGazer
-            showToast={showToast}
-            season={gameState.season}
-          />
+          <ConstellationGazer showToast={showToast} season={gameState.season} />
         );
       case 'tea':
         return <TeaBrewingStation showToast={showToast} />;
       case 'candles':
         return (
-          <CandleWorkshop
-            showToast={showToast}
-            season={gameState.season}
-          />
+          <CandleWorkshop showToast={showToast} season={gameState.season} />
         );
       case 'mixer':
         return <AmbientLofiMixer showToast={showToast} />;

@@ -48,20 +48,20 @@ State resets on process restart. The `/api/new-game` endpoint resets all globals
 
 The backend is split into eight well-separated simulation subsystems:
 
-| Module          | Purpose                                                                      | Lines  |
-| --------------- | ---------------------------------------------------------------------------- | ------ |
-| `game.py`       | Orchestrator — composes subsystems into `advance_day()` loop                 | ~427   |
-| `villagers.py`  | NPC personalities, schedules, friendships, gifts, moods                      | Large  |
-| `weather.py`    | Seasonal weather engine, magical events, village mood                        | Large  |
-| `garden.py`     | Farming: crop types, growth stages, watering, harvesting, companion planting | Large  |
-| `animals.py`    | Pet companions: adoption, bonding, foraging, species profiles                | Large  |
-| `economy.py`    | Market trading: items, seasonal pricing, spoilage, recipes                   | Large  |
-| `crafting.py`   | Recipe and material crafting system                                          | Medium |
+| Module              | Purpose                                                                      | Lines  |
+| ------------------- | ---------------------------------------------------------------------------- | ------ |
+| `game.py`           | Orchestrator — composes subsystems into `advance_day()` loop                 | ~427   |
+| `villagers.py`      | NPC personalities, schedules, friendships, gifts, moods                      | Large  |
+| `weather.py`        | Seasonal weather engine, magical events, village mood                        | Large  |
+| `garden.py`         | Farming: crop types, growth stages, watering, harvesting, companion planting | Large  |
+| `animals.py`        | Pet companions: adoption, bonding, foraging, species profiles                | Large  |
+| `economy.py`        | Market trading: items, seasonal pricing, spoilage, recipes                   | Large  |
+| `crafting.py`       | Recipe and material crafting system                                          | Medium |
 | `zen_garden.py`     | Zen garden: succulents, rocks, raking patterns, harmony scoring              | Medium |
 | `constellations.py` | Seasonal constellation discovery with lore, star maps, and player tracking   | Medium |
 | `swarm.py`          | Firefly particle physics simulation                                          | Small  |
-| `candles.py`        | Candle workshop: scented candle crafting, burn mechanics, mood effects        | Medium |
-| `math_utils.py` | Single `clamp()` utility                                                     | Tiny   |
+| `candles.py`        | Candle workshop: scented candle crafting, burn mechanics, mood effects       | Medium |
+| `math_utils.py`     | Single `clamp()` utility                                                     | Tiny   |
 
 ### Game Loop
 
@@ -166,14 +166,14 @@ The backend is split into eight well-separated simulation subsystems:
 
 Seven test files cover all simulation domains:
 
-| Test File            | Module     | Focus Areas                                                          |
-| -------------------- | ---------- | -------------------------------------------------------------------- |
-| `test_animals.py`    | animals    | Bond tiers, species profiles, mood, foraging                         |
-| `test_economy.py`    | economy    | Seasonal pricing, ingredient costs, spoilage                         |
-| `test_game.py`       | game       | Creation, weather mapping, day advance, player actions               |
-| `test_garden.py`     | garden     | Seasonal crops, growth, watering, harvesting, companion planting     |
-| `test_villagers.py`  | villagers  | Schedules (full year), weather integration, birthday gifts           |
-| `test_weather.py`    | weather    | Calendar, temperature, sky, magical events, festivals, mood, streaks |
+| Test File                | Module         | Focus Areas                                                          |
+| ------------------------ | -------------- | -------------------------------------------------------------------- |
+| `test_animals.py`        | animals        | Bond tiers, species profiles, mood, foraging                         |
+| `test_economy.py`        | economy        | Seasonal pricing, ingredient costs, spoilage                         |
+| `test_game.py`           | game           | Creation, weather mapping, day advance, player actions               |
+| `test_garden.py`         | garden         | Seasonal crops, growth, watering, harvesting, companion planting     |
+| `test_villagers.py`      | villagers      | Schedules (full year), weather integration, birthday gifts           |
+| `test_weather.py`        | weather        | Calendar, temperature, sky, magical events, festivals, mood, streaks |
 | `test_zen_garden.py`     | zen_garden     | Succulents, rocks, tiles, raking, harmony                            |
 | `test_constellations.py` | constellations | Data integrity, discovery logic, season gating, serialization        |
 | `test_candles.py`        | candles        | Crafting, lighting, burn-down, mood effects, workshop state          |

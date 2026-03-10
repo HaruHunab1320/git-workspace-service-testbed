@@ -31,7 +31,11 @@ export default tseslint.config(
     rules: {
       'no-unused-vars': [
         'warn',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
       ],
       'no-console': 'warn',
       eqeqeq: ['error', 'always'],
@@ -53,7 +57,11 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-unused-vars': [
         'warn',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
       ],
       'no-console': 'warn',
       eqeqeq: ['error', 'always'],
@@ -73,6 +81,8 @@ export default tseslint.config(
     },
     rules: {
       'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'error',
+      'react/jsx-uses-vars': 'error',
       'react/prop-types': 'warn',
       'react/jsx-no-target-blank': 'error',
     },

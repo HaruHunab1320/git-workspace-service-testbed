@@ -33,20 +33,20 @@ The `getCozyGreeting(userName)` method returns an object with the following shap
 }
 ```
 
-| Field     | Type     | Description                                                        |
-|-----------|----------|--------------------------------------------------------------------|
-| `message` | `string` | A warm, time-aware greeting that includes the user's name.         |
-| `quote`   | `string` | A cozy, uplifting quote to brighten the moment.                    |
+| Field     | Type     | Description                                                  |
+| --------- | -------- | ------------------------------------------------------------ |
+| `message` | `string` | A warm, time-aware greeting that includes the user's name.   |
+| `quote`   | `string` | A cozy, uplifting quote to brighten the moment.              |
 | `icon`    | `string` | An emoji icon that matches the time of day (☕, 🧸, 🕯️, 🌙). |
 
 ### Greeting Periods
 
-| Time of Day       | Hours       | Example Message                  | Icon |
-|--------------------|-------------|----------------------------------|------|
-| 🌅 Morning        | 5:00–11:59  | "Good morning, Sasha! ☕"        | ☕   |
-| ☀️ Afternoon       | 12:00–16:59 | "Good afternoon, Sasha! 🧸"     | 🧸   |
-| 🕯️ Evening        | 17:00–20:59 | "Good evening, Sasha! 🕯️"      | 🕯️  |
-| 🌙 Night           | 21:00–4:59  | "Rest well, Sasha! 🌙"          | 🌙   |
+| Time of Day  | Hours       | Example Message             | Icon |
+| ------------ | ----------- | --------------------------- | ---- |
+| 🌅 Morning   | 5:00–11:59  | "Good morning, Sasha! ☕"   | ☕   |
+| ☀️ Afternoon | 12:00–16:59 | "Good afternoon, Sasha! 🧸" | 🧸   |
+| 🕯️ Evening   | 17:00–20:59 | "Good evening, Sasha! 🕯️"   | 🕯️   |
+| 🌙 Night     | 21:00–4:59  | "Rest well, Sasha! 🌙"      | 🌙   |
 
 ---
 
@@ -68,8 +68,8 @@ const greeter = new CozyGreetingService();
 const greeting = greeter.getCozyGreeting('Sasha');
 
 console.log(greeting.message); // "Good morning, Sasha! ☕"
-console.log(greeting.quote);   // "A new day is a gentle reminder that you can start again."
-console.log(greeting.icon);    // "☕"
+console.log(greeting.quote); // "A new day is a gentle reminder that you can start again."
+console.log(greeting.icon); // "☕"
 ```
 
 ### Integration Example
@@ -109,9 +109,9 @@ Returns a cozy, time-aware greeting for the given user.
 
 **Parameters:**
 
-| Name       | Type     | Description                        |
-|------------|----------|------------------------------------|
-| `userName` | `string` | The name of the user to greet.     |
+| Name       | Type     | Description                    |
+| ---------- | -------- | ------------------------------ |
+| `userName` | `string` | The name of the user to greet. |
 
 **Returns:** `{ message: string, quote: string, icon: string }`
 

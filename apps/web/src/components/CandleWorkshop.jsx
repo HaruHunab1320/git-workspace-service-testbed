@@ -4,7 +4,7 @@ import './CandleWorkshop.css';
 
 /* alpha */
 
-export default function CandleWorkshop({ showToast, season }) {
+export default function CandleWorkshop({ showToast, season: _season }) {
   const [scents, setScents] = useState([]);
   const [candles, setCandles] = useState([]);
   const [workshopInfo, setWorkshopInfo] = useState(null);
@@ -41,7 +41,7 @@ export default function CandleWorkshop({ showToast, season }) {
       const data = await api.craftCandle(scentKey);
       if (showToast) showToast(data.message);
       await fetchWorkshop();
-    } catch (err) {
+    } catch (_err) {
       if (showToast) showToast('Failed to craft candle');
     }
   };
@@ -51,7 +51,7 @@ export default function CandleWorkshop({ showToast, season }) {
       const data = await api.lightCandle(candleId);
       if (showToast) showToast(data.message);
       await fetchWorkshop();
-    } catch (err) {
+    } catch (_err) {
       if (showToast) showToast('Failed to light candle');
     }
   };
@@ -61,7 +61,7 @@ export default function CandleWorkshop({ showToast, season }) {
       const data = await api.extinguishCandle(candleId);
       if (showToast) showToast(data.message);
       await fetchWorkshop();
-    } catch (err) {
+    } catch (_err) {
       if (showToast) showToast('Failed to extinguish candle');
     }
   };
@@ -71,7 +71,7 @@ export default function CandleWorkshop({ showToast, season }) {
       const data = await api.removeCandle(candleId);
       if (showToast) showToast(data.message);
       await fetchWorkshop();
-    } catch (err) {
+    } catch (_err) {
       if (showToast) showToast('Failed to remove candle');
     }
   };
@@ -90,9 +90,7 @@ export default function CandleWorkshop({ showToast, season }) {
             <span className="candle-stat">
               🕯️ {workshopInfo.total_crafted} crafted
             </span>
-            <span className="candle-stat">
-              🔥 {litCount} lit
-            </span>
+            <span className="candle-stat">🔥 {litCount} lit</span>
             {workshopInfo.total_burned > 0 && (
               <span className="candle-stat">
                 ✨ {workshopInfo.total_burned} fully enjoyed
@@ -183,10 +181,7 @@ export default function CandleWorkshop({ showToast, season }) {
               const burnPct = Math.round(candle.burn_fraction * 100);
               const candleHeight = Math.max(15, candle.burn_fraction * 55);
               return (
-                <div
-                  key={candle.id}
-                  className={`candle-item ${candle.status}`}
-                >
+                <div key={candle.id} className={`candle-item ${candle.status}`}>
                   <div className="candle-visual">
                     {candle.status === 'lit' && (
                       <>

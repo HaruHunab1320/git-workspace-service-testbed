@@ -9,7 +9,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
-import { render, screen, fireEvent, act, within } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // ---------------------------------------------------------------------------
@@ -66,13 +66,17 @@ describe('CompanionDisplay', () => {
     const { container } = render(<CompanionDisplay mood="happy" />);
     const pre = container.querySelector('pre.companion-ascii');
     expect(pre.textContent).toContain('^.^');
-    expect(screen.getByText('Your companion is purring contentedly!')).toBeInTheDocument();
+    expect(
+      screen.getByText('Your companion is purring contentedly!')
+    ).toBeInTheDocument();
   });
 
   it('renders calm mood', () => {
     const { container } = render(<CompanionDisplay mood="calm" />);
     expect(container.querySelector('pre').textContent).toContain('-.-');
-    expect(screen.getByText('A peaceful moment together...')).toBeInTheDocument();
+    expect(
+      screen.getByText('A peaceful moment together...')
+    ).toBeInTheDocument();
   });
 
   it('renders tired mood', () => {
@@ -84,16 +88,20 @@ describe('CompanionDisplay', () => {
   it('renders excited mood', () => {
     const { container } = render(<CompanionDisplay mood="excited" />);
     expect(container.querySelector('pre').textContent).toContain('*.*');
-    expect(screen.getByText('So much energy! What an adventure!')).toBeInTheDocument();
+    expect(
+      screen.getByText('So much energy! What an adventure!')
+    ).toBeInTheDocument();
   });
 
   it('renders anxious mood', () => {
     render(<CompanionDisplay mood="anxious" />);
-    expect(screen.getByText("It's okay. Deep breaths together.")).toBeInTheDocument();
+    expect(
+      screen.getByText("It's okay. Deep breaths together.")
+    ).toBeInTheDocument();
   });
 
   it('shows mood badge when mood is set', () => {
-    const { container } = render(<CompanionDisplay mood="happy" />);
+    const { container: _container } = render(<CompanionDisplay mood="happy" />);
     expect(screen.getByText('happy')).toBeInTheDocument();
   });
 
@@ -111,7 +119,9 @@ describe('CompanionDisplay', () => {
 
   it('changes particles when mood changes', () => {
     const { container, rerender } = render(<CompanionDisplay mood="happy" />);
-    const key1 = container.querySelector('.companion-particles')?.getAttribute('data-reactid');
+    const _key1 = container
+      .querySelector('.companion-particles')
+      ?.getAttribute('data-reactid');
     rerender(<CompanionDisplay mood="calm" />);
     // Particles should re-render (key changes internally)
     const particles = container.querySelectorAll('.companion-particle');
@@ -527,9 +537,7 @@ describe('GentleReminders', () => {
   });
 
   it('does not auto-advance when there is only one reminder', async () => {
-    render(
-      <GentleReminders reminders={['Only one.']} intervalMs={1000} />
-    );
+    render(<GentleReminders reminders={['Only one.']} intervalMs={1000} />);
     await advanceTimers(5000);
     expect(screen.getByText('Only one.')).toBeInTheDocument();
   });
@@ -564,7 +572,9 @@ describe('JournalPanel', () => {
   it('renders empty state when no entries exist', () => {
     render(<JournalPanel showToast={() => {}} />);
     expect(
-      screen.getByText('No entries yet. Start writing to capture your thoughts.')
+      screen.getByText(
+        'No entries yet. Start writing to capture your thoughts.'
+      )
     ).toBeInTheDocument();
   });
 
@@ -602,7 +612,9 @@ describe('JournalPanel', () => {
 
   it('does not save empty entries', () => {
     const showToast = vi.fn();
-    const { container } = render(<JournalPanel showToast={showToast} />);
+    const { container: _container } = render(
+      <JournalPanel showToast={showToast} />
+    );
 
     fireEvent.click(screen.getByText('Save Entry'));
     expect(showToast).not.toHaveBeenCalled();
@@ -659,7 +671,9 @@ describe('JournalPanel', () => {
 
     // Deselect Grateful
     fireEvent.click(screen.getByText('Grateful'));
-    expect(container.querySelector('.journal-tag--selected')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('.journal-tag--selected')
+    ).not.toBeInTheDocument();
   });
 
   it('shows word count when draft has text', () => {
@@ -708,9 +722,9 @@ describe('JournalPanel', () => {
     expect(screen.getByText('To be deleted')).toBeInTheDocument();
 
     // Click delete button (the "x" button)
-    const deleteBtn = screen.getAllByText('x').find(
-      (el) => el.closest('.journal-entry__header')
-    );
+    const deleteBtn = screen
+      .getAllByText('x')
+      .find((el) => el.closest('.journal-entry__header'));
     fireEvent.click(deleteBtn);
 
     // Modal should appear
@@ -734,9 +748,9 @@ describe('JournalPanel', () => {
 
     render(<JournalPanel showToast={() => {}} />);
 
-    const deleteBtn = screen.getAllByText('x').find(
-      (el) => el.closest('.journal-entry__header')
-    );
+    const deleteBtn = screen
+      .getAllByText('x')
+      .find((el) => el.closest('.journal-entry__header'));
     fireEvent.click(deleteBtn);
 
     fireEvent.click(screen.getByText('Cancel'));
@@ -753,7 +767,9 @@ describe('JournalPanel', () => {
     localStorage.setItem('cozy-journal', JSON.stringify(entries));
 
     const { container } = render(<JournalPanel showToast={() => {}} />);
-    expect(container.querySelector('.journal-search__input')).toBeInTheDocument();
+    expect(
+      container.querySelector('.journal-search__input')
+    ).toBeInTheDocument();
   });
 
   it('does not show search bar with 3 or fewer entries', () => {
@@ -764,7 +780,9 @@ describe('JournalPanel', () => {
     localStorage.setItem('cozy-journal', JSON.stringify(entries));
 
     const { container } = render(<JournalPanel showToast={() => {}} />);
-    expect(container.querySelector('.journal-search__input')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('.journal-search__input')
+    ).not.toBeInTheDocument();
   });
 
   it('filters entries by search query', () => {
@@ -816,13 +834,13 @@ describe('JournalPanel', () => {
     const searchInput = container.querySelector('.journal-search__input');
     fireEvent.change(searchInput, { target: { value: 'nonexistent' } });
 
-    expect(screen.getByText('No entries match your search.')).toBeInTheDocument();
+    expect(
+      screen.getByText('No entries match your search.')
+    ).toBeInTheDocument();
   });
 
   it('loads entries from localStorage on mount', () => {
-    const entries = [
-      { id: 1, text: 'Persisted entry', tags: [], date: 'Mon' },
-    ];
+    const entries = [{ id: 1, text: 'Persisted entry', tags: [], date: 'Mon' }];
     localStorage.setItem('cozy-journal', JSON.stringify(entries));
 
     render(<JournalPanel showToast={() => {}} />);
@@ -834,7 +852,9 @@ describe('JournalPanel', () => {
 
     render(<JournalPanel showToast={() => {}} />);
     expect(
-      screen.getByText('No entries yet. Start writing to capture your thoughts.')
+      screen.getByText(
+        'No entries yet. Start writing to capture your thoughts.'
+      )
     ).toBeInTheDocument();
   });
 });
@@ -918,7 +938,10 @@ describe('SettingsPanel', () => {
 
     // Confirm reset
     fireEvent.click(screen.getByText('Reset'));
-    expect(showToast).toHaveBeenCalledWith('Settings reset to defaults', 'info');
+    expect(showToast).toHaveBeenCalledWith(
+      'Settings reset to defaults',
+      'info'
+    );
 
     // Name should be reset
     expect(nameInput.value).toBe('Mochi');
@@ -1257,7 +1280,7 @@ describe('useDailyCheckIn', () => {
   });
 
   it('submits a check-in and updates state', () => {
-    const { result, rerender } = renderHook(() => useDailyCheckIn());
+    const { result, rerender: _rerender } = renderHook(() => useDailyCheckIn());
 
     act(() => {
       result.current.submitCheckIn({
@@ -1312,7 +1335,11 @@ describe('useDailyCheckIn', () => {
       result.current.submitCheckIn({ mood: 'happy', energy: null, note: '' });
     });
     act(() => {
-      result.current.submitCheckIn({ mood: 'tired', energy: 'low', note: 'changed' });
+      result.current.submitCheckIn({
+        mood: 'tired',
+        energy: 'low',
+        note: 'changed',
+      });
     });
 
     expect(result.current.todayCheckIn.mood).toBe('tired');
@@ -1338,9 +1365,30 @@ describe('useDailyCheckIn', () => {
     dayBefore.setDate(dayBefore.getDate() - 2);
 
     const history = [
-      { id: 3, date: today.toISOString(), mood: 'happy', energy: null, note: '', companionResponse: '' },
-      { id: 2, date: yesterday.toISOString(), mood: 'calm', energy: null, note: '', companionResponse: '' },
-      { id: 1, date: dayBefore.toISOString(), mood: 'tired', energy: null, note: '', companionResponse: '' },
+      {
+        id: 3,
+        date: today.toISOString(),
+        mood: 'happy',
+        energy: null,
+        note: '',
+        companionResponse: '',
+      },
+      {
+        id: 2,
+        date: yesterday.toISOString(),
+        mood: 'calm',
+        energy: null,
+        note: '',
+        companionResponse: '',
+      },
+      {
+        id: 1,
+        date: dayBefore.toISOString(),
+        mood: 'tired',
+        energy: null,
+        note: '',
+        companionResponse: '',
+      },
     ];
     localStorage.setItem('cozy-checkin-history', JSON.stringify(history));
 
@@ -1355,7 +1403,14 @@ describe('useDailyCheckIn', () => {
     localStorage.setItem(
       'cozy-checkin-history',
       JSON.stringify([
-        { id: 1, date: twoDaysAgo.toISOString(), mood: 'happy', energy: null, note: '', companionResponse: '' },
+        {
+          id: 1,
+          date: twoDaysAgo.toISOString(),
+          mood: 'happy',
+          energy: null,
+          note: '',
+          companionResponse: '',
+        },
       ])
     );
 
@@ -1392,7 +1447,11 @@ describe('useDailyCheckIn', () => {
     moods.forEach((mood) => {
       let response;
       act(() => {
-        response = result.current.submitCheckIn({ mood, energy: null, note: '' });
+        response = result.current.submitCheckIn({
+          mood,
+          energy: null,
+          note: '',
+        });
       });
       expect(typeof response).toBe('string');
       expect(response.length).toBeGreaterThan(0);
@@ -1435,7 +1494,9 @@ describe('App', () => {
   it('renders a greeting message', () => {
     render(<App />);
     // One of the four greetings should be displayed
-    const greeting = screen.getByText(/Good (morning|afternoon|evening)|Late night/);
+    const greeting = screen.getByText(
+      /Good (morning|afternoon|evening)|Late night/
+    );
     expect(greeting).toBeInTheDocument();
   });
 
