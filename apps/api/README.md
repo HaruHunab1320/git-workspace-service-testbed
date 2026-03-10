@@ -44,7 +44,6 @@ cozy-village/
     │
     └── utils/                 # @cozy-village/utils — Shared utility functions
         ├── greet.js
-        ├── hello.js
         └── shuffle.js
 ```
 

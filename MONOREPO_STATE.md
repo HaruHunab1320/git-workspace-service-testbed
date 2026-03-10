@@ -98,7 +98,7 @@
 ### 3. `packages/utils` -- Shared Utilities (`@cozy-village/utils`)
 
 - **Type:** Utility library
-- **Contents:** `greet.js` (greeting generator), `shuffle.js` (Fisher-Yates shuffle), `hello.js` (console utility), `weather.js` (deterministic weather forecast generator using seeded PRNG / mulberry32)
+- **Contents:** `greet.js` (greeting generator), `shuffle.js` (Fisher-Yates shuffle), `weather.js` (deterministic weather forecast generator using seeded PRNG / mulberry32)
 - **No framework dependencies**
 
 ---
@@ -136,7 +136,6 @@
 | `BACKEND_STATUS.md`  | Backend implementation status and details                     |
 | `FRONTEND_STATUS.md` | Frontend implementation status and details                    |
 | `TEA_RECIPES.md`     | Tea recipe content for the tea brewing feature                |
-| `CLAUDE_TEST.md`     | Test marker file                                              |
 | `docs/logging.md`    | Logger utility API documentation                              |
 
 ---
