@@ -85,6 +85,76 @@ npx turbo dev --filter=@cozy-village/cozy-companion
 - **Candle Workshop** -- Craft scented candles (8 scents) that burn down over game days and boost village mood
 - **Journal** -- Personal entry system tied to in-game days
 - **Cozy Break** -- A wellness utility with relaxation timers and comforting messages for developers. See [docs/cozy_feature.md](./docs/cozy_feature.md)
+- **Daily Quote** -- A deterministic cozy quote of the day, themed around hygge, tea, reading, nature, and gentle productivity
+
+## Cozy Features
+
+### Daily Quote Generator
+
+Start each day with a little warmth. The **Cozy Daily Quote** service delivers a gentle, thoughtful quote every day — drawing from themes like hygge, tea, reading, nature, and slow living. Because sometimes the best feature is a reminder to breathe.
+
+Every user sees the same quote on the same day: the selection is deterministic based on the current date, so your whole team shares the same moment of calm.
+
+#### Quick Start
+
+```ts
+import { getDailyQuote } from './src/utils/quoteGenerator';
+
+// Get today's cozy quote
+const { quote, author, theme } = getDailyQuote();
+
+console.log(`"${quote}" — ${author}`);
+// => "Nature does not hurry, yet everything is accomplished." — Lao Tzu
+console.log(`Theme: ${theme}`);
+// => Theme: nature
+```
+
+#### API
+
+**`getDailyQuote(date?: Date): { quote: string; author: string; theme: string }`**
+
+| Parameter | Type   | Default      | Description                            |
+| --------- | ------ | ------------ | -------------------------------------- |
+| `date`    | `Date` | `new Date()` | The date to select a quote for.        |
+
+**Returns** an object with:
+
+| Field    | Type     | Description                                                         |
+| -------- | -------- | ------------------------------------------------------------------- |
+| `quote`  | `string` | The quote text.                                                     |
+| `author` | `string` | Who said or wrote it.                                               |
+| `theme`  | `string` | The cozy category (e.g. `hygge`, `tea`, `reading`, `nature`).       |
+
+#### Integrating into the UI
+
+Drop the quote into any component — a welcome banner, a sidebar widget, or a loading screen:
+
+```tsx
+import { getDailyQuote } from './src/utils/quoteGenerator';
+
+function DailyQuoteBanner() {
+  const { quote, author, theme } = getDailyQuote();
+
+  return (
+    <div className={`quote-banner theme-${theme}`}>
+      <p className="quote-text">"{quote}"</p>
+      <span className="quote-author">— {author}</span>
+    </div>
+  );
+}
+```
+
+Because the quote is date-deterministic (no network call, no randomness), it works perfectly in server-rendered and static contexts too — no loading spinners needed.
+
+#### Themes
+
+Quotes are tagged with cozy themes you can use for styling or filtering:
+
+- **hygge** — Danish comfort and togetherness
+- **tea** — The ritual of a warm cup
+- **reading** — The joy of getting lost in a book
+- **nature** — Stillness, seasons, and the outdoors
+- **gentle productivity** — Doing things at your own pace
 
 ## Logger
 
