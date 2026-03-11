@@ -1,0 +1,486 @@
+/* ============================================================
+   Wind Chimes — Gentle Ambient Chime Widget
+   ============================================================ */
+
+.windchimes-widget {
+  position: fixed;
+  bottom: 80px;
+  left: 150px;
+  z-index: 91;
+  font-family: inherit;
+}
+
+/* ---- Floating Action Button (collapsed) ---- */
+
+.windchimes-fab {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #b8cfe0, #92b4cc);
+  color: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(146, 180, 204, 0.35);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: visible;
+}
+
+.windchimes-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 18px rgba(146, 180, 204, 0.5);
+}
+
+.windchimes-fab.active {
+  background: linear-gradient(135deg, #92b4cc, #6a98b8);
+  box-shadow: 0 4px 18px rgba(106, 152, 184, 0.45);
+}
+
+.windchimes-fab-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+  z-index: 2;
+}
+
+.windchimes-fab-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(146, 180, 204, 0.5);
+  animation: windchimes-ring-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes windchimes-ring-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* ---- Expanded Panel ---- */
+
+.windchimes-panel {
+  width: 240px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(74, 55, 40, 0.18);
+  overflow: hidden;
+  animation: windchimes-slide-up 0.3s ease;
+  padding-bottom: 10px;
+}
+
+@keyframes windchimes-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.windchimes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 6px;
+}
+
+.windchimes-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--brown-light);
+}
+
+.windchimes-collapse-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: var(--tan-light);
+  color: var(--brown-light);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.windchimes-collapse-btn:hover {
+  background: var(--tan);
+  color: var(--brown);
+}
+
+/* ---- Chime Visualization ---- */
+
+.windchimes-visual {
+  position: relative;
+  height: 110px;
+  margin: 4px 16px 8px;
+  border-radius: var(--radius);
+  background: linear-gradient(to bottom, #e8eef5 0%, #d4dfe8 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* Horizontal crossbar */
+.windchimes-bar {
+  width: 70%;
+  height: 4px;
+  background: linear-gradient(to right, #a08060, #c8a878, #a08060);
+  border-radius: 2px;
+  margin-top: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 2;
+}
+
+/* Hanging tubes */
+.windchimes-tubes {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 2px;
+  transform-origin: top center;
+  transition: transform 0.15s ease;
+  z-index: 2;
+}
+
+.windchimes-tubes.sway {
+  animation: windchimes-sway 1.2s ease-in-out;
+}
+
+@keyframes windchimes-sway {
+  0% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(3deg);
+  }
+  30% {
+    transform: rotate(-2.5deg);
+  }
+  45% {
+    transform: rotate(2deg);
+  }
+  60% {
+    transform: rotate(-1.5deg);
+  }
+  75% {
+    transform: rotate(1deg);
+  }
+  90% {
+    transform: rotate(-0.5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.chime-tube {
+  width: 4px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(to bottom, #c0c8d0, #a0aab4, #d0d8e0);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.5);
+  transform-origin: top center;
+}
+
+.tube-1 {
+  height: 40px;
+}
+.tube-2 {
+  height: 52px;
+}
+.tube-3 {
+  height: 58px;
+}
+.tube-4 {
+  height: 48px;
+}
+.tube-5 {
+  height: 36px;
+}
+
+/* Wind sail at bottom */
+.windchimes-sail {
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #c8a878, #b09060);
+  border-radius: 50%;
+  margin-top: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transform-origin: top center;
+  transition: transform 0.15s ease;
+  z-index: 2;
+}
+
+.windchimes-sail.sway {
+  animation: windchimes-sail-sway 1.2s ease-in-out;
+}
+
+@keyframes windchimes-sail-sway {
+  0% {
+    transform: rotate(0deg) translateX(0);
+  }
+  15% {
+    transform: rotate(4deg) translateX(3px);
+  }
+  30% {
+    transform: rotate(-3deg) translateX(-2px);
+  }
+  45% {
+    transform: rotate(2.5deg) translateX(2px);
+  }
+  60% {
+    transform: rotate(-2deg) translateX(-1.5px);
+  }
+  75% {
+    transform: rotate(1deg) translateX(1px);
+  }
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+}
+
+/* Subtle breeze lines (decorative) */
+.windchimes-visual::before,
+.windchimes-visual::after {
+  content: '';
+  position: absolute;
+  height: 1px;
+  background: rgba(146, 180, 204, 0.3);
+  border-radius: 1px;
+  z-index: 1;
+}
+
+.windchimes-visual::before {
+  width: 30px;
+  top: 35px;
+  right: 12px;
+  animation: breeze-line 4s ease-in-out infinite;
+}
+
+.windchimes-visual::after {
+  width: 24px;
+  top: 55px;
+  left: 10px;
+  animation: breeze-line 4.5s ease-in-out infinite 1s;
+}
+
+@keyframes breeze-line {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  30% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.4;
+    transform: translateX(8px);
+  }
+  70% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+/* ---- Toggle Row ---- */
+
+.windchimes-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px 6px;
+}
+
+.windchimes-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--brown-light);
+}
+
+.windchimes-toggle {
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.25s;
+  padding: 0;
+}
+
+.windchimes-toggle.on {
+  background: #6a98b8;
+}
+
+.windchimes-toggle.off {
+  background: var(--tan-light);
+}
+
+.windchimes-toggle-knob {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: 2px;
+  transition: left 0.25s;
+}
+
+.windchimes-toggle.on .windchimes-toggle-knob {
+  left: 20px;
+}
+
+.windchimes-toggle.off .windchimes-toggle-knob {
+  left: 2px;
+}
+
+/* ---- Pace Controls ---- */
+
+.windchimes-pace {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 16px 8px;
+}
+
+.windchimes-pace-btn {
+  padding: 5px 12px;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: #e8eef5;
+  color: var(--brown-light);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.windchimes-pace-btn:hover {
+  background: #d4dfe8;
+  color: var(--brown);
+}
+
+.windchimes-pace-btn.active {
+  background: linear-gradient(135deg, #6a98b8, #5280a0);
+  color: var(--white);
+  border-color: #4a7090;
+}
+
+/* ---- Volume Control ---- */
+
+.windchimes-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 6px;
+}
+
+.windchimes-volume-icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.windchimes-volume-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--tan-light);
+  outline: none;
+  cursor: pointer;
+}
+
+.windchimes-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6a98b8;
+  border: 2px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.windchimes-volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.windchimes-volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6a98b8;
+  border: 2px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+/* ---- Hint ---- */
+
+.windchimes-hint {
+  text-align: center;
+  padding: 4px 14px 0;
+  font-size: 0.65rem;
+  color: var(--brown-light);
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* ---- Night mode overrides ---- */
+
+body.stars-active .windchimes-panel {
+  background: #223050;
+}
+
+body.stars-active .windchimes-title,
+body.stars-active .windchimes-label,
+body.stars-active .windchimes-hint {
+  color: #8a9ab8;
+}
+
+body.stars-active .windchimes-visual {
+  background: linear-gradient(to bottom, #1e2d4a 0%, #162240 100%);
+}
+
+body.stars-active .windchimes-pace-btn {
+  background: #1e2d4a;
+  color: #8a9ab8;
+}
+
+body.stars-active .windchimes-pace-btn:hover {
+  background: #2a3d5e;
+  color: #c0cce0;
+}
