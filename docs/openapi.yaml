@@ -1,0 +1,59 @@
+openapi: 3.0.3
+info:
+  title: Git Workspace Service API
+  version: 1.0.0
+  description: API for the Git Workspace Service.
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      description: >
+        Returns the current health status of the service, including app version,
+        git commit hash, process uptime in seconds, and database connectivity.
+      operationId: getHealth
+      tags:
+        - health
+      responses:
+        "200":
+          description: Service health information.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                version: "1.0.0"
+                commit: "abc1234"
+                uptime: 123.45
+                database: "connected"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - version
+        - commit
+        - uptime
+        - database
+      properties:
+        version:
+          type: string
+          description: Application version (semver).
+          example: "1.0.0"
+        commit:
+          type: string
+          description: Git commit SHA the service was built from.
+          example: "abc1234"
+        uptime:
+          type: number
+          format: double
+          description: Process uptime in seconds.
+          example: 123.45
+        database:
+          type: string
+          enum:
+            - connected
+            - disconnected
+          description: Current database connectivity status.
+          example: "connected"
