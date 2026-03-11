@@ -1,4 +1,4 @@
-const { checkConnection } = require('../db');
+const db = require('../db');
 
 const startTime = Date.now();
 
@@ -11,7 +11,7 @@ async function healthHandler(req, res) {
   let statusCode = 503;
 
   try {
-    const isConnected = await checkConnection();
+    const isConnected = await db.checkConnection();
     if (isConnected) {
       databaseStatus = 'connected';
       statusCode = 200;
