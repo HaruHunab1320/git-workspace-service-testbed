@@ -1,0 +1,144 @@
+.zen-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--brown-light);
+}
+
+.zen-harmony {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.harmony-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--sage-dark);
+  white-space: nowrap;
+}
+
+.harmony-desc {
+  font-size: 0.8rem;
+  color: var(--brown-light);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+.zen-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.zen-rake-options {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.zen-grid {
+  display: grid;
+  gap: 5px;
+  margin-bottom: 12px;
+  background: #e8ddd0;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+
+.zen-tile {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5ede2;
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-height: 65px;
+  cursor: pointer;
+  animation: cozy-scale-in 0.3s ease both;
+}
+
+.zen-tile.empty {
+  border: 2px dashed #ddd0be;
+  background: #f5ede2;
+}
+
+.zen-tile.empty:hover {
+  border-color: var(--sage);
+  background: rgba(122, 158, 126, 0.08);
+}
+
+.zen-tile.raked {
+  border: 2px solid #ddd0be;
+  background: #f0e6d8;
+}
+
+.zen-tile.succulent {
+  border: 2px solid var(--sage-light);
+  background: #eef5e8;
+}
+
+.zen-tile.succulent.blooming {
+  border-color: var(--rose-light);
+  background: #fef0f0;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.zen-tile.succulent.rare {
+  box-shadow: 0 0 8px rgba(180, 140, 255, 0.3);
+}
+
+.zen-tile.rock {
+  border: 2px solid #c4b8a8;
+  background: #e8e0d5;
+}
+
+.zen-tile.rock.special {
+  box-shadow: 0 0 8px rgba(232, 168, 73, 0.4);
+}
+
+.tile-emoji {
+  font-size: 1.6rem;
+  transition: transform 0.3s ease;
+}
+
+.zen-tile:hover .tile-emoji {
+  transform: scale(1.15);
+}
+
+.tile-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--brown-light);
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.zen-legend {
+  display: flex;
+  gap: 14px;
+  font-size: 0.8rem;
+  color: var(--brown-light);
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.zen-hint {
+  font-size: 0.75rem;
+  color: var(--brown-light);
+  font-style: italic;
+}

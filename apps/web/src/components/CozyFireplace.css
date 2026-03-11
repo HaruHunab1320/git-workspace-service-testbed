@@ -1,0 +1,691 @@
+/* ============================================================
+   Cozy Fireplace — Ambient Crackling Fire Widget
+   ============================================================ */
+
+.fireplace-widget {
+  position: fixed;
+  bottom: 80px;
+  left: 80px;
+  z-index: 90;
+  font-family: inherit;
+}
+
+/* ---- Floating Action Button (collapsed) ---- */
+
+.fireplace-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #e8a849, #d4944a);
+  color: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(232, 168, 73, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: visible;
+}
+
+.fireplace-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(232, 168, 73, 0.45);
+}
+
+.fireplace-fab.lit {
+  background: linear-gradient(135deg, #e87040, #d44a2a);
+  box-shadow: 0 4px 20px rgba(232, 100, 50, 0.4);
+}
+
+.fireplace-fab-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+  z-index: 2;
+}
+
+.fireplace-fab-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 120, 40, 0.3), transparent 70%);
+  animation: fireplace-glow-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes fireplace-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.15);
+  }
+}
+
+/* ---- Expanded Panel ---- */
+
+.fireplace-panel {
+  width: 260px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(74, 55, 40, 0.18);
+  overflow: hidden;
+  animation: fireplace-slide-up 0.3s ease;
+}
+
+@keyframes fireplace-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fireplace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+}
+
+.fireplace-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--brown-light);
+}
+
+.fireplace-collapse-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: var(--tan-light);
+  color: var(--brown-light);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.fireplace-collapse-btn:hover {
+  background: var(--tan);
+  color: var(--brown);
+}
+
+/* ---- Fire Visualization ---- */
+
+.fireplace-hearth {
+  position: relative;
+  height: 120px;
+  margin: 4px 16px 8px;
+  border-radius: var(--radius);
+  background: linear-gradient(to top, #2a1a0e 0%, #3a2518 40%, #4a3020 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.fireplace-logs {
+  position: absolute;
+  bottom: 8px;
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+}
+
+.fireplace-log {
+  width: 40px;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to bottom, #6b4226, #4a2e18);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.fireplace-log:nth-child(2) {
+  width: 44px;
+  transform: rotate(-8deg) translateY(-4px);
+}
+
+.fireplace-log:nth-child(3) {
+  width: 36px;
+  transform: rotate(5deg) translateY(-2px);
+}
+
+/* ---- Fire Flames ---- */
+
+.fireplace-flames {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  z-index: 3;
+  transition: opacity 0.5s ease;
+}
+
+.flame {
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  position: relative;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  filter: blur(0.5px);
+}
+
+.flame-core {
+  width: 20px;
+  height: 50px;
+  background: linear-gradient(
+    to top,
+    #ff4500 0%,
+    #ff6b35 30%,
+    #ffa040 60%,
+    #ffcc40 85%,
+    #fff8a0 100%
+  );
+  animation: flame-dance-core 0.4s ease-in-out infinite alternate;
+  z-index: 3;
+}
+
+.flame-mid-left {
+  width: 16px;
+  height: 38px;
+  background: linear-gradient(
+    to top,
+    #ff4500 0%,
+    #ff6b35 40%,
+    #ffa040 80%,
+    #ffcc40 100%
+  );
+  margin-right: -6px;
+  animation: flame-dance-left 0.5s ease-in-out infinite alternate;
+  z-index: 2;
+}
+
+.flame-mid-right {
+  width: 16px;
+  height: 38px;
+  background: linear-gradient(
+    to top,
+    #ff4500 0%,
+    #ff6b35 40%,
+    #ffa040 80%,
+    #ffcc40 100%
+  );
+  margin-left: -6px;
+  animation: flame-dance-right 0.45s ease-in-out infinite alternate;
+  z-index: 2;
+}
+
+.flame-outer-left {
+  width: 12px;
+  height: 26px;
+  background: linear-gradient(to top, #ff4500 0%, #ff6b35 50%, #ffa040 100%);
+  margin-right: -4px;
+  animation: flame-dance-outer 0.55s ease-in-out infinite alternate;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+.flame-outer-right {
+  width: 12px;
+  height: 26px;
+  background: linear-gradient(to top, #ff4500 0%, #ff6b35 50%, #ffa040 100%);
+  margin-left: -4px;
+  animation: flame-dance-outer 0.5s ease-in-out infinite alternate-reverse;
+  opacity: 0.8;
+  z-index: 1;
+}
+
+@keyframes flame-dance-core {
+  0% {
+    height: 50px;
+    transform: scaleX(1) translateY(0);
+  }
+  25% {
+    height: 46px;
+    transform: scaleX(0.95) translateY(2px);
+  }
+  50% {
+    height: 52px;
+    transform: scaleX(1.02) translateY(-1px);
+  }
+  75% {
+    height: 48px;
+    transform: scaleX(0.98) translateY(1px);
+  }
+  100% {
+    height: 50px;
+    transform: scaleX(1.03) translateY(0);
+  }
+}
+
+@keyframes flame-dance-left {
+  0% {
+    height: 38px;
+    transform: rotate(-3deg) scaleX(1);
+  }
+  50% {
+    height: 34px;
+    transform: rotate(-6deg) scaleX(0.9);
+  }
+  100% {
+    height: 40px;
+    transform: rotate(-2deg) scaleX(1.05);
+  }
+}
+
+@keyframes flame-dance-right {
+  0% {
+    height: 38px;
+    transform: rotate(3deg) scaleX(1);
+  }
+  50% {
+    height: 36px;
+    transform: rotate(5deg) scaleX(0.92);
+  }
+  100% {
+    height: 40px;
+    transform: rotate(2deg) scaleX(1.04);
+  }
+}
+
+@keyframes flame-dance-outer {
+  0% {
+    height: 26px;
+    transform: rotate(-5deg);
+  }
+  50% {
+    height: 22px;
+    transform: rotate(-8deg);
+  }
+  100% {
+    height: 28px;
+    transform: rotate(-3deg);
+  }
+}
+
+/* ---- Embers (floating sparks) ---- */
+
+.fireplace-embers {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.ember {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffaa30;
+  box-shadow: 0 0 4px #ff6b20;
+  animation: ember-float 2s ease-out infinite;
+  opacity: 0;
+}
+
+.ember:nth-child(1) {
+  left: 30%;
+  animation-delay: 0s;
+}
+.ember:nth-child(2) {
+  left: 50%;
+  animation-delay: 0.4s;
+}
+.ember:nth-child(3) {
+  left: 70%;
+  animation-delay: 0.8s;
+}
+.ember:nth-child(4) {
+  left: 40%;
+  animation-delay: 1.2s;
+}
+.ember:nth-child(5) {
+  left: 60%;
+  animation-delay: 1.6s;
+}
+
+@keyframes ember-float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-50px) translateX(10px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* ---- Warm glow on hearth ---- */
+
+.fireplace-glow {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 60px;
+  background: radial-gradient(
+    ellipse at bottom center,
+    rgba(255, 140, 40, 0.4) 0%,
+    rgba(255, 100, 30, 0.2) 40%,
+    transparent 70%
+  );
+  z-index: 1;
+  animation: glow-flicker 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-flicker {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.75;
+  }
+}
+
+/* ---- Intensity Variations ---- */
+
+.intensity-embers .flame {
+  transform: scale(0.3);
+  opacity: 0.5;
+}
+.intensity-embers .fireplace-glow {
+  opacity: 0.3;
+}
+.intensity-embers .ember {
+  animation-duration: 4s;
+}
+
+.intensity-low .flame {
+  transform: scale(0.6);
+}
+.intensity-low .fireplace-glow {
+  opacity: 0.6;
+}
+
+.intensity-medium .flame {
+  transform: scale(0.85);
+}
+.intensity-medium .fireplace-glow {
+  opacity: 0.85;
+}
+
+.intensity-roaring .flame {
+  transform: scale(1.1);
+}
+.intensity-roaring .fireplace-glow {
+  opacity: 1;
+}
+.intensity-roaring .ember {
+  animation-duration: 1.4s;
+}
+
+/* ---- Intensity Controls ---- */
+
+.fireplace-intensity {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 16px 8px;
+}
+
+.fireplace-intensity-btn {
+  padding: 5px 12px;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background: #fef0e0;
+  color: var(--brown-light);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.fireplace-intensity-btn:hover {
+  background: #fce0c0;
+  color: var(--brown);
+}
+
+.fireplace-intensity-btn.active {
+  background: linear-gradient(135deg, #e87040, #d44a2a);
+  color: var(--white);
+  border-color: #c04030;
+}
+
+/* ---- Volume Control ---- */
+
+.fireplace-volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 10px;
+}
+
+.fireplace-volume-icon {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.fireplace-volume-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--tan-light);
+  outline: none;
+  cursor: pointer;
+}
+
+.fireplace-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #e87040;
+  border: 2px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.fireplace-volume-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.fireplace-volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #e87040;
+  border: 2px solid var(--white);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+/* ---- Marshmallow Toasting ---- */
+
+.fireplace-marshmallow-area {
+  border-top: 1px solid #fef0e0;
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.fireplace-marshmallow-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--brown-light);
+  letter-spacing: 0.5px;
+}
+
+.marshmallow-stick {
+  position: relative;
+  width: 100px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marshmallow-skewer {
+  position: absolute;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(to right, #8b7355, #a08060);
+  border-radius: 2px;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%) rotate(-5deg);
+}
+
+.marshmallow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 26px;
+  border-radius: 6px;
+  transition: all 0.5s ease;
+  z-index: 2;
+}
+
+.marshmallow.raw {
+  background: linear-gradient(135deg, #fff8f0, #f5efe5);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.marshmallow.warming {
+  background: linear-gradient(135deg, #fff0d0, #f0dbb8);
+  box-shadow: 0 1px 6px rgba(232, 168, 73, 0.2);
+}
+
+.marshmallow.golden {
+  background: linear-gradient(135deg, #e8c878, #d4a850);
+  box-shadow: 0 2px 8px rgba(212, 168, 80, 0.3);
+}
+
+.marshmallow.perfect {
+  background: linear-gradient(135deg, #c8882a, #b07020);
+  box-shadow: 0 2px 10px rgba(176, 112, 32, 0.4);
+  animation: marshmallow-sizzle 0.3s ease-in-out infinite alternate;
+}
+
+.marshmallow.burnt {
+  background: linear-gradient(135deg, #3a2a1a, #2a1a0e);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes marshmallow-sizzle {
+  from {
+    transform: translateY(-50%) scale(1);
+  }
+  to {
+    transform: translateY(-50%) scale(1.04);
+  }
+}
+
+.marshmallow-status {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--brown-light);
+  min-height: 16px;
+}
+
+.marshmallow-status.perfect {
+  color: #c8882a;
+}
+
+.marshmallow-status.burnt {
+  color: var(--rose);
+}
+
+.fireplace-toast-btn {
+  padding: 5px 14px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #e8a849, #d4944a);
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fireplace-toast-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d4944a, #c08040);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(212, 148, 74, 0.3);
+}
+
+.fireplace-toast-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Night mode overrides ---- */
+
+body.stars-active .fireplace-panel {
+  background: #223050;
+}
+
+body.stars-active .fireplace-title,
+body.stars-active .fireplace-marshmallow-label {
+  color: #8a9ab8;
+}
+
+body.stars-active .fireplace-intensity-btn {
+  background: #1e2d4a;
+  color: #8a9ab8;
+}
+
+body.stars-active .fireplace-intensity-btn:hover {
+  background: #2a3d5e;
+  color: #c0cce0;
+}
+
+body.stars-active .fireplace-marshmallow-area {
+  border-top-color: #2a3d5e;
+}
+
+body.stars-active .marshmallow-status {
+  color: #8a9ab8;
+}

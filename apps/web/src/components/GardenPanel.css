@@ -1,0 +1,98 @@
+.garden-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--brown-light);
+}
+
+.garden-grid {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.garden-plot {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-height: 70px;
+  animation: cozy-scale-in 0.3s ease both;
+}
+
+.garden-plot.empty {
+  cursor: pointer;
+  border: 2px dashed var(--tan-light);
+  background: transparent;
+}
+
+.garden-plot.empty:hover {
+  border-color: var(--sage);
+  background: rgba(122, 158, 126, 0.08);
+}
+
+.garden-plot.planted {
+  border: 2px solid var(--sage-light);
+  background: #f0f7e8;
+}
+
+.plot-emoji {
+  font-size: 1.8rem;
+  transition: transform 0.3s ease;
+}
+
+.garden-plot:hover .plot-emoji {
+  transform: scale(1.15);
+}
+
+.garden-plot.planted .plot-emoji {
+  animation: gentle-sway 3s ease-in-out infinite;
+}
+
+@keyframes gentle-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(2deg);
+  }
+  75% {
+    transform: rotate(-2deg);
+  }
+}
+
+.plot-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--brown-light);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.plot-watered {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.7rem;
+}
+
+.garden-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--brown-light);
+  flex-wrap: wrap;
+}

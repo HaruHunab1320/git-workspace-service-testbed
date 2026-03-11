@@ -1,0 +1,129 @@
+/* ============================================================
+   Zen Garden — Tool Palette
+   ============================================================ */
+
+.zen-palette {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.zen-palette-tools {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.zen-tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 16px;
+  border: 2px solid var(--tan-light);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  min-width: 68px;
+}
+
+.zen-tool-btn:hover {
+  border-color: var(--sage-light);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.zen-tool-btn.active {
+  border-color: var(--sage);
+  background: #f0f7e8;
+  box-shadow: 0 0 0 3px rgba(122, 158, 126, 0.15);
+}
+
+.zen-tool-emoji {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.zen-tool-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--brown-light);
+}
+
+.zen-tool-btn.active .zen-tool-label {
+  color: var(--sage-dark);
+}
+
+/* ---- Sub-options ---- */
+
+.zen-palette-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  animation: zenSubFadeIn 0.2s ease;
+}
+
+.zen-sub-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--brown-light);
+  margin-right: 4px;
+}
+
+.zen-sub-btn {
+  padding: 4px 12px;
+  border: 2px solid var(--tan-light);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--brown);
+  transition: all 0.15s;
+}
+
+.zen-sub-btn:hover {
+  border-color: var(--sage-light);
+}
+
+.zen-sub-btn.active {
+  border-color: var(--sage);
+  background: var(--sage);
+  color: var(--white);
+}
+
+.zen-color-btn {
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zen-color-swatch {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.zen-color-btn.active .zen-color-swatch {
+  border-color: var(--white);
+  box-shadow: 0 0 0 2px var(--sage);
+}
+
+@keyframes zenSubFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
