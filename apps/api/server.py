@@ -7,6 +7,9 @@ frontend can query and mutate game state via JSON.
 
 from __future__ import annotations
 
+import json
+import time
+
 from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -63,6 +66,47 @@ async def cozy_village_error_handler(request, exc: CozyVillageError):
         status_code=exc.status_code,
         content={"detail": exc.message},
     )
+
+# ---------------------------------------------------------------------------
+# Health endpoint
+# ---------------------------------------------------------------------------
+
+_start_time = time.monotonic()
+
+def _read_version() -> str:
+    try:
+        with open(_os.path.join(_os.path.dirname(__file__), "package.json")) as f:
+            return json.load(f).get("version", "unknown")
+    except Exception:
+        return "unknown"
+
+_app_version = _read_version()
+_git_commit = _os.environ.get("GIT_COMMIT", "unknown")
+
+# Database connectivity checker — replaceable for testing and future use.
+# Currently the app uses in-memory state only (no real database), so the
+# default always returns True.  When a database is added, swap this out.
+_db_check = lambda: True
+
+
+@app.get("/api/health")
+async def health():
+    uptime = round(time.monotonic() - _start_time, 2)
+    try:
+        db_ok = _db_check()
+    except Exception:
+        db_ok = False
+
+    healthy = db_ok
+    body = {
+        "status": "ok" if healthy else "error",
+        "version": _app_version,
+        "commit": _git_commit,
+        "uptime": uptime,
+        "database": "connected" if db_ok else "disconnected",
+    }
+    return JSONResponse(content=body, status_code=200 if healthy else 503)
+
 
 # Single in-memory game instance
 game: CozyVillageGame = CozyVillageGame.create_default(seed=42)
