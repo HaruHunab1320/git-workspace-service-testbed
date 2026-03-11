@@ -3,7 +3,7 @@ const express = require('express');
 
 // Mock the db module before requiring the health router
 jest.mock('../../src/db', () => ({
-  query: jest.fn(),
+  ping: jest.fn(),
 }));
 
 const db = require('../../src/db');
@@ -11,7 +11,7 @@ const healthRouter = require('../../src/api/health');
 
 function createApp() {
   const app = express();
-  app.use('/api/health', healthRouter);
+  app.use(healthRouter);
   return app;
 }
 
@@ -21,6 +21,7 @@ const originalUptime = process.uptime;
 
 afterEach(() => {
   jest.restoreAllMocks();
+  db.ping.mockReset();
   process.env.GIT_COMMIT = originalEnv;
   process.uptime = originalUptime;
 });
@@ -30,7 +31,7 @@ describe('GET /api/health', () => {
 
   describe('when all checks pass', () => {
     beforeEach(() => {
-      db.query.mockResolvedValue({ rows: [{ '?column?': 1 }] });
+      db.ping.mockResolvedValue(true);
       process.env.GIT_COMMIT = 'abc1234';
       process.uptime = () => 42;
     });
@@ -56,9 +57,10 @@ describe('GET /api/health', () => {
       expect(res.body.commit).toBe('abc1234');
     });
 
-    it('returns uptime as a number', async () => {
+    it('returns uptime as an integer (seconds)', async () => {
       const res = await request(createApp()).get('/api/health');
       expect(typeof res.body.uptime).toBe('number');
+      expect(Number.isInteger(res.body.uptime)).toBe(true);
       expect(res.body.uptime).toBeGreaterThanOrEqual(0);
     });
 
@@ -84,7 +86,7 @@ describe('GET /api/health', () => {
 
   describe('when the database is unreachable', () => {
     beforeEach(() => {
-      db.query.mockRejectedValue(new Error('connection refused'));
+      db.ping.mockRejectedValue(new Error('connection refused'));
       process.env.GIT_COMMIT = 'abc1234';
       process.uptime = () => 10;
     });
@@ -117,7 +119,7 @@ describe('GET /api/health', () => {
 
   describe('when the database query times out', () => {
     beforeEach(() => {
-      db.query.mockRejectedValue(new Error('query timeout'));
+      db.ping.mockRejectedValue(new Error('query timeout'));
       process.env.GIT_COMMIT = 'def5678';
       process.uptime = () => 100;
     });
@@ -134,7 +136,7 @@ describe('GET /api/health', () => {
 
   describe('when GIT_COMMIT is not set', () => {
     beforeEach(() => {
-      db.query.mockResolvedValue({ rows: [{ '?column?': 1 }] });
+      db.ping.mockResolvedValue(true);
       delete process.env.GIT_COMMIT;
       process.uptime = () => 5;
     });
@@ -154,7 +156,7 @@ describe('GET /api/health', () => {
 
   describe('response schema', () => {
     beforeEach(() => {
-      db.query.mockResolvedValue({ rows: [{ '?column?': 1 }] });
+      db.ping.mockResolvedValue(true);
       process.env.GIT_COMMIT = 'schema-test';
       process.uptime = () => 1;
     });
@@ -191,7 +193,7 @@ describe('GET /api/health', () => {
 
   describe('unsupported methods', () => {
     beforeEach(() => {
-      db.query.mockResolvedValue({ rows: [{ '?column?': 1 }] });
+      db.ping.mockResolvedValue(true);
       process.env.GIT_COMMIT = 'abc1234';
     });
 
@@ -215,21 +217,14 @@ describe('GET /api/health', () => {
 
   describe('database ping', () => {
     beforeEach(() => {
-      db.query.mockResolvedValue({ rows: [{ '?column?': 1 }] });
+      db.ping.mockResolvedValue(true);
       process.env.GIT_COMMIT = 'abc1234';
       process.uptime = () => 1;
     });
 
-    it('calls db.query exactly once per request', async () => {
+    it('calls db.ping exactly once per request', async () => {
       await request(createApp()).get('/api/health');
-      expect(db.query).toHaveBeenCalledTimes(1);
-    });
-
-    it('executes a minimal query (SELECT 1 or similar)', async () => {
-      await request(createApp()).get('/api/health');
-      const queryArg = db.query.mock.calls[0][0];
-      expect(typeof queryArg).toBe('string');
-      expect(queryArg.toLowerCase()).toMatch(/select\s+1/);
+      expect(db.ping).toHaveBeenCalledTimes(1);
     });
   });
 });
