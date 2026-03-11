@@ -1,9 +1,0 @@
-{
-  "name": "@cozy-village/api",
-  "private": true,
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "uvicorn server:app --reload",
-    "test": "pytest"
-  }
-}
