@@ -1,0 +1,12 @@
+{
+  "name": "service-testbed",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test tests/"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
