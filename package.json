@@ -1,0 +1,17 @@
+{
+  "name": "git-workspace-service-testbed",
+  "version": "1.0.0",
+  "description": "Service testbed with health endpoint",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "pg": "^8.13.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
