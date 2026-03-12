@@ -1,0 +1,28 @@
+{
+  "name": "73bcef60-2f99-44f9-b4ab-a34f50f6ae60",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HaruHunab1320/git-workspace-service-testbed.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HaruHunab1320/git-workspace-service-testbed/issues"
+  },
+  "homepage": "https://github.com/HaruHunab1320/git-workspace-service-testbed#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2"
+  }
+}
