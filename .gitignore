@@ -1,3 +1,4 @@
+node_modules/
 
 # orchestrator-injected (do not commit agent config/memory files)
 CLAUDE.md
