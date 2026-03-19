@@ -37,7 +37,7 @@ export interface NervState {
 
 function computeMagiStatus(votes: MagiVotes): MagiStatus {
   const approvals = [votes.melchior, votes.balthasar, votes.casper].filter(Boolean).length;
-  if (approvals === 3) return 'AGREE';
+  if (approvals >= 2) return 'AGREE';
   if (approvals === 0) return 'DISAGREE';
   return 'CONFLICT';
 }

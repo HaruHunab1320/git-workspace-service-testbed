@@ -95,7 +95,7 @@ export default function NervTerminal() {
             useNervStore.getState().setMagiVotes(votes);
             const approvals = [melchior, balthasar, casper].filter(Boolean).length;
             const consensus = approvals >= 2;
-            const status = approvals === 3 ? 'AGREE' : approvals === 0 ? 'DISAGREE' : 'CONFLICT';
+            const status = approvals >= 2 ? 'AGREE' : approvals === 0 ? 'DISAGREE' : 'CONFLICT';
             outputLines.push(
               { type: 'output', text: '[SYSTEM_REPORT] MAGI VOTING INITIATED...' },
               { type: 'output', text: `[SYSTEM_REPORT]   MELCHIOR-1  : ${melchior ? 'APPROVE' : 'REJECT'}` },
