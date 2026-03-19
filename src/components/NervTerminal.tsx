@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNervStore } from '../store/useNervStore';
+import type { NervState, EmergencyLevel } from '../store/useNervStore';
 
 interface TerminalLine {
   type: 'input' | 'output' | 'error' | 'system';
@@ -17,6 +18,43 @@ const BOOT_MESSAGES: string[] = [
   '',
 ];
 
+/**
+ * Formats a MAGI vote boolean as a display string.
+ * @param vote - The boolean vote value
+ * @returns 'APPROVE' or 'REJECT'
+ */
+function eva_formatVote(vote: boolean): string {
+  return vote ? 'APPROVE' : 'REJECT';
+}
+
+/**
+ * Determines the consensus result from the current MAGI status.
+ * @param approvedCount - Number of MAGI subsystems that approved
+ * @returns Formatted consensus result string
+ */
+function eva_consensusResult(approvedCount: number): string {
+  return approvedCount >= 2
+    ? 'PRIORITY: APPROVED (2/3 consensus reached)'
+    : 'PRIORITY: REJECTED (consensus not reached)';
+}
+
+/** Selector for terminal-relevant state slices. */
+const selectTerminalState = (state: NervState) => ({
+  emergencyLevel: state.emergencyLevel,
+  syncRatios: state.syncRatios,
+  magiVotes: state.magiVotes,
+  magiStatus: state.magiStatus,
+  systemAlerts: state.systemAlerts,
+  setEmergencyLevel: state.setEmergencyLevel,
+  randomizeMagiVotes: state.randomizeMagiVotes,
+  addSystemAlert: state.addSystemAlert,
+});
+
+/**
+ * NERV Command Terminal — command-line interface for NERV operators.
+ * Provides system status inspection, MAGI voting, and emergency signal control.
+ * Reads and writes state via the global `useNervStore`.
+ */
 export default function NervTerminal() {
   const [history, setHistory] = useState<TerminalLine[]>(
     BOOT_MESSAGES.map((text) => ({ type: 'system', text })),
@@ -27,7 +65,16 @@ export default function NervTerminal() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const store = useNervStore();
+  const {
+    emergencyLevel,
+    syncRatios,
+    magiVotes,
+    magiStatus,
+    systemAlerts,
+    setEmergencyLevel,
+    randomizeMagiVotes,
+    addSystemAlert,
+  } = useNervStore(selectTerminalState);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -53,15 +100,44 @@ export default function NervTerminal() {
         case 'system': {
           if (flag === '--status') {
             outputLines.push(
-              { type: 'output', text: '--- NERV SYSTEM STATUS ---' },
-              { type: 'output', text: `Emergency Level : ${store.emergencyLevel}` },
-              { type: 'output', text: `Sync Ratio      : ${store.syncRatio.toFixed(1)}%` },
-              { type: 'output', text: `MAGI Votes:` },
-              { type: 'output', text: `  MELCHIOR-1  : ${store.magiVotes.melchior ? 'APPROVE' : 'REJECT'}` },
-              { type: 'output', text: `  BALTHASAR-2 : ${store.magiVotes.balthasar ? 'APPROVE' : 'REJECT'}` },
-              { type: 'output', text: `  CASPER-3    : ${store.magiVotes.casper ? 'APPROVE' : 'REJECT'}` },
-              { type: 'output', text: '--------------------------' },
+              { type: 'output', text: '[SYSTEM_REPORT] --- NERV SYSTEM STATUS ---' },
+              { type: 'output', text: `[SYSTEM_REPORT] Emergency Level : ${emergencyLevel}` },
+              { type: 'output', text: `[SYSTEM_REPORT] MAGI Status     : ${magiStatus}` },
             );
+
+            // Per-pilot sync ratios
+            const pilotIds = Object.keys(syncRatios);
+            outputLines.push({ type: 'output', text: '[SYSTEM_REPORT] Sync Ratios:' });
+            if (pilotIds.length === 0) {
+              outputLines.push({ type: 'output', text: '[SYSTEM_REPORT]   (no pilots registered)' });
+            } else {
+              for (const pilotId of pilotIds) {
+                outputLines.push({
+                  type: 'output',
+                  text: `[SYSTEM_REPORT]   ${pilotId} : ${syncRatios[pilotId].toFixed(1)}%`,
+                });
+              }
+            }
+
+            outputLines.push(
+              { type: 'output', text: '[SYSTEM_REPORT] MAGI Votes:' },
+              { type: 'output', text: `[SYSTEM_REPORT]   MELCHIOR-1  : ${eva_formatVote(magiVotes.melchior)}` },
+              { type: 'output', text: `[SYSTEM_REPORT]   BALTHASAR-2 : ${eva_formatVote(magiVotes.balthasar)}` },
+              { type: 'output', text: `[SYSTEM_REPORT]   CASPER-3    : ${eva_formatVote(magiVotes.casper)}` },
+            );
+
+            // System alerts
+            if (systemAlerts.length === 0) {
+              outputLines.push({ type: 'output', text: '[SYSTEM_REPORT] System Alerts   : NONE' });
+            } else {
+              outputLines.push({ type: 'output', text: `[SYSTEM_REPORT] System Alerts   : ${systemAlerts.length} active` });
+              for (const alert of systemAlerts) {
+                const message = typeof alert === 'string' ? alert : alert.message;
+                outputLines.push({ type: 'error', text: `[SYSTEM_REPORT]   - ${message}` });
+              }
+            }
+
+            outputLines.push({ type: 'output', text: '[SYSTEM_REPORT] --------------------------' });
           } else {
             outputLines.push({
               type: 'error',
@@ -73,24 +149,19 @@ export default function NervTerminal() {
 
         case 'magi': {
           if (flag === '--vote') {
-            const melchior = Math.random() > 0.5;
-            const balthasar = Math.random() > 0.5;
-            const casper = Math.random() > 0.5;
-            useNervStore.setState({
-              magiVotes: { melchior, balthasar, casper },
-            });
-            const approved = [melchior, balthasar, casper].filter(Boolean).length >= 2;
+            randomizeMagiVotes();
+            // Read the freshly randomized votes from the store
+            const freshState = useNervStore.getState();
+            const votes = freshState.magiVotes;
+            const approvedCount = [votes.melchior, votes.balthasar, votes.casper].filter(Boolean).length;
+
             outputLines.push(
-              { type: 'output', text: 'MAGI VOTING INITIATED...' },
-              { type: 'output', text: `  MELCHIOR-1  : ${melchior ? 'APPROVE' : 'REJECT'}` },
-              { type: 'output', text: `  BALTHASAR-2 : ${balthasar ? 'APPROVE' : 'REJECT'}` },
-              { type: 'output', text: `  CASPER-3    : ${casper ? 'APPROVE' : 'REJECT'}` },
-              {
-                type: 'system',
-                text: approved
-                  ? 'PRIORITY: APPROVED (2/3 consensus reached)'
-                  : 'PRIORITY: REJECTED (consensus not reached)',
-              },
+              { type: 'output', text: '[SYSTEM_REPORT] MAGI VOTING INITIATED...' },
+              { type: 'output', text: `[SYSTEM_REPORT]   MELCHIOR-1  : ${eva_formatVote(votes.melchior)}` },
+              { type: 'output', text: `[SYSTEM_REPORT]   BALTHASAR-2 : ${eva_formatVote(votes.balthasar)}` },
+              { type: 'output', text: `[SYSTEM_REPORT]   CASPER-3    : ${eva_formatVote(votes.casper)}` },
+              { type: 'system', text: `[SYSTEM_REPORT] ${eva_consensusResult(approvedCount)}` },
+              { type: 'system', text: `[SYSTEM_REPORT] MAGI STATUS: ${freshState.magiStatus}` },
             );
           } else {
             outputLines.push({
@@ -103,23 +174,24 @@ export default function NervTerminal() {
 
         case 'signal': {
           if (flag === '--emergency') {
-            useNervStore.setState({ emergencyLevel: 'EMERGENCY' });
+            setEmergencyLevel('EMERGENCY');
+            addSystemAlert({ message: 'EMERGENCY SIGNAL ACTIVATED BY OPERATOR', level: 'EMERGENCY' });
             outputLines.push(
-              { type: 'error', text: '!!! EMERGENCY SIGNAL ACTIVATED !!!' },
-              { type: 'error', text: 'All units to battle stations.' },
-              { type: 'error', text: 'Emergency level set to: EMERGENCY' },
+              { type: 'error', text: '[SYSTEM_REPORT] !!! EMERGENCY SIGNAL ACTIVATED !!!' },
+              { type: 'error', text: '[SYSTEM_REPORT] All units to battle stations.' },
+              { type: 'error', text: '[SYSTEM_REPORT] Emergency level set to: EMERGENCY' },
             );
           } else if (flag === '--alert') {
-            useNervStore.setState({ emergencyLevel: 'ALERT' });
+            setEmergencyLevel('ALERT');
             outputLines.push(
-              { type: 'system', text: 'ALERT STATUS ACTIVATED.' },
-              { type: 'system', text: 'Emergency level set to: ALERT' },
+              { type: 'system', text: '[SYSTEM_REPORT] ALERT STATUS ACTIVATED.' },
+              { type: 'system', text: '[SYSTEM_REPORT] Emergency level set to: ALERT' },
             );
           } else if (flag === '--normal') {
-            useNervStore.setState({ emergencyLevel: 'NORMAL' });
+            setEmergencyLevel('NORMAL');
             outputLines.push(
-              { type: 'output', text: 'All clear. Returning to normal operations.' },
-              { type: 'output', text: 'Emergency level set to: NORMAL' },
+              { type: 'output', text: '[SYSTEM_REPORT] All clear. Returning to normal operations.' },
+              { type: 'output', text: '[SYSTEM_REPORT] Emergency level set to: NORMAL' },
             );
           } else {
             outputLines.push({
@@ -160,7 +232,7 @@ export default function NervTerminal() {
 
       appendLines(outputLines);
     },
-    [store.emergencyLevel, store.syncRatio, store.magiVotes, appendLines],
+    [emergencyLevel, syncRatios, magiVotes, magiStatus, systemAlerts, setEmergencyLevel, randomizeMagiVotes, addSystemAlert, appendLines],
   );
 
   const handleSubmit = (e: React.FormEvent) => {
