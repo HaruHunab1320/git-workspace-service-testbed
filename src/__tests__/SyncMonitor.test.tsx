@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SyncMonitor from '../components/SyncMonitor';
@@ -8,8 +7,14 @@ import { useNervStore } from '../store/useNervStore';
 jest.mock('../store/useNervStore');
 const mockUseNervStore = useNervStore as unknown as jest.Mock;
 
+/**
+ * Default NERV state used across all SyncMonitor tests.
+ * Includes all state properties and action stubs so selector functions
+ * never throw on missing keys.
+ */
 const defaultState = {
   emergencyLevel: 'NORMAL' as const,
+  syncRatio: 100,
   syncRatios: {} as Record<string, number>,
   magiStatus: 'DISAGREE' as const,
   magiVotes: { melchior: false, balthasar: false, casper: false },
@@ -30,6 +35,10 @@ const defaultState = {
   resetEmergency: jest.fn(),
 };
 
+/**
+ * Helper to mock the store with specific sync ratios and emergency level.
+ * Uses the selector-compatible mockImplementation pattern.
+ */
 function mockStore(
   syncRatios: Record<string, number>,
   emergencyLevel: 'NORMAL' | 'ALERT' | 'EMERGENCY' = 'NORMAL',
@@ -194,6 +203,30 @@ describe('SyncMonitor', () => {
       mockStore({ [TEST_PILOT_ID]: 80 }, 'NORMAL');
       render(<SyncMonitor />);
       expect(screen.queryByTestId('emergency-warning')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Pattern Blue — Emergency Overlay (direct state)', () => {
+    it('renders emergency warning when systemAlerts is populated and level is EMERGENCY', () => {
+      const state = {
+        ...defaultState,
+        syncRatios: { [TEST_PILOT_ID]: 75 },
+        systemAlerts: [
+          {
+            id: 'alert-1',
+            message: 'PATTERN BLUE DETECTED — ANGEL APPROACHING',
+            level: 'EMERGENCY' as const,
+            timestamp: Date.now(),
+          },
+        ],
+        emergencyLevel: 'EMERGENCY' as const,
+      };
+      mockUseNervStore.mockImplementation((selector?: (s: typeof state) => unknown) => {
+        if (typeof selector === 'function') return selector(state);
+        return state;
+      });
+      render(<SyncMonitor />);
+      expect(screen.getByTestId('emergency-warning')).toBeInTheDocument();
     });
   });
 });
