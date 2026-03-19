@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { EvaPosition, HexCoordinate } from '../types/nerv.d';
 
 export type EmergencyLevel = 'NORMAL' | 'ALERT' | 'EMERGENCY';
 
@@ -28,6 +29,7 @@ export interface NervState {
   magiVotes: MagiVotes;
   magiStatus: MagiStatus;
   systemAlerts: SystemAlert[];
+  evaPositions: EvaPosition[];
   angelDetected: boolean;
 
   setEmergencyLevel: (level: EmergencyLevel) => void;
@@ -38,6 +40,8 @@ export interface NervState {
   randomizeMagiVotes: () => void;
   addSystemAlert: (alert: Omit<SystemAlert, 'id' | 'timestamp'>) => void;
   clearSystemAlerts: () => void;
+  updateEvaPosition: (pilotId: string, unitId: string, hexCoordinate: HexCoordinate) => void;
+  removeEvaPosition: (pilotId: string) => void;
   triggerAngelDetected: () => void;
   resetEmergency: () => void;
 }
@@ -61,6 +65,7 @@ export const useNervStore = create<NervState>((set) => ({
   },
   magiStatus: 'DISAGREE',
   systemAlerts: [],
+  evaPositions: [],
   angelDetected: false,
 
   setEmergencyLevel: (level) => set({ emergencyLevel: level }),
@@ -109,6 +114,23 @@ export const useNervStore = create<NervState>((set) => ({
     })),
 
   clearSystemAlerts: () => set({ systemAlerts: [] }),
+
+  updateEvaPosition: (pilotId, unitId, hexCoordinate) =>
+    set((state) => {
+      const existing = state.evaPositions.findIndex((p: EvaPosition) => p.pilotId === pilotId);
+      const newPosition: EvaPosition = { pilotId, unitId, hexCoordinate, timestamp: Date.now() };
+      if (existing >= 0) {
+        const updated = [...state.evaPositions];
+        updated[existing] = newPosition;
+        return { evaPositions: updated };
+      }
+      return { evaPositions: [...state.evaPositions, newPosition] };
+    }),
+
+  removeEvaPosition: (pilotId) =>
+    set((state) => ({
+      evaPositions: state.evaPositions.filter((p: EvaPosition) => p.pilotId !== pilotId),
+    })),
 
   triggerAngelDetected: () =>
     set((state) => ({
