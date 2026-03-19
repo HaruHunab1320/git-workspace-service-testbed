@@ -1,7 +1,7 @@
 
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import GeoFrontMap from '../components/GeoFrontMap';
+import GeoFrontMap from '../ui/map/GeoFrontMap';
 import { useNervStore } from '../store/useNervStore';
 
 // Mock the store
@@ -107,11 +107,11 @@ describe('GeoFrontMap', () => {
       expect(statusLabel.className).not.toContain('animate-pulse');
     });
 
-    it('uses green center label color during NORMAL state', () => {
+    it('uses NERV Red center label color during NORMAL state', () => {
       mockStore('NORMAL');
       const { container } = render(<GeoFrontMap />);
       const textElement = container.querySelector('text');
-      expect(textElement).toHaveAttribute('fill', '#39FF14');
+      expect(textElement).toHaveAttribute('fill', '#FF3300');
     });
 
     it('uses orange center label color during EMERGENCY state', () => {

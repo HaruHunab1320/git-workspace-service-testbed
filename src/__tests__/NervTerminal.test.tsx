@@ -121,7 +121,7 @@ describe('NervTerminal', () => {
       mockStore();
       render(<NervTerminal />);
       submitCommand('signal --emergency');
-      expect(mockSetState).toHaveBeenCalledWith({ emergencyLevel: 'EMERGENCY' });
+      expect(defaultState.setEmergencyLevel).toHaveBeenCalledWith('EMERGENCY');
       expect(screen.getByText(/EMERGENCY SIGNAL ACTIVATED/)).toBeInTheDocument();
     });
 
@@ -129,7 +129,7 @@ describe('NervTerminal', () => {
       mockStore();
       render(<NervTerminal />);
       submitCommand('signal --alert');
-      expect(mockSetState).toHaveBeenCalledWith({ emergencyLevel: 'ALERT' });
+      expect(defaultState.setEmergencyLevel).toHaveBeenCalledWith('ALERT');
       expect(screen.getByText(/ALERT STATUS ACTIVATED/)).toBeInTheDocument();
     });
 
@@ -137,7 +137,7 @@ describe('NervTerminal', () => {
       mockStore({ emergencyLevel: 'EMERGENCY' });
       render(<NervTerminal />);
       submitCommand('signal --normal');
-      expect(mockSetState).toHaveBeenCalledWith({ emergencyLevel: 'NORMAL' });
+      expect(defaultState.setEmergencyLevel).toHaveBeenCalledWith('NORMAL');
       expect(screen.getByText(/Returning to normal operations/)).toBeInTheDocument();
     });
   });

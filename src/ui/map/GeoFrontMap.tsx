@@ -127,7 +127,8 @@ const GeoFrontMap: React.FC = () => {
   const evaByHex = useMemo(() => {
     const map = new Map<string, EvaPosition>();
     for (const pos of evaPositions) {
-      map.set(pos.hexCoordinate, pos);
+      const key = `${pos.hexCoordinate.row}-${pos.hexCoordinate.col}`;
+      map.set(key, pos);
     }
     return map;
   }, [evaPositions]);

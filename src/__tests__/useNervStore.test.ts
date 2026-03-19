@@ -123,7 +123,7 @@ describe('useNervStore', () => {
     it('adds a system alert', () => {
       useNervStore.getState().addSystemAlert({
         message: 'Test alert',
-        level: 'ALERT',
+        level: 'WARNING',
       });
       const alerts = useNervStore.getState().systemAlerts;
       expect(alerts).toHaveLength(1);
@@ -133,7 +133,7 @@ describe('useNervStore', () => {
     });
 
     it('clears all system alerts', () => {
-      useNervStore.getState().addSystemAlert({ message: 'Alert 1', level: 'ALERT' });
+      useNervStore.getState().addSystemAlert({ message: 'Alert 1', level: 'WARNING' });
       useNervStore.getState().addSystemAlert({ message: 'Alert 2', level: 'EMERGENCY' });
       expect(useNervStore.getState().systemAlerts).toHaveLength(2);
 
@@ -144,23 +144,23 @@ describe('useNervStore', () => {
 
   describe('EVA positions', () => {
     it('adds a new EVA position', () => {
-      useNervStore.getState().updateEvaPosition('pilot-01', 'EVA-01', '3-4');
+      useNervStore.getState().updateEvaPosition('pilot-01', 'EVA-01', { row: 3, col: 4 });
       const positions = useNervStore.getState().evaPositions;
       expect(positions).toHaveLength(1);
       expect(positions[0].pilotId).toBe('pilot-01');
-      expect(positions[0].hexCoordinate).toBe('3-4');
+      expect(positions[0].hexCoordinate).toEqual({ row: 3, col: 4 });
     });
 
     it('updates an existing EVA position', () => {
-      useNervStore.getState().updateEvaPosition('pilot-01', 'EVA-01', '3-4');
-      useNervStore.getState().updateEvaPosition('pilot-01', 'EVA-01', '5-6');
+      useNervStore.getState().updateEvaPosition('pilot-01', 'EVA-01', { row: 3, col: 4 });
+      useNervStore.getState().updateEvaPosition('pilot-01', 'EVA-01', { row: 5, col: 6 });
       const positions = useNervStore.getState().evaPositions;
       expect(positions).toHaveLength(1);
-      expect(positions[0].hexCoordinate).toBe('5-6');
+      expect(positions[0].hexCoordinate).toEqual({ row: 5, col: 6 });
     });
 
     it('removes an EVA position', () => {
-      useNervStore.getState().updateEvaPosition('pilot-01', 'EVA-01', '3-4');
+      useNervStore.getState().updateEvaPosition('pilot-01', 'EVA-01', { row: 3, col: 4 });
       useNervStore.getState().removeEvaPosition('pilot-01');
       expect(useNervStore.getState().evaPositions).toHaveLength(0);
     });

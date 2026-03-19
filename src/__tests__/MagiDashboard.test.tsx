@@ -153,7 +153,7 @@ describe('MagiDashboard', () => {
       );
       render(<MagiDashboard />);
       // MagiDashboard still renders with MAGI data during emergency
-      expect(screen.getByTestId('consensus')).toBeInTheDocument();
+      expect(screen.getByTestId('consensus-result')).toBeInTheDocument();
     });
   });
 });
