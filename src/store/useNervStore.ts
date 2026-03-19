@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-
-export type EmergencyLevel = 'NORMAL' | 'ALERT' | 'EMERGENCY';
+import type { MagiStatus, SystemAlert, SyncRatios } from '../types/nerv';
 
 export interface MagiVotes {
   melchior: boolean;
@@ -8,20 +7,32 @@ export interface MagiVotes {
   casper: boolean;
 }
 
+function deriveMagiStatus(votes: MagiVotes): MagiStatus {
+  const count = [votes.melchior, votes.balthasar, votes.casper].filter(Boolean).length;
+  if (count >= 2) return 'AGREE';
+  if (count === 1) return 'CONFLICT';
+  return 'DISAGREE';
+}
+
 export interface NervState {
-  emergencyLevel: EmergencyLevel;
-  syncRatio: number;
+  syncRatios: SyncRatios;
   magiVotes: MagiVotes;
-  setEmergencyLevel: (level: EmergencyLevel) => void;
-  setSyncRatio: (ratio: number) => void;
+  magiStatus: MagiStatus;
+  systemAlerts: SystemAlert[];
+  setSyncRatios: (ratios: SyncRatios) => void;
   setMagiVotes: (votes: MagiVotes) => void;
+  addSystemAlert: (alert: SystemAlert) => void;
+  clearSystemAlerts: () => void;
 }
 
 export const useNervStore = create<NervState>((set) => ({
-  emergencyLevel: 'NORMAL',
-  syncRatio: 0,
+  syncRatios: {},
   magiVotes: { melchior: false, balthasar: false, casper: false },
-  setEmergencyLevel: (level) => set({ emergencyLevel: level }),
-  setSyncRatio: (ratio) => set({ syncRatio: ratio }),
-  setMagiVotes: (votes) => set({ magiVotes: votes }),
+  magiStatus: 'DISAGREE',
+  systemAlerts: [],
+  setSyncRatios: (ratios) => set({ syncRatios: ratios }),
+  setMagiVotes: (votes) => set({ magiVotes: votes, magiStatus: deriveMagiStatus(votes) }),
+  addSystemAlert: (alert) =>
+    set((state) => ({ systemAlerts: [...state.systemAlerts, alert] })),
+  clearSystemAlerts: () => set({ systemAlerts: [] }),
 }));

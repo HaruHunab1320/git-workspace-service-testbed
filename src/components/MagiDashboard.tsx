@@ -2,14 +2,24 @@ import React from 'react';
 import { useNervStore } from '../store/useNervStore';
 
 const MagiDashboard: React.FC = () => {
-  const { magiVotes } = useNervStore();
+  const { magiVotes, magiStatus, systemAlerts } = useNervStore();
 
-  const approvedCount = [magiVotes.melchior, magiVotes.balthasar, magiVotes.casper].filter(Boolean).length;
-  const consensus = approvedCount >= 2;
+  const consensus = magiStatus === 'AGREE';
+  const hasEmergencyAlerts = systemAlerts.length > 0;
 
   return (
-    <div className="bg-black text-[#39FF14] border-1 border-[#FF9900] font-mono p-4">
-      <h2 className="text-xl mb-4">MAGI SYSTEM</h2>
+    <div className="bg-[#050505] text-[#39FF14] border-1 border-[#FF9900] font-['Share_Tech_Mono'] p-4 relative">
+      {hasEmergencyAlerts && (
+        <div
+          data-testid="emergency-overlay"
+          className="absolute inset-0 bg-[#FF3300]/20 border-2 border-[#FF3300] animate-pulse z-10 flex items-center justify-center"
+        >
+          <span className="text-[#FF3300] text-2xl font-bold tracking-widest">
+            [SYSTEM_REPORT] EMERGENCY ACTIVE
+          </span>
+        </div>
+      )}
+      <h2 className="text-xl mb-4">[SYSTEM_REPORT] MAGI SYSTEM</h2>
       <div className="space-y-2">
         <div data-testid="melchior" className={magiVotes.melchior ? 'text-[#39FF14]' : 'text-[#FF9900]'}>
           MELCHIOR-1: {magiVotes.melchior ? 'APPROVE' : 'REJECT'}
@@ -25,7 +35,10 @@ const MagiDashboard: React.FC = () => {
         data-testid="consensus"
         className={`mt-4 text-lg font-bold ${consensus ? 'text-[#39FF14]' : 'text-[#FF9900]'}`}
       >
-        {consensus ? 'PRIORITY: APPROVED' : 'PRIORITY: REJECTED'}
+        {consensus ? 'PRIORITY: APPROVED' : magiStatus === 'CONFLICT' ? 'PRIORITY: CONFLICT' : 'PRIORITY: REJECTED'}
+      </div>
+      <div data-testid="magi-status" className="mt-2 text-xs opacity-60">
+        MAGI STATUS: {magiStatus}
       </div>
     </div>
   );

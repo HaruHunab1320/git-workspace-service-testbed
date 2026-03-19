@@ -36,7 +36,6 @@ function buildGrid(): HexCell[] {
   return cells;
 }
 
-// Determine which hexes are in the "GeoFront dome" shape (roughly oval center region)
 function isInDome(row: number, col: number): boolean {
   const centerRow = (ROWS - 1) / 2;
   const centerCol = (COLS - 1) / 2;
@@ -46,7 +45,9 @@ function isInDome(row: number, col: number): boolean {
 }
 
 const GeoFrontMap: React.FC = () => {
-  const emergencyLevel = useNervStore((s) => s.emergencyLevel);
+  const { systemAlerts } = useNervStore();
+  const hasEmergency = systemAlerts.some((a) => a.level === 'EMERGENCY');
+  const hasWarning = systemAlerts.some((a) => a.level === 'WARNING');
 
   const grid = useMemo(() => buildGrid(), []);
 
@@ -57,37 +58,46 @@ const GeoFrontMap: React.FC = () => {
 
   const fillForHex = (row: number, col: number): string => {
     const dome = isInDome(row, col);
-    if (emergencyLevel === 'EMERGENCY') {
+    if (hasEmergency) {
       return dome ? '#FF9900' : '#331800';
     }
-    if (emergencyLevel === 'ALERT') {
+    if (hasWarning) {
       return dome ? '#FF9900' : '#1a1a00';
     }
-    // NORMAL
     return dome ? '#39FF14' : '#0a1a00';
   };
 
   const strokeForHex = (row: number, col: number): string => {
-    if (emergencyLevel === 'EMERGENCY') return '#FF9900';
+    if (hasEmergency) return '#FF9900';
     return isInDome(row, col) ? '#39FF14' : '#1a3a00';
   };
 
   return (
-    <div className="bg-black border-1 border-[#FF9900] p-4 font-mono">
+    <div className="bg-[#050505] border-1 border-[#FF9900] p-4 font-['Share_Tech_Mono'] relative">
+      {systemAlerts.length > 0 && (
+        <div
+          data-testid="emergency-overlay"
+          className="absolute inset-0 bg-[#FF3300]/20 border-2 border-[#FF3300] animate-pulse z-10 flex items-center justify-center"
+        >
+          <span className="text-[#FF3300] text-2xl font-bold tracking-widest">
+            [SYSTEM_REPORT] EMERGENCY ACTIVE
+          </span>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-2">
         <span className="text-[#39FF14] text-xs tracking-widest uppercase">
           GeoFront Topology Map
         </span>
         <span
           className={`text-xs tracking-wider ${
-            emergencyLevel === 'EMERGENCY'
-              ? 'text-red-500 animate-pulse'
-              : emergencyLevel === 'ALERT'
+            hasEmergency
+              ? 'text-[#FF3300] animate-pulse'
+              : hasWarning
                 ? 'text-[#FF9900]'
                 : 'text-[#39FF14]'
           }`}
         >
-          [{emergencyLevel}]
+          [{hasEmergency ? 'EMERGENCY' : hasWarning ? 'ALERT' : 'NORMAL'}]
         </span>
       </div>
 
@@ -117,7 +127,7 @@ const GeoFrontMap: React.FC = () => {
         {grid.map((cell) => {
           const dome = isInDome(cell.row, cell.col);
           const glowFilter =
-            emergencyLevel === 'EMERGENCY' && dome
+            hasEmergency && dome
               ? 'url(#glow-orange)'
               : dome
                 ? 'url(#glow-green)'
@@ -126,6 +136,7 @@ const GeoFrontMap: React.FC = () => {
           return (
             <polygon
               key={cell.id}
+              data-testid={cell.id}
               points={hexPoints(cell.cx, cell.cy, HEX_RADIUS - 1)}
               fill={fillForHex(cell.row, cell.col)}
               stroke={strokeForHex(cell.row, cell.col)}
@@ -133,7 +144,7 @@ const GeoFrontMap: React.FC = () => {
               opacity={dome ? 1 : 0.4}
               filter={glowFilter}
             >
-              {emergencyLevel === 'EMERGENCY' && dome && (
+              {hasEmergency && dome && (
                 <animate
                   attributeName="opacity"
                   values="1;0.5;1"
@@ -145,13 +156,12 @@ const GeoFrontMap: React.FC = () => {
           );
         })}
 
-        {/* Center label */}
         <text
           x={svgWidth / 2}
           y={svgHeight / 2}
           textAnchor="middle"
           dominantBaseline="central"
-          fill={emergencyLevel === 'EMERGENCY' ? '#FF9900' : '#39FF14'}
+          fill={hasEmergency ? '#FF9900' : '#39FF14'}
           fontSize="10"
           fontFamily="monospace"
           opacity={0.8}

@@ -7,7 +7,7 @@ interface TerminalLine {
 }
 
 const BOOT_MESSAGES: string[] = [
-  'NERV COMMAND TERMINAL v2.51 — MAGI INTERFACE',
+  '[SYSTEM_REPORT] NERV COMMAND TERMINAL v2.51 — MAGI INTERFACE',
   '========================================',
   'Establishing uplink to MAGI system...',
   'MELCHIOR-1 ... ONLINE',
@@ -52,10 +52,21 @@ export default function NervTerminal() {
       switch (cmd) {
         case 'system': {
           if (flag === '--status') {
+            const ratioEntries = Object.entries(store.syncRatios);
             outputLines.push(
-              { type: 'output', text: '--- NERV SYSTEM STATUS ---' },
-              { type: 'output', text: `Emergency Level : ${store.emergencyLevel}` },
-              { type: 'output', text: `Sync Ratio      : ${store.syncRatio.toFixed(1)}%` },
+              { type: 'output', text: '[SYSTEM_REPORT] --- NERV SYSTEM STATUS ---' },
+              { type: 'output', text: `MAGI Status     : ${store.magiStatus}` },
+              { type: 'output', text: `System Alerts   : ${store.systemAlerts.length}` },
+              { type: 'output', text: `Sync Ratios:` },
+            );
+            if (ratioEntries.length === 0) {
+              outputLines.push({ type: 'output', text: '  (no pilots registered)' });
+            } else {
+              ratioEntries.forEach(([id, ratio]) => {
+                outputLines.push({ type: 'output', text: `  ${id}: ${ratio.toFixed(1)}%` });
+              });
+            }
+            outputLines.push(
               { type: 'output', text: `MAGI Votes:` },
               { type: 'output', text: `  MELCHIOR-1  : ${store.magiVotes.melchior ? 'APPROVE' : 'REJECT'}` },
               { type: 'output', text: `  BALTHASAR-2 : ${store.magiVotes.balthasar ? 'APPROVE' : 'REJECT'}` },
@@ -76,20 +87,24 @@ export default function NervTerminal() {
             const melchior = Math.random() > 0.5;
             const balthasar = Math.random() > 0.5;
             const casper = Math.random() > 0.5;
-            useNervStore.setState({
-              magiVotes: { melchior, balthasar, casper },
-            });
-            const approved = [melchior, balthasar, casper].filter(Boolean).length >= 2;
+            useNervStore.setState(
+              (() => {
+                const votes = { melchior, balthasar, casper };
+                const count = [melchior, balthasar, casper].filter(Boolean).length;
+                const magiStatus = count >= 2 ? 'AGREE' as const : count === 1 ? 'CONFLICT' as const : 'DISAGREE' as const;
+                return { magiVotes: votes, magiStatus };
+              })(),
+            );
+            const count = [melchior, balthasar, casper].filter(Boolean).length;
+            const status = count >= 2 ? 'AGREE' : count === 1 ? 'CONFLICT' : 'DISAGREE';
             outputLines.push(
-              { type: 'output', text: 'MAGI VOTING INITIATED...' },
+              { type: 'output', text: '[SYSTEM_REPORT] MAGI VOTING INITIATED...' },
               { type: 'output', text: `  MELCHIOR-1  : ${melchior ? 'APPROVE' : 'REJECT'}` },
               { type: 'output', text: `  BALTHASAR-2 : ${balthasar ? 'APPROVE' : 'REJECT'}` },
               { type: 'output', text: `  CASPER-3    : ${casper ? 'APPROVE' : 'REJECT'}` },
               {
                 type: 'system',
-                text: approved
-                  ? 'PRIORITY: APPROVED (2/3 consensus reached)'
-                  : 'PRIORITY: REJECTED (consensus not reached)',
+                text: `MAGI STATUS: ${status}`,
               },
             );
           } else {
@@ -103,23 +118,40 @@ export default function NervTerminal() {
 
         case 'signal': {
           if (flag === '--emergency') {
-            useNervStore.setState({ emergencyLevel: 'EMERGENCY' });
+            useNervStore.setState((state) => ({
+              systemAlerts: [
+                ...state.systemAlerts,
+                {
+                  id: `alert-${Date.now()}`,
+                  level: 'EMERGENCY' as const,
+                  message: 'Manual emergency signal activated',
+                  timestamp: Date.now(),
+                },
+              ],
+            }));
             outputLines.push(
-              { type: 'error', text: '!!! EMERGENCY SIGNAL ACTIVATED !!!' },
+              { type: 'error', text: '[SYSTEM_REPORT] !!! EMERGENCY SIGNAL ACTIVATED !!!' },
               { type: 'error', text: 'All units to battle stations.' },
-              { type: 'error', text: 'Emergency level set to: EMERGENCY' },
             );
           } else if (flag === '--alert') {
-            useNervStore.setState({ emergencyLevel: 'ALERT' });
+            useNervStore.setState((state) => ({
+              systemAlerts: [
+                ...state.systemAlerts,
+                {
+                  id: `alert-${Date.now()}`,
+                  level: 'WARNING' as const,
+                  message: 'Manual alert signal activated',
+                  timestamp: Date.now(),
+                },
+              ],
+            }));
             outputLines.push(
-              { type: 'system', text: 'ALERT STATUS ACTIVATED.' },
-              { type: 'system', text: 'Emergency level set to: ALERT' },
+              { type: 'system', text: '[SYSTEM_REPORT] ALERT STATUS ACTIVATED.' },
             );
           } else if (flag === '--normal') {
-            useNervStore.setState({ emergencyLevel: 'NORMAL' });
+            useNervStore.setState({ systemAlerts: [] });
             outputLines.push(
-              { type: 'output', text: 'All clear. Returning to normal operations.' },
-              { type: 'output', text: 'Emergency level set to: NORMAL' },
+              { type: 'output', text: '[SYSTEM_REPORT] All clear. Returning to normal operations.' },
             );
           } else {
             outputLines.push({
@@ -132,7 +164,7 @@ export default function NervTerminal() {
 
         case 'help': {
           outputLines.push(
-            { type: 'output', text: '--- AVAILABLE COMMANDS ---' },
+            { type: 'output', text: '[SYSTEM_REPORT] --- AVAILABLE COMMANDS ---' },
             { type: 'output', text: 'system --status      Display current NERV system state' },
             { type: 'output', text: 'magi --vote          Initiate MAGI voting sequence' },
             { type: 'output', text: 'signal --emergency   Activate emergency protocol' },
@@ -160,7 +192,7 @@ export default function NervTerminal() {
 
       appendLines(outputLines);
     },
-    [store.emergencyLevel, store.syncRatio, store.magiVotes, appendLines],
+    [store.syncRatios, store.magiVotes, store.magiStatus, store.systemAlerts, appendLines],
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -202,7 +234,7 @@ export default function NervTerminal() {
       case 'output':
         return 'text-[#39FF14] opacity-80';
       case 'error':
-        return 'text-red-500';
+        return 'text-[#FF3300]';
       case 'system':
         return 'text-[#FF9900]';
     }
@@ -210,11 +242,17 @@ export default function NervTerminal() {
 
   return (
     <div
-      className="flex flex-col bg-black border border-[#FF9900] font-mono text-sm h-full min-h-[300px]"
+      className="flex flex-col bg-[#050505] border border-[#FF9900] font-['Share_Tech_Mono'] text-sm h-full min-h-[300px] relative"
       onClick={() => inputRef.current?.focus()}
     >
+      {store.systemAlerts.length > 0 && (
+        <div
+          data-testid="emergency-overlay"
+          className="absolute inset-0 bg-[#FF3300]/10 border-2 border-[#FF3300] animate-pulse z-10 pointer-events-none"
+        />
+      )}
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-1 border-b border-[#FF9900] bg-black">
+      <div className="flex items-center justify-between px-3 py-1 border-b border-[#FF9900] bg-[#050505]">
         <span className="text-[#FF9900] text-xs tracking-widest uppercase">
           NERV Command Terminal
         </span>
@@ -242,7 +280,7 @@ export default function NervTerminal() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex-1 bg-transparent text-[#39FF14] outline-none caret-[#39FF14] font-mono text-sm placeholder-[#39FF14]/30"
+          className="flex-1 bg-transparent text-[#39FF14] outline-none caret-[#39FF14] font-['Share_Tech_Mono'] text-sm placeholder-[#39FF14]/30"
           placeholder="Enter command..."
           autoFocus
           spellCheck={false}
