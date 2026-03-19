@@ -212,8 +212,8 @@ SVG-based hexagonal grid visualization of the GeoFront underground facility.
 **Behavior:**
 - Renders a 9x7 flat-top hexagonal SVG grid using `<polygon>` elements.
 - An elliptical dome mask (`isInDome()`) differentiates interior GeoFront sectors from exterior sectors.
-- Uses `hex-coordinates` as the primary key for state updates.
-- Pulls real-time EVA positions from the `useNervStore`.
+- Uses `hex-coordinates` in `'row-col'` string format (e.g., `'3-4'`) as the primary key for state updates.
+- Pulls real-time EVA positions from `evaPositions` in the `useNervStore`.
 - Dome (interior) hexagons toggle color based on `emergencyLevel`:
   - `NORMAL` → NERV Red fill (`#FF3300`) with glow filter
   - `ALERT` → Orange fill (`#FF9900`)
@@ -221,7 +221,7 @@ SVG-based hexagonal grid visualization of the GeoFront underground facility.
 - Exterior hexagons render at reduced opacity with muted background colors.
 - A center "GEOFRONT" label is overlaid on the SVG.
 
-**Store Dependencies:** `emergencyLevel`, `syncRatios`
+**Store Dependencies:** `emergencyLevel`, `syncRatios`, `evaPositions`
 
 ---
 
@@ -256,6 +256,20 @@ interface Pilot {
 
 This interface is the single source of truth for pilot data across all components. Use it whenever referencing pilot records in the store, components, or tests.
 
+### `EvaPosition`
+
+Real-time EVA unit positions on the GeoFront hexagonal grid use `row-col` coordinate strings (e.g., `'3-4'`):
+
+```typescript
+interface EvaPosition {
+  pilotId: string;
+  hexCoordinate: string;  // 'row-col' format, e.g. '3-4'
+  unitLabel: string;      // e.g. 'EVA-01'
+}
+```
+
+This interface is also defined in `src/types/nerv.d.ts`.
+
 ---
 
 ## Standard Operating Procedure — `useNervStore` API
@@ -282,6 +296,9 @@ interface NervState {
     casper: boolean;     // CASPER-3 vote
   };
 
+  // Real-time EVA positions on the GeoFront hex grid
+  evaPositions: EvaPosition[];
+
   // Active system alerts (populated triggers Emergency overlay)
   systemAlerts: string[];
 
@@ -302,6 +319,7 @@ interface NervState {
     balthasar: false,
     casper: false,
   },
+  evaPositions: [],
   systemAlerts: [],
   angelDetected: false,
 }
@@ -312,10 +330,9 @@ interface NervState {
 The `magiStatus` field is derived from the tripartite MAGI voting system (MELCHIOR, BALTHASAR, CASPER). Critical actions require a **2/3 majority**:
 
 ```
-IF (3/3 votes agree)   → magiStatus = 'AGREE'
-IF (2/3 votes agree)   → magiStatus = 'AGREE'
-IF (1/3 or 0/3 agree)  → magiStatus = 'DISAGREE'
-IF (system error)      → magiStatus = 'CONFLICT'
+IF (approvals >= 2)  → magiStatus = 'AGREE'    (2/3 or 3/3 majority)
+IF (approvals == 1)  → magiStatus = 'CONFLICT' (split vote, no majority)
+IF (approvals == 0)  → magiStatus = 'DISAGREE' (unanimous rejection)
 ```
 
 The consensus result is stored in the Zustand state and consumed by both the `MagiDashboard` and `NervTerminal` components.
@@ -535,6 +552,7 @@ const defaultState = {
   syncRatios: {},
   magiStatus: 'DISAGREE' as const,
   magiVotes: { melchior: false, balthasar: false, casper: false },
+  evaPositions: [],
   systemAlerts: [],
   angelDetected: false,
   setEmergencyLevel: jest.fn(),
