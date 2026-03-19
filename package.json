@@ -3,6 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HaruHunab1320/git-workspace-service-testbed.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HaruHunab1320/git-workspace-service-testbed/issues"
+  },
+  "homepage": "https://github.com/HaruHunab1320/git-workspace-service-testbed#readme",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

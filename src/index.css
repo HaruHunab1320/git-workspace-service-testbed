@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-black text-[#39FF14] font-mono min-h-screen;
+    @apply bg-[#050505] text-[#FF3300] font-mono min-h-screen;
   }
 
   /* CRT scan-line overlay effect */
@@ -29,7 +31,7 @@
 
 @layer components {
   .nerv-panel {
-    @apply bg-black border border-[#FF9900] p-4 font-mono text-[#39FF14];
+    @apply bg-[#050505] border border-[#FF9900] p-4 font-mono text-[#FF3300];
   }
 
   .nerv-header {
@@ -37,13 +39,13 @@
   }
 
   .nerv-button {
-    @apply bg-black border border-[#39FF14] text-[#39FF14] font-mono px-4 py-2
-           hover:bg-[#39FF14] hover:text-black transition-colors duration-150
+    @apply bg-[#050505] border border-[#FF3300] text-[#FF3300] font-mono px-4 py-2
+           hover:bg-[#FF3300] hover:text-[#050505] transition-colors duration-150
            uppercase tracking-wider text-sm cursor-pointer;
   }
 
   .nerv-input {
-    @apply bg-black border border-[#39FF14] text-[#39FF14] font-mono px-3 py-2
+    @apply bg-[#050505] border border-[#FF3300] text-[#FF3300] font-mono px-3 py-2
            outline-none focus:border-[#FF9900] focus:shadow-[0_0_10px_rgba(255,153,0,0.3)];
   }
 }

@@ -7,12 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        'nerv-green': '#39FF14',
+        'nerv-red': '#FF3300',
         'nerv-orange': '#FF9900',
-        'nerv-black': '#000000',
+        'nerv-black': '#050505',
       },
       fontFamily: {
-        mono: ['Courier New', 'Consolas', 'monospace'],
+        mono: ['Share Tech Mono', 'Courier New', 'Consolas', 'monospace'],
       },
       animation: {
         'pulse-red': 'pulse-red 1s ease-in-out infinite',
