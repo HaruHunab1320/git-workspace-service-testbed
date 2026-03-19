@@ -119,18 +119,17 @@ The NERV Command Center UI follows the **Terminal-Retro** aesthetic — a dark, 
 
 ### Color Palette
 
-| Name         | Hex Code    | CSS Variable / Tailwind             | Usage                                   |
-| ------------ | ----------- | ------------------------------------ | --------------------------------------- |
-| NERV Black   | `#000000`   | `bg-black`                           | Primary background for all panels       |
-| Neon Green   | `#39FF14`   | `text-[#39FF14]`, `border-[#39FF14]` | Primary text, active/positive states    |
-| NERV Orange  | `#FF9900`   | `text-[#FF9900]`, `border-[#FF9900]` | Borders, warnings, alert/rejected states|
-| Emergency Red| `#FF0000`   | `text-red-500`                       | Emergency pulse, critical alerts        |
+| Name           | Hex Code    | CSS Variable / Tailwind             | Usage                                   |
+| -------------- | ----------- | ------------------------------------ | --------------------------------------- |
+| Deep Black     | `#050505`   | `bg-[#050505]`                       | Primary background for all panels       |
+| NERV Red       | `#FF3300`   | `text-[#FF3300]`, `border-[#FF3300]` | Primary text, active/positive states, critical alerts |
+| Warning Orange | `#FF9900`   | `text-[#FF9900]`, `border-[#FF9900]` | Borders, warnings, alert/rejected states|
 
 ### Typography
 
-- **Font Family:** `font-mono` (monospace) is used for **all** text across the UI.
+- **Font Family:** `Share-Tech-Mono` is used for **all** text across the UI. Import via Google Fonts or include locally.
 - **Sizing:** Use Tailwind's standard sizing scale (`text-xs` through `text-4xl`).
-- **Casing:** UI labels and headings should use UPPERCASE for the Terminal-Retro feel.
+- **Casing:** UI labels and headings should use UPPERCASE for the brutalist Terminal-Retro feel.
 
 ### UI Patterns
 
@@ -138,10 +137,10 @@ All components follow these styling conventions:
 
 ```
 ┌─ border-1 border-[#FF9900] ──────────────────────┐
-│  bg-black                                         │
-│  text-[#39FF14] font-mono                         │
+│  bg-[#050505]                                     │
+│  text-[#FF3300] font-['Share-Tech-Mono']          │
 │                                                   │
-│  Content area with neon green text on black        │
+│  Content area with NERV Red text on Deep Black     │
 │  background. Orange border frames each panel.      │
 │                                                   │
 └───────────────────────────────────────────────────┘
@@ -149,7 +148,7 @@ All components follow these styling conventions:
 
 **Tailwind class pattern for all panels:**
 ```html
-<div class="bg-black text-[#39FF14] border border-[#FF9900] font-mono p-4">
+<div class="bg-[#050505] text-[#FF3300] border border-[#FF9900] font-['Share-Tech-Mono'] p-4">
   <!-- Panel content -->
 </div>
 ```
@@ -158,9 +157,9 @@ All components follow these styling conventions:
 
 | State       | Text Color   | Border Color | Special Effect               |
 | ----------- | ------------ | ------------ | ---------------------------- |
-| NORMAL      | `#39FF14`    | `#FF9900`    | None                         |
+| NORMAL      | `#FF3300`    | `#FF9900`    | None                         |
 | ALERT       | `#FF9900`    | `#FF9900`    | Amber text for warnings      |
-| EMERGENCY   | `#FF0000`    | `#FF9900`    | Pulsing red animation        |
+| EMERGENCY   | `#FF3300`    | `#FF3300`    | Pulsing red animation        |
 
 ---
 
@@ -175,17 +174,19 @@ The MAGI supercomputer voting interface. Displays the three MAGI components and 
 - **BALTHASAR-2** — The Mother personality
 - **CASPER-3** — The Woman personality
 
-**Consensus Logic:**
+**Consensus Logic (2/3 majority):**
 ```
 IF (2 or more of 3 votes are TRUE)
-  → Display "PRIORITY: APPROVED" in green (#39FF14)
+  → magiStatus = 'AGREE'
+  → Display "[SYSTEM_REPORT] PRIORITY: APPROVED" in NERV Red (#FF3300)
 ELSE
-  → Display "PRIORITY: REJECTED" in orange (#FF9900)
+  → magiStatus = 'DISAGREE'
+  → Display "[SYSTEM_REPORT] PRIORITY: REJECTED" in Warning Orange (#FF9900)
 ```
 
 Each MAGI component displays its current vote state (APPROVE / REJECT) and contributes to the overall consensus calculation. The consensus result element uses `data-testid="consensus-result"` for test targeting.
 
-**Store Dependencies:** `magiVotes.melchior`, `magiVotes.balthasar`, `magiVotes.casper`
+**Store Dependencies:** `magiVotes.melchior`, `magiVotes.balthasar`, `magiVotes.casper`, `magiStatus`
 
 ---
 
@@ -194,12 +195,13 @@ Each MAGI component displays its current vote state (APPROVE / REJECT) and contr
 Evangelion sync-ratio monitoring widget with animated vertical progress bars.
 
 **Behavior:**
-- Displays the current `syncRatio` value (0–100) as a vertical progress bar.
-- Bar height corresponds directly to the sync ratio percentage.
-- Under normal conditions, the bar renders in neon green (`#39FF14`).
-- When `emergencyLevel` is `'EMERGENCY'`, the bar **pulses red** with a CSS animation.
+- Displays per-pilot `syncRatios` values (0–100) as vertical progress bars.
+- Bar height corresponds directly to the sync ratio percentage for each pilot.
+- Under normal conditions, bars render in NERV Red (`#FF3300`).
+- When `emergencyLevel` is `'EMERGENCY'`, bars **pulse** with a CSS animation.
+- When `systemAlerts` is populated, an Emergency overlay is rendered.
 
-**Store Dependencies:** `syncRatio`, `emergencyLevel`
+**Store Dependencies:** `syncRatios`, `emergencyLevel`, `systemAlerts`
 
 ---
 
@@ -210,14 +212,16 @@ SVG-based hexagonal grid visualization of the GeoFront underground facility.
 **Behavior:**
 - Renders a 9x7 flat-top hexagonal SVG grid using `<polygon>` elements.
 - An elliptical dome mask (`isInDome()`) differentiates interior GeoFront sectors from exterior sectors.
+- Uses `hex-coordinates` in `'row-col'` string format (e.g., `'3-4'`) as the primary key for state updates.
+- Pulls real-time EVA positions from `evaPositions` in the `useNervStore`.
 - Dome (interior) hexagons toggle color based on `emergencyLevel`:
-  - `NORMAL` → Green fill (`#39FF14`) with green glow filter
+  - `NORMAL` → NERV Red fill (`#FF3300`) with glow filter
   - `ALERT` → Orange fill (`#FF9900`)
   - `EMERGENCY` → Orange fill (`#FF9900`) with orange glow filter and pulsing opacity animation
 - Exterior hexagons render at reduced opacity with muted background colors.
 - A center "GEOFRONT" label is overlaid on the SVG.
 
-**Store Dependencies:** `emergencyLevel`
+**Store Dependencies:** `emergencyLevel`, `syncRatios`, `evaPositions`
 
 ---
 
@@ -237,9 +241,40 @@ See [Terminal Commands](#terminal-commands) for the full command reference.
 
 ---
 
+## Shared Data Interface — `Pilot`
+
+All pilot and EVA data must follow the `Pilot` interface defined in `src/types/nerv.d.ts`:
+
+```typescript
+interface Pilot {
+  id: string;
+  name: string;
+  syncRate: number;
+  status: 'ACTIVE' | 'INACTIVE' | 'BERSERK';
+}
+```
+
+This interface is the single source of truth for pilot data across all components. Use it whenever referencing pilot records in the store, components, or tests.
+
+### `EvaPosition`
+
+Real-time EVA unit positions on the GeoFront hexagonal grid use `row-col` coordinate strings (e.g., `'3-4'`):
+
+```typescript
+interface EvaPosition {
+  pilotId: string;
+  hexCoordinate: string;  // 'row-col' format, e.g. '3-4'
+  unitLabel: string;      // e.g. 'EVA-01'
+}
+```
+
+This interface is also defined in `src/types/nerv.d.ts`.
+
+---
+
 ## Standard Operating Procedure — `useNervStore` API
 
-The global state is managed by a Zustand store exported from `src/store/useNervStore.ts`.
+The global state is managed by a Zustand store exported from `src/store/useNervStore.ts`. The store exports a single hook: `useNervStore`.
 
 ### State Shape
 
@@ -248,15 +283,24 @@ interface NervState {
   // Current threat level of the facility
   emergencyLevel: 'NORMAL' | 'ALERT' | 'EMERGENCY';
 
-  // Evangelion pilot synchronization ratio (0–100)
-  syncRatio: number;
+  // Per-pilot synchronization ratios (keyed by pilot ID)
+  syncRatios: Record<string, number>;
 
-  // MAGI supercomputer voting state
+  // MAGI supercomputer consensus status
+  magiStatus: 'AGREE' | 'DISAGREE' | 'CONFLICT';
+
+  // MAGI supercomputer voting state (individual votes)
   magiVotes: {
     melchior: boolean;   // MELCHIOR-1 vote
     balthasar: boolean;  // BALTHASAR-2 vote
     casper: boolean;     // CASPER-3 vote
   };
+
+  // Real-time EVA positions on the GeoFront hex grid
+  evaPositions: EvaPosition[];
+
+  // Active system alerts (populated triggers Emergency overlay)
+  systemAlerts: string[];
 
   // Angel detection flag — set via triggerAngelDetected()
   angelDetected: boolean;
@@ -268,15 +312,30 @@ interface NervState {
 ```typescript
 {
   emergencyLevel: 'NORMAL',
-  syncRatio: 100,
+  syncRatios: {},
+  magiStatus: 'DISAGREE',
   magiVotes: {
     melchior: false,
     balthasar: false,
     casper: false,
   },
+  evaPositions: [],
+  systemAlerts: [],
   angelDetected: false,
 }
 ```
+
+### MAGI Consensus Logic
+
+The `magiStatus` field is derived from the tripartite MAGI voting system (MELCHIOR, BALTHASAR, CASPER). Critical actions require a **2/3 majority**:
+
+```
+IF (approvals >= 2)  → magiStatus = 'AGREE'    (2/3 or 3/3 majority)
+IF (approvals == 1)  → magiStatus = 'CONFLICT' (split vote, no majority)
+IF (approvals == 0)  → magiStatus = 'DISAGREE' (unanimous rejection)
+```
+
+The consensus result is stored in the Zustand state and consumed by both the `MagiDashboard` and `NervTerminal` components.
 
 ### Actions
 
@@ -285,11 +344,13 @@ The store exposes the following actions for state mutation:
 | Action                  | Signature                                                   | Description                          |
 | ----------------------- | ----------------------------------------------------------- | ------------------------------------ |
 | `setEmergencyLevel`     | `(level: 'NORMAL' \| 'ALERT' \| 'EMERGENCY') => void`      | Set the facility emergency level     |
-| `setSyncRatio`          | `(ratio: number) => void`                                   | Update the sync ratio (clamped to 0–100) |
-| `setMagiVotes`          | `(votes: Partial<MagiVotes>) => void`                       | Merge partial MAGI votes into current state |
-| `randomizeMagiVotes`    | `() => void`                                                | Randomize all three MAGI votes       |
-| `triggerAngelDetected`  | `() => void`                                                | Set `angelDetected: true` and `emergencyLevel: 'EMERGENCY'` |
-| `resetEmergency`        | `() => void`                                                | Reset `angelDetected: false` and `emergencyLevel: 'NORMAL'` |
+| `setSyncRatio`          | `(pilotId: string, ratio: number) => void`                  | Update a pilot's sync ratio (clamped to 0–100) |
+| `setMagiVotes`          | `(votes: Partial<MagiVotes>) => void`                       | Merge partial MAGI votes and recompute `magiStatus` |
+| `randomizeMagiVotes`    | `() => void`                                                | Randomize all three MAGI votes and recompute consensus |
+| `addSystemAlert`        | `(alert: string) => void`                                   | Push a new alert to `systemAlerts`   |
+| `clearSystemAlerts`     | `() => void`                                                | Clear all system alerts              |
+| `triggerAngelDetected`  | `() => void`                                                | Set `angelDetected: true`, `emergencyLevel: 'EMERGENCY'`, add alert |
+| `resetEmergency`        | `() => void`                                                | Reset `angelDetected: false`, `emergencyLevel: 'NORMAL'`, clear alerts |
 
 ### Usage Example
 
@@ -297,13 +358,18 @@ The store exposes the following actions for state mutation:
 import { useNervStore } from '../store/useNervStore';
 
 function MyComponent() {
-  const emergencyLevel = useNervStore((state) => state.emergencyLevel);
+  const magiStatus = useNervStore((state) => state.magiStatus);
+  const systemAlerts = useNervStore((state) => state.systemAlerts);
   const setEmergencyLevel = useNervStore((state) => state.setEmergencyLevel);
 
   return (
-    <button onClick={() => setEmergencyLevel('EMERGENCY')}>
-      TRIGGER ALERT
-    </button>
+    <div>
+      <p>[SYSTEM_REPORT] MAGI STATUS: {magiStatus}</p>
+      {systemAlerts.length > 0 && <EmergencyOverlay alerts={systemAlerts} />}
+      <button onClick={() => setEmergencyLevel('EMERGENCY')}>
+        TRIGGER ALERT
+      </button>
+    </div>
   );
 }
 ```
@@ -313,8 +379,11 @@ function MyComponent() {
 Always use **selectors** to subscribe to specific slices of state. This prevents unnecessary re-renders:
 
 ```tsx
-// Good — subscribes only to syncRatio
-const syncRatio = useNervStore((state) => state.syncRatio);
+// Good — subscribes only to syncRatios
+const syncRatios = useNervStore((state) => state.syncRatios);
+
+// Good — subscribes only to magiStatus
+const magiStatus = useNervStore((state) => state.magiStatus);
 
 // Avoid — subscribes to entire store
 const store = useNervStore();
@@ -333,14 +402,17 @@ Returns the current state of the NERV system.
 ```
 > system --status
 
---- NERV SYSTEM STATUS ---
-Emergency Level : NORMAL
-Sync Ratio      : 100.0%
-MAGI Votes:
-  MELCHIOR-1  : REJECT
-  BALTHASAR-2 : REJECT
-  CASPER-3    : REJECT
---------------------------
+[SYSTEM_REPORT] --- NERV SYSTEM STATUS ---
+[SYSTEM_REPORT] Emergency Level : NORMAL
+[SYSTEM_REPORT] MAGI Status     : DISAGREE
+[SYSTEM_REPORT] Sync Ratios:
+[SYSTEM_REPORT]   (no pilots registered)
+[SYSTEM_REPORT] MAGI Votes:
+[SYSTEM_REPORT]   MELCHIOR-1  : REJECT
+[SYSTEM_REPORT]   BALTHASAR-2 : REJECT
+[SYSTEM_REPORT]   CASPER-3    : REJECT
+[SYSTEM_REPORT] System Alerts   : NONE
+[SYSTEM_REPORT] --------------------------
 ```
 
 ### `magi --vote`
@@ -350,11 +422,12 @@ Randomizes the MAGI voting state. Each of the three MAGI components receives a r
 ```
 > magi --vote
 
-MAGI VOTING INITIATED...
-  MELCHIOR-1  : REJECT
-  BALTHASAR-2 : APPROVE
-  CASPER-3    : REJECT
-PRIORITY: REJECTED (consensus not reached)
+[SYSTEM_REPORT] MAGI VOTING INITIATED...
+[SYSTEM_REPORT]   MELCHIOR-1  : REJECT
+[SYSTEM_REPORT]   BALTHASAR-2 : APPROVE
+[SYSTEM_REPORT]   CASPER-3    : REJECT
+[SYSTEM_REPORT] PRIORITY: REJECTED (consensus not reached)
+[SYSTEM_REPORT] MAGI STATUS: DISAGREE
 ```
 
 ### `signal --emergency`
@@ -364,9 +437,9 @@ Sets the facility emergency level to `EMERGENCY`. All components will respond ac
 ```
 > signal --emergency
 
-!!! EMERGENCY SIGNAL ACTIVATED !!!
-All units to battle stations.
-Emergency level set to: EMERGENCY
+[SYSTEM_REPORT] !!! EMERGENCY SIGNAL ACTIVATED !!!
+[SYSTEM_REPORT] All units to battle stations.
+[SYSTEM_REPORT] Emergency level set to: EMERGENCY
 ```
 
 ### `signal --alert`
@@ -376,8 +449,8 @@ Sets the facility emergency level to `ALERT`.
 ```
 > signal --alert
 
-ALERT STATUS ACTIVATED.
-Emergency level set to: ALERT
+[SYSTEM_REPORT] ALERT STATUS ACTIVATED.
+[SYSTEM_REPORT] Emergency level set to: ALERT
 ```
 
 ### `signal --normal`
@@ -387,8 +460,8 @@ Returns the facility to normal operations.
 ```
 > signal --normal
 
-All clear. Returning to normal operations.
-Emergency level set to: NORMAL
+[SYSTEM_REPORT] All clear. Returning to normal operations.
+[SYSTEM_REPORT] Emergency level set to: NORMAL
 ```
 
 ### `help`
@@ -441,6 +514,28 @@ npm run test
 | Pulses red during EMERGENCY                  | Mocks `emergencyLevel: 'EMERGENCY'` → expects red pulse animation |
 | No pulse during NORMAL                       | Mocks `emergencyLevel: 'NORMAL'` → expects no pulse class         |
 
+### Pattern Blue Test Suite
+
+All UI components must include a "Pattern Blue" test that verifies the Emergency overlay renders correctly when the global `systemAlerts` state is populated. This ensures every component reacts to Angel detection events:
+
+```typescript
+describe('Pattern Blue — Emergency Overlay', () => {
+  it('renders Emergency overlay when systemAlerts is populated', () => {
+    // Mock store with active system alerts
+    mockUseNervStore.mockImplementation((selector) =>
+      selector({
+        ...defaultState,
+        systemAlerts: ['PATTERN BLUE DETECTED — ANGEL APPROACHING'],
+        emergencyLevel: 'EMERGENCY',
+      })
+    );
+
+    render(<ComponentUnderTest />);
+    expect(screen.getByText(/PATTERN BLUE/)).toBeInTheDocument();
+  });
+});
+```
+
 ### Mocking the Store
 
 Tests mock `useNervStore` to isolate component behavior:
@@ -452,20 +547,27 @@ jest.mock('../store/useNervStore');
 
 const mockUseNervStore = useNervStore as jest.MockedFunction<typeof useNervStore>;
 
+const defaultState = {
+  emergencyLevel: 'NORMAL' as const,
+  syncRatios: {},
+  magiStatus: 'DISAGREE' as const,
+  magiVotes: { melchior: false, balthasar: false, casper: false },
+  evaPositions: [],
+  systemAlerts: [],
+  angelDetected: false,
+  setEmergencyLevel: jest.fn(),
+  setSyncRatio: jest.fn(),
+  setMagiVotes: jest.fn(),
+  randomizeMagiVotes: jest.fn(),
+  addSystemAlert: jest.fn(),
+  clearSystemAlerts: jest.fn(),
+  triggerAngelDetected: jest.fn(),
+  resetEmergency: jest.fn(),
+};
+
 beforeEach(() => {
   mockUseNervStore.mockImplementation((selector) =>
-    selector({
-      emergencyLevel: 'NORMAL',
-      syncRatio: 100,
-      magiVotes: { melchior: false, balthasar: false, casper: false },
-      angelDetected: false,
-      setEmergencyLevel: jest.fn(),
-      setSyncRatio: jest.fn(),
-      setMagiVotes: jest.fn(),
-      randomizeMagiVotes: jest.fn(),
-      triggerAngelDetected: jest.fn(),
-      resetEmergency: jest.fn(),
-    })
+    selector(defaultState)
   );
 });
 ```
@@ -489,6 +591,8 @@ nerv-command-center/
 │   │   └── NervTerminal.tsx          # Command terminal
 │   ├── store/
 │   │   └── useNervStore.ts           # Zustand global state
+│   ├── types/
+│   │   └── nerv.d.ts                 # Shared data interfaces (Pilot, etc.)
 │   ├── App.tsx                       # Root layout component
 │   ├── index.css                     # Tailwind imports & global styles
 │   └── main.tsx                      # Application entry point
@@ -523,15 +627,69 @@ module.exports = {
 }
 ```
 
-Arbitrary values like `text-[#39FF14]` require Tailwind JIT mode (enabled by default in Tailwind v3+).
+Arbitrary values like `text-[#FF3300]` require Tailwind JIT mode (enabled by default in Tailwind v3+).
 
 ### Tests failing with store mock errors
 
-Ensure the mock implementation returns all state properties **and** all actions. Missing properties will cause selector functions to throw.
+Ensure the mock implementation returns all state properties **and** all actions, including the new `syncRatios`, `magiStatus`, `systemAlerts`, `addSystemAlert`, and `clearSystemAlerts` fields. Missing properties will cause selector functions to throw.
 
 ### Components not updating on state change
 
 Verify you are using **selectors** rather than destructuring the entire store. Zustand only triggers re-renders when the selected slice changes.
+
+---
+
+### Sync-Ratio Fluctuations
+
+Sync-ratio values in `syncRatios` may fluctuate unexpectedly. Use this checklist to diagnose:
+
+1. **Verify pilot registration.** Ensure `setSyncRatio(pilotId, ratio)` is called with a valid pilot ID matching a `Pilot` record. Unregistered pilot IDs will create orphan entries in the `syncRatios` object.
+
+2. **Check clamping bounds.** The store clamps sync ratios to the 0–100 range. Values outside this range are silently clamped — if you observe unexpected capping, verify the upstream data source.
+
+3. **Rapid state updates.** If multiple components dispatch `setSyncRatio` in rapid succession (e.g., during simulated telemetry), Zustand batches updates within a single React render cycle. Ensure your selectors subscribe to the specific pilot's ratio rather than the entire `syncRatios` object to avoid unnecessary re-renders:
+   ```tsx
+   // Good — subscribes to a specific pilot
+   const ratio = useNervStore((state) => state.syncRatios['pilot-01']);
+
+   // Avoid — re-renders on ANY pilot change
+   const allRatios = useNervStore((state) => state.syncRatios);
+   ```
+
+4. **Emergency state interaction.** When `triggerAngelDetected()` fires, the emergency level jumps to `EMERGENCY`. This does not reset sync ratios, but the `SyncMonitor` visual changes (pulsing animation) may give the impression of a ratio change. Verify the actual numeric value via `system --status` in the terminal.
+
+5. **Stale closures.** If a component captures `syncRatios` in a callback or effect, the value may be stale. Use the Zustand `getState()` escape hatch for imperative reads:
+   ```tsx
+   const currentRatio = useNervStore.getState().syncRatios['pilot-01'];
+   ```
+
+---
+
+### MAGI Consensus Failures
+
+The MAGI system uses tripartite consensus (MELCHIOR, BALTHASAR, CASPER) with a 2/3 majority requirement. When consensus fails or enters `CONFLICT` state, follow these steps:
+
+1. **Verify vote state.** Run `system --status` or `magi --vote` in the `NervTerminal` to inspect individual MAGI votes. The `magiStatus` field should reflect:
+   - `'AGREE'` — 2 or 3 of 3 votes are `true`
+   - `'DISAGREE'` — fewer than 2 votes are `true`
+   - `'CONFLICT'` — system error or inconsistent state
+
+2. **Check `setMagiVotes` calls.** The action accepts `Partial<MagiVotes>`, merging into existing state. If only one vote is updated at a time, the consensus recomputation uses the previous values for the other two. Ensure all three votes are set together when performing a full vote cycle:
+   ```tsx
+   setMagiVotes({ melchior: true, balthasar: false, casper: true });
+   ```
+
+3. **Stale `magiStatus` after vote.** If the UI shows a stale consensus result after calling `randomizeMagiVotes()`, verify that the action both updates `magiVotes` AND recomputes `magiStatus` in a single Zustand `set()` call. Split updates will cause an intermediate render with inconsistent state.
+
+4. **Terminal vs. Dashboard disagreement.** Both `NervTerminal` and `MagiDashboard` read `magiStatus` from the same Zustand store. If they show different results, one component may be using a local copy instead of a selector. Ensure both use:
+   ```tsx
+   const magiStatus = useNervStore((state) => state.magiStatus);
+   ```
+
+5. **CONFLICT state recovery.** The `CONFLICT` state indicates a system-level error. To recover:
+   - Call `resetEmergency()` to clear emergency state
+   - Call `randomizeMagiVotes()` to re-initiate a fresh vote cycle
+   - If the `CONFLICT` persists, check for errors in the browser console — the Zustand middleware may have logged the root cause
 
 ---
 
