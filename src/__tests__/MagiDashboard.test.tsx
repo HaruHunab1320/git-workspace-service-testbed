@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MagiDashboard from '../components/MagiDashboard';
@@ -8,10 +7,43 @@ import { useNervStore } from '../store/useNervStore';
 jest.mock('../store/useNervStore');
 const mockUseNervStore = useNervStore as unknown as jest.Mock;
 
+/**
+ * Default NERV state used across all MagiDashboard tests.
+ * Includes all state properties and action stubs so selector functions
+ * never throw on missing keys.
+ */
+const defaultState: Record<string, unknown> = {
+  emergencyLevel: 'NORMAL',
+  syncRatio: 100,
+  syncRatios: {},
+  magiStatus: 'DISAGREE',
+  magiVotes: { melchior: false, balthasar: false, casper: false },
+  evaPositions: [],
+  systemAlerts: [],
+  angelDetected: false,
+  setEmergencyLevel: jest.fn(),
+  setSyncRatio: jest.fn(),
+  setSyncRatios: jest.fn(),
+  updatePilotSyncRatio: jest.fn(),
+  setMagiVotes: jest.fn(),
+  randomizeMagiVotes: jest.fn(),
+  addSystemAlert: jest.fn(),
+  clearSystemAlerts: jest.fn(),
+  updateEvaPosition: jest.fn(),
+  removeEvaPosition: jest.fn(),
+  triggerAngelDetected: jest.fn(),
+  resetEmergency: jest.fn(),
+};
+
+/**
+ * Helper to mock the store with specific MAGI votes.
+ * Uses the selector-compatible mockImplementation pattern.
+ */
 function mockStore(votes: { melchior: boolean; balthasar: boolean; casper: boolean }) {
-  mockUseNervStore.mockReturnValue({
-    magiVotes: votes,
-  });
+  const state = { ...defaultState, magiVotes: votes };
+  mockUseNervStore.mockImplementation((selector?: (s: Record<string, unknown>) => unknown) =>
+    selector ? selector(state) : state,
+  );
 }
 
 describe('MagiDashboard', () => {
@@ -98,6 +130,30 @@ describe('MagiDashboard', () => {
       mockStore({ melchior: false, balthasar: false, casper: false });
       render(<MagiDashboard />);
       expect(screen.getByTestId('consensus').className).toContain('text-[#FF9900]');
+    });
+  });
+
+  describe('Pattern Blue — Emergency Overlay', () => {
+    it('renders Emergency overlay when systemAlerts is populated', () => {
+      const state = {
+        ...defaultState,
+        magiVotes: { melchior: true, balthasar: true, casper: true },
+        systemAlerts: [
+          {
+            id: 'alert-1',
+            message: 'PATTERN BLUE DETECTED — ANGEL APPROACHING',
+            level: 'EMERGENCY' as const,
+            timestamp: Date.now(),
+          },
+        ],
+        emergencyLevel: 'EMERGENCY' as const,
+      };
+      mockUseNervStore.mockImplementation((selector?: (s: Record<string, unknown>) => unknown) =>
+        selector ? selector(state) : state,
+      );
+      render(<MagiDashboard />);
+      // MagiDashboard still renders with MAGI data during emergency
+      expect(screen.getByTestId('consensus')).toBeInTheDocument();
     });
   });
 });

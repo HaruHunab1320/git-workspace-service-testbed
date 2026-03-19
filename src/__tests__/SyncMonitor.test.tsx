@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SyncMonitor from '../components/SyncMonitor';
@@ -8,11 +7,43 @@ import { useNervStore } from '../store/useNervStore';
 jest.mock('../store/useNervStore');
 const mockUseNervStore = useNervStore as unknown as jest.Mock;
 
+/**
+ * Default NERV state used across all SyncMonitor tests.
+ * Includes all state properties and action stubs so selector functions
+ * never throw on missing keys.
+ */
+const defaultState: Record<string, unknown> = {
+  emergencyLevel: 'NORMAL',
+  syncRatio: 100,
+  syncRatios: {},
+  magiStatus: 'DISAGREE',
+  magiVotes: { melchior: false, balthasar: false, casper: false },
+  evaPositions: [],
+  systemAlerts: [],
+  angelDetected: false,
+  setEmergencyLevel: jest.fn(),
+  setSyncRatio: jest.fn(),
+  setSyncRatios: jest.fn(),
+  updatePilotSyncRatio: jest.fn(),
+  setMagiVotes: jest.fn(),
+  randomizeMagiVotes: jest.fn(),
+  addSystemAlert: jest.fn(),
+  clearSystemAlerts: jest.fn(),
+  updateEvaPosition: jest.fn(),
+  removeEvaPosition: jest.fn(),
+  triggerAngelDetected: jest.fn(),
+  resetEmergency: jest.fn(),
+};
+
+/**
+ * Helper to mock the store with specific sync ratio and emergency level.
+ * Uses the selector-compatible mockImplementation pattern.
+ */
 function mockStore(syncRatio: number, emergencyLevel: 'NORMAL' | 'ALERT' | 'EMERGENCY' = 'NORMAL') {
-  mockUseNervStore.mockReturnValue({
-    syncRatio,
-    emergencyLevel,
-  });
+  const state = { ...defaultState, syncRatio, emergencyLevel };
+  mockUseNervStore.mockImplementation((selector?: (s: Record<string, unknown>) => unknown) =>
+    selector ? selector(state) : state,
+  );
 }
 
 describe('SyncMonitor', () => {
@@ -119,6 +150,29 @@ describe('SyncMonitor', () => {
       const bar = screen.getByTestId('sync-bar');
       expect(bar.className).toContain('bg-[#39FF14]');
       expect(bar.className).not.toContain('bg-red-500');
+    });
+  });
+
+  describe('Pattern Blue — Emergency Overlay', () => {
+    it('renders emergency warning when systemAlerts is populated and level is EMERGENCY', () => {
+      const state = {
+        ...defaultState,
+        syncRatio: 75,
+        systemAlerts: [
+          {
+            id: 'alert-1',
+            message: 'PATTERN BLUE DETECTED — ANGEL APPROACHING',
+            level: 'EMERGENCY' as const,
+            timestamp: Date.now(),
+          },
+        ],
+        emergencyLevel: 'EMERGENCY' as const,
+      };
+      mockUseNervStore.mockImplementation((selector?: (s: Record<string, unknown>) => unknown) =>
+        selector ? selector(state) : state,
+      );
+      render(<SyncMonitor />);
+      expect(screen.getByTestId('emergency-warning')).toBeInTheDocument();
     });
   });
 });
