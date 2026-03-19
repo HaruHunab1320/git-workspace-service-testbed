@@ -48,6 +48,7 @@ const selectTerminalState = (state: NervState) => ({
   setEmergencyLevel: state.setEmergencyLevel,
   randomizeMagiVotes: state.randomizeMagiVotes,
   addSystemAlert: state.addSystemAlert,
+  clearSystemAlerts: state.clearSystemAlerts,
 });
 
 /**
@@ -74,6 +75,7 @@ export default function NervTerminal() {
     setEmergencyLevel,
     randomizeMagiVotes,
     addSystemAlert,
+    clearSystemAlerts,
   } = useNervStore(selectTerminalState);
 
   useEffect(() => {
@@ -202,6 +204,34 @@ export default function NervTerminal() {
           break;
         }
 
+        case 'alert': {
+          if (flag === '--list') {
+            const freshAlerts = useNervStore.getState().systemAlerts;
+            if (freshAlerts.length === 0) {
+              outputLines.push({ type: 'output', text: '[SYSTEM_REPORT] No active alerts.' });
+            } else {
+              outputLines.push({ type: 'output', text: `[SYSTEM_REPORT] --- ACTIVE ALERTS (${freshAlerts.length}) ---` });
+              for (const a of freshAlerts) {
+                const time = new Date(a.timestamp).toTimeString().slice(0, 8);
+                outputLines.push({
+                  type: a.level === 'EMERGENCY' || a.level === 'CRITICAL' ? 'error' : 'output',
+                  text: `[${time}] [${a.level}] ${a.message}`,
+                });
+              }
+              outputLines.push({ type: 'output', text: '[SYSTEM_REPORT] --------------------------' });
+            }
+          } else if (flag === '--clear') {
+            clearSystemAlerts();
+            outputLines.push({ type: 'output', text: '[SYSTEM_REPORT] All system alerts cleared.' });
+          } else {
+            outputLines.push({
+              type: 'error',
+              text: 'Usage: alert --list | --clear',
+            });
+          }
+          break;
+        }
+
         case 'help': {
           outputLines.push(
             { type: 'output', text: '--- AVAILABLE COMMANDS ---' },
@@ -210,6 +240,8 @@ export default function NervTerminal() {
             { type: 'output', text: 'signal --emergency   Activate emergency protocol' },
             { type: 'output', text: 'signal --alert       Activate alert status' },
             { type: 'output', text: 'signal --normal      Return to normal operations' },
+            { type: 'output', text: 'alert --list         Display active system alerts' },
+            { type: 'output', text: 'alert --clear        Clear all system alerts' },
             { type: 'output', text: 'clear                Clear terminal output' },
             { type: 'output', text: 'help                 Show this message' },
             { type: 'output', text: '--------------------------' },
@@ -232,7 +264,7 @@ export default function NervTerminal() {
 
       appendLines(outputLines);
     },
-    [emergencyLevel, syncRatios, magiVotes, magiStatus, systemAlerts, setEmergencyLevel, randomizeMagiVotes, addSystemAlert, appendLines],
+    [emergencyLevel, syncRatios, magiVotes, magiStatus, systemAlerts, setEmergencyLevel, randomizeMagiVotes, addSystemAlert, clearSystemAlerts, appendLines],
   );
 
   const handleSubmit = (e: React.FormEvent) => {
