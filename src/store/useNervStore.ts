@@ -33,7 +33,7 @@ export interface NervState {
 
 function deriveMagiStatus(votes: MagiVotes): MagiStatus {
   const count = [votes.melchior, votes.balthasar, votes.casper].filter(Boolean).length;
-  if (count === 3) return 'AGREE';
+  if (count >= 2) return 'AGREE';
   if (count === 0) return 'DISAGREE';
   return 'CONFLICT';
 }
