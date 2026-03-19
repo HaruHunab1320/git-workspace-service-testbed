@@ -183,7 +183,7 @@ ELSE
   → Display "PRIORITY: REJECTED" in orange (#FF9900)
 ```
 
-Each MAGI component displays its current vote state (APPROVE / DENY) and contributes to the overall consensus calculation.
+Each MAGI component displays its current vote state (APPROVE / REJECT) and contributes to the overall consensus calculation. The consensus result element uses `data-testid="consensus-result"` for test targeting.
 
 **Store Dependencies:** `magiVotes.melchior`, `magiVotes.balthasar`, `magiVotes.casper`
 
@@ -208,11 +208,14 @@ Evangelion sync-ratio monitoring widget with animated vertical progress bars.
 SVG-based hexagonal grid visualization of the GeoFront underground facility.
 
 **Behavior:**
-- Renders a hexagonal grid using SVG `<polygon>` elements.
-- Each hexagon toggles color based on the `emergencyLevel`:
-  - `NORMAL` → Green fill (`#39FF14`)
-  - `ALERT` or `EMERGENCY` → Orange fill (`#FF9900`)
-- Hexagons may include interactive hover or click states.
+- Renders a 9x7 flat-top hexagonal SVG grid using `<polygon>` elements.
+- An elliptical dome mask (`isInDome()`) differentiates interior GeoFront sectors from exterior sectors.
+- Dome (interior) hexagons toggle color based on `emergencyLevel`:
+  - `NORMAL` → Green fill (`#39FF14`) with green glow filter
+  - `ALERT` → Orange fill (`#FF9900`)
+  - `EMERGENCY` → Orange fill (`#FF9900`) with orange glow filter and pulsing opacity animation
+- Exterior hexagons render at reduced opacity with muted background colors.
+- A center "GEOFRONT" label is overlaid on the SVG.
 
 **Store Dependencies:** `emergencyLevel`
 
@@ -223,9 +226,10 @@ SVG-based hexagonal grid visualization of the GeoFront underground facility.
 Command-line terminal interface for NERV operators.
 
 **Behavior:**
+- Displays a boot sequence on initialization (MAGI uplink messages).
 - Presents a scrollable terminal output area and a text input field.
 - Processes mock commands and displays responses in the terminal log.
-- Supports command history and standard terminal aesthetics.
+- Supports command history navigation via Arrow Up/Down keys.
 
 See [Terminal Commands](#terminal-commands) for the full command reference.
 
@@ -253,6 +257,9 @@ interface NervState {
     balthasar: boolean;  // BALTHASAR-2 vote
     casper: boolean;     // CASPER-3 vote
   };
+
+  // Angel detection flag — set via triggerAngelDetected()
+  angelDetected: boolean;
 }
 ```
 
@@ -261,12 +268,13 @@ interface NervState {
 ```typescript
 {
   emergencyLevel: 'NORMAL',
-  syncRatio: 75,
+  syncRatio: 100,
   magiVotes: {
-    melchior: true,
-    balthasar: true,
+    melchior: false,
+    balthasar: false,
     casper: false,
   },
+  angelDetected: false,
 }
 ```
 
@@ -277,8 +285,11 @@ The store exposes the following actions for state mutation:
 | Action                  | Signature                                                   | Description                          |
 | ----------------------- | ----------------------------------------------------------- | ------------------------------------ |
 | `setEmergencyLevel`     | `(level: 'NORMAL' \| 'ALERT' \| 'EMERGENCY') => void`      | Set the facility emergency level     |
-| `setSyncRatio`          | `(ratio: number) => void`                                   | Update the Evangelion sync ratio     |
-| `setMagiVotes`          | `(votes: { melchior: boolean; balthasar: boolean; casper: boolean }) => void` | Set MAGI voting state |
+| `setSyncRatio`          | `(ratio: number) => void`                                   | Update the sync ratio (clamped to 0–100) |
+| `setMagiVotes`          | `(votes: Partial<MagiVotes>) => void`                       | Merge partial MAGI votes into current state |
+| `randomizeMagiVotes`    | `() => void`                                                | Randomize all three MAGI votes       |
+| `triggerAngelDetected`  | `() => void`                                                | Set `angelDetected: true` and `emergencyLevel: 'EMERGENCY'` |
+| `resetEmergency`        | `() => void`                                                | Reset `angelDetected: false` and `emergencyLevel: 'NORMAL'` |
 
 ### Usage Example
 
@@ -322,30 +333,28 @@ Returns the current state of the NERV system.
 ```
 > system --status
 
-NERV SYSTEM STATUS REPORT
-==========================
-Emergency Level: NORMAL
-Sync Ratio:      75%
-MAGI Consensus:
-  MELCHIOR-1:    APPROVE
-  BALTHASAR-2:   APPROVE
-  CASPER-3:      DENY
-Result:          PRIORITY: APPROVED
+--- NERV SYSTEM STATUS ---
+Emergency Level : NORMAL
+Sync Ratio      : 100.0%
+MAGI Votes:
+  MELCHIOR-1  : REJECT
+  BALTHASAR-2 : REJECT
+  CASPER-3    : REJECT
+--------------------------
 ```
 
 ### `magi --vote`
 
-Randomizes the MAGI voting state. Each of the three MAGI components receives a random boolean vote.
+Randomizes the MAGI voting state. Each of the three MAGI components receives a random boolean vote, and the consensus result is displayed.
 
 ```
 > magi --vote
 
-MAGI VOTE RECALCULATED
-==========================
-MELCHIOR-1: DENY
-BALTHASAR-2: APPROVE
-CASPER-3: DENY
-Result: PRIORITY: REJECTED
+MAGI VOTING INITIATED...
+  MELCHIOR-1  : REJECT
+  BALTHASAR-2 : APPROVE
+  CASPER-3    : REJECT
+PRIORITY: REJECTED (consensus not reached)
 ```
 
 ### `signal --emergency`
@@ -355,11 +364,40 @@ Sets the facility emergency level to `EMERGENCY`. All components will respond ac
 ```
 > signal --emergency
 
-!! ALERT !!
-EMERGENCY SIGNAL ACTIVATED
-ALL PERSONNEL TO BATTLE STATIONS
-Emergency Level: EMERGENCY
+!!! EMERGENCY SIGNAL ACTIVATED !!!
+All units to battle stations.
+Emergency level set to: EMERGENCY
 ```
+
+### `signal --alert`
+
+Sets the facility emergency level to `ALERT`.
+
+```
+> signal --alert
+
+ALERT STATUS ACTIVATED.
+Emergency level set to: ALERT
+```
+
+### `signal --normal`
+
+Returns the facility to normal operations.
+
+```
+> signal --normal
+
+All clear. Returning to normal operations.
+Emergency level set to: NORMAL
+```
+
+### `help`
+
+Displays the list of available commands.
+
+### `clear`
+
+Clears the terminal output history.
 
 ### Unrecognized Commands
 
@@ -368,8 +406,7 @@ Any unrecognized input returns:
 ```
 > hello
 
-ERROR: UNKNOWN COMMAND "hello"
-TYPE "system --status", "magi --vote", OR "signal --emergency"
+Unknown command: "hello". Type "help" for available commands.
 ```
 
 ---
@@ -419,11 +456,15 @@ beforeEach(() => {
   mockUseNervStore.mockImplementation((selector) =>
     selector({
       emergencyLevel: 'NORMAL',
-      syncRatio: 75,
-      magiVotes: { melchior: true, balthasar: true, casper: false },
+      syncRatio: 100,
+      magiVotes: { melchior: false, balthasar: false, casper: false },
+      angelDetected: false,
       setEmergencyLevel: jest.fn(),
       setSyncRatio: jest.fn(),
       setMagiVotes: jest.fn(),
+      randomizeMagiVotes: jest.fn(),
+      triggerAngelDetected: jest.fn(),
+      resetEmergency: jest.fn(),
     })
   );
 });
