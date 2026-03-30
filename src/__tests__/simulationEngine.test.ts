@@ -155,29 +155,45 @@ describe('SimulationEngine', () => {
 
   describe('MAGI bonus', () => {
     it('deals more angel damage when MAGI status is AGREE', () => {
-      // Setup: Two runs — one with AGREE, one without
-      const store = useNervStore.getState();
-      store.addPilot({ id: 'p1', name: 'Shinji', status: 'ACTIVE', evaUnitId: 'EVA-01', syncRatio: 80 });
+      // Seed Math.random to eliminate flakiness from sync fluctuation and randomizeMagiVotes
+      const origRandom = Math.random;
+      let callCount = 0;
+      Math.random = () => {
+        callCount++;
+        return 0.5; // deterministic: sync fluctuation delta = 0, randomizeMagiVotes always true
+      };
 
-      // Run with DISAGREE
-      store.setMagiVotes({ melchior: false, balthasar: false, casper: false });
-      engine.start();
-      // Run into APPROACH phase where damage starts (10s detection + a few ticks)
-      jest.advanceTimersByTime(12_000);
-      const hpWithoutMagi = useNervStore.getState().simulation.angelHp;
-      engine.destroy();
+      try {
+        const store = useNervStore.getState();
+        store.addPilot({ id: 'p1', name: 'Shinji', status: 'ACTIVE', evaUnitId: 'EVA-01', syncRatio: 80 });
 
-      // Reset and run with AGREE
-      resetStore();
-      store.addPilot({ id: 'p1', name: 'Shinji', status: 'ACTIVE', evaUnitId: 'EVA-01', syncRatio: 80 });
-      useNervStore.getState().setMagiVotes({ melchior: true, balthasar: true, casper: true });
-      engine = new SimulationEngine();
-      engine.start();
-      jest.advanceTimersByTime(12_000);
-      const hpWithMagi = useNervStore.getState().simulation.angelHp;
+        // Run with DISAGREE — set votes after start since start randomizes them
+        engine.start();
+        useNervStore.getState().setMagiVotes({ melchior: false, balthasar: false, casper: false });
+        // Run into APPROACH phase where damage starts (10s detection + a few ticks)
+        jest.advanceTimersByTime(12_000);
+        // Re-assert DISAGREE after phase transition (advancePhase calls randomizeMagiVotes)
+        useNervStore.getState().setMagiVotes({ melchior: false, balthasar: false, casper: false });
+        jest.advanceTimersByTime(1_000);
+        const hpWithoutMagi = useNervStore.getState().simulation.angelHp;
+        engine.destroy();
 
-      // With MAGI AGREE, angel should take more damage (lower HP)
-      expect(hpWithMagi).toBeLessThanOrEqual(hpWithoutMagi);
+        // Reset and run with AGREE
+        resetStore();
+        useNervStore.getState().addPilot({ id: 'p1', name: 'Shinji', status: 'ACTIVE', evaUnitId: 'EVA-01', syncRatio: 80 });
+        engine = new SimulationEngine();
+        engine.start();
+        useNervStore.getState().setMagiVotes({ melchior: true, balthasar: true, casper: true });
+        jest.advanceTimersByTime(12_000);
+        useNervStore.getState().setMagiVotes({ melchior: true, balthasar: true, casper: true });
+        jest.advanceTimersByTime(1_000);
+        const hpWithMagi = useNervStore.getState().simulation.angelHp;
+
+        // With MAGI AGREE, angel should take more damage (lower HP)
+        expect(hpWithMagi).toBeLessThanOrEqual(hpWithoutMagi);
+      } finally {
+        Math.random = origRandom;
+      }
     });
   });
 
