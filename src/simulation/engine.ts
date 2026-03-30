@@ -35,15 +35,47 @@ export function eva_pickAngel(): string {
   return ANGEL_NAMES[Math.floor(Math.random() * ANGEL_NAMES.length)];
 }
 
-export function eva_computeCombatDamage(syncRatios: SyncRatios): {
+/** Per-phase damage multipliers for angel and NERV damage */
+export const PHASE_DAMAGE_MULTIPLIERS: Record<SimulationPhase, { angel: number; nerv: number }> = {
+  IDLE: { angel: 0, nerv: 0 },
+  DETECTION: { angel: 0, nerv: 0 },
+  APPROACH: { angel: 0.5, nerv: 0.3 },
+  CONTACT: { angel: 1.5, nerv: 0.8 },
+  RESOLUTION: { angel: 2.0, nerv: 1.2 },
+};
+
+export function eva_computeCombatDamage(
+  syncRatios: SyncRatios,
+  options?: { phase?: SimulationPhase; magiAgreed?: boolean },
+): {
   angelDamage: number;
   nervDamage: number;
 } {
+  const phase = options?.phase ?? 'CONTACT';
+  const multipliers = PHASE_DAMAGE_MULTIPLIERS[phase];
+
+  // No damage during non-combat phases
+  if (multipliers.angel === 0 && multipliers.nerv === 0) {
+    return { angelDamage: 0, nervDamage: 0 };
+  }
+
   const values = Object.values(syncRatios);
   const avg = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 50;
-  const angelDamage = avg / 20 + Math.random() * 2;
-  const nervDamage = 1 + Math.random() * 4;
+  const syncFactor = avg / 100;
+  const magiMultiplier = options?.magiAgreed ? 1.5 : 1.0;
+
+  const angelDamage = multipliers.angel * syncFactor * magiMultiplier + Math.random() * 2;
+  const nervDamage = multipliers.nerv + Math.random() * 4;
   return { angelDamage, nervDamage };
+}
+
+/**
+ * Apply random fluctuation to a sync ratio value.
+ * @returns The new sync ratio, clamped to 0–100.
+ */
+export function eva_fluctuateSyncRatio(current: number): number {
+  const delta = (Math.random() - 0.5) * 4;
+  return Math.max(0, Math.min(100, current + delta));
 }
 
 export function eva_phaseAlertMessage(phase: SimulationPhase, angelName: string): string {
