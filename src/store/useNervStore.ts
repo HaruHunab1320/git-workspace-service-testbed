@@ -13,10 +13,20 @@ import type {
   SyncRatios,
   EvaPosition,
   HexCoordinate,
+  SimulationState,
 } from '../types/nerv.d';
+import {
+  PHASE_DURATIONS,
+  eva_nextPhase,
+  eva_simulationTick,
+  eva_checkOutcome,
+  eva_phaseToEmergencyLevel,
+  eva_phaseAlertMessage,
+  eva_phaseAlertLevel,
+} from '../systems/simulation';
 
 // Re-export all types so consumers can import from either location
-export type { EmergencyLevel, MagiStatus, MagiSubSystem, MagiVotes, SystemAlert, SyncRatios, EvaPosition, HexCoordinate };
+export type { EmergencyLevel, MagiStatus, MagiSubSystem, MagiVotes, SystemAlert, SyncRatios, EvaPosition, HexCoordinate, SimulationState };
 
 /** Full shape of the NERV global state including data and actions */
 export interface NervState {
@@ -59,6 +69,17 @@ export interface NervState {
   triggerAngelDetected: () => void;
   /** Reset all emergency state back to NORMAL */
   resetEmergency: () => void;
+
+  // --- Simulation State ---
+  simulation: SimulationState;
+
+  // --- Simulation Actions ---
+  startSimulation: () => void;
+  pauseSimulation: () => void;
+  resumeSimulation: () => void;
+  resetSimulation: () => void;
+  /** Called every second by the component's interval. Advances timers, computes damage, transitions phases. */
+  tickSimulation: () => void;
 }
 
 /**
@@ -205,5 +226,222 @@ export const useNervStore = create<NervState>((set) => ({
       angelDetected: false,
       emergencyLevel: 'NORMAL',
       systemAlerts: [],
+    }),
+
+  // --- Simulation ---
+  simulation: {
+    phase: 'IDLE',
+    status: 'STOPPED',
+    outcome: 'PENDING',
+    phaseTimeRemaining: 0,
+    totalElapsed: 0,
+    angelHp: 100,
+    nervIntegrity: 100,
+  },
+
+  startSimulation: () =>
+    set((state) => ({
+      simulation: {
+        phase: 'DETECTION',
+        status: 'RUNNING',
+        outcome: 'PENDING',
+        phaseTimeRemaining: PHASE_DURATIONS.DETECTION,
+        totalElapsed: 0,
+        angelHp: 100,
+        nervIntegrity: 100,
+      },
+      angelDetected: true,
+      emergencyLevel: 'EMERGENCY' as const,
+      systemAlerts: [
+        ...state.systemAlerts,
+        {
+          id: generateAlertId(),
+          message: '[SYSTEM_REPORT] ANGEL DETECTED - PATTERN BLUE CONFIRMED',
+          level: 'EMERGENCY' as const,
+          timestamp: Date.now(),
+        },
+      ],
+    })),
+
+  pauseSimulation: () =>
+    set((state) => ({
+      simulation: { ...state.simulation, status: 'PAUSED' },
+    })),
+
+  resumeSimulation: () =>
+    set((state) => ({
+      simulation: { ...state.simulation, status: 'RUNNING' },
+    })),
+
+  resetSimulation: () =>
+    set({
+      simulation: {
+        phase: 'IDLE',
+        status: 'STOPPED',
+        outcome: 'PENDING',
+        phaseTimeRemaining: 0,
+        totalElapsed: 0,
+        angelHp: 100,
+        nervIntegrity: 100,
+      },
+      angelDetected: false,
+      emergencyLevel: 'NORMAL',
+      systemAlerts: [],
+    }),
+
+  tickSimulation: () =>
+    set((state) => {
+      const sim = state.simulation;
+      if (sim.status !== 'RUNNING') return {};
+
+      // Compute average sync ratio from store
+      const ratioValues = Object.values(state.syncRatios);
+      const avgSyncRatio = ratioValues.length > 0
+        ? ratioValues.reduce((a, b) => a + b, 0) / ratioValues.length
+        : 50; // default if no pilots
+
+      // Compute tick deltas
+      const deltas = eva_simulationTick({
+        phase: sim.phase,
+        angelHp: sim.angelHp,
+        nervIntegrity: sim.nervIntegrity,
+        avgSyncRatio,
+        magiStatus: state.magiStatus,
+      });
+
+      const newAngelHp = Math.max(0, Math.min(100, sim.angelHp + deltas.angelHpDelta));
+      const newNervIntegrity = Math.max(0, Math.min(100, sim.nervIntegrity + deltas.nervIntegrityDelta));
+      const newTotalElapsed = sim.totalElapsed + 1;
+      const newPhaseTimeRemaining = sim.phaseTimeRemaining - 1;
+
+      // Check outcome
+      const outcome = eva_checkOutcome(newAngelHp, newNervIntegrity);
+
+      if (outcome === 'WIN') {
+        return {
+          simulation: {
+            ...sim,
+            angelHp: newAngelHp,
+            nervIntegrity: newNervIntegrity,
+            totalElapsed: newTotalElapsed,
+            phaseTimeRemaining: 0,
+            outcome: 'WIN',
+            status: 'COMPLETE',
+            phase: 'IDLE',
+          },
+          angelDetected: false,
+          emergencyLevel: 'NORMAL' as const,
+          systemAlerts: [
+            {
+              id: generateAlertId(),
+              message: '[VICTORY] Angel neutralized - all clear',
+              level: 'INFO' as const,
+              timestamp: Date.now(),
+            },
+          ],
+        };
+      }
+
+      if (outcome === 'LOSE') {
+        return {
+          simulation: {
+            ...sim,
+            angelHp: newAngelHp,
+            nervIntegrity: newNervIntegrity,
+            totalElapsed: newTotalElapsed,
+            phaseTimeRemaining: 0,
+            outcome: 'LOSE',
+            status: 'COMPLETE',
+            phase: 'IDLE',
+          },
+          systemAlerts: [
+            ...state.systemAlerts,
+            {
+              id: generateAlertId(),
+              message: '[DEFEAT] NERV integrity compromised - facility lost',
+              level: 'EMERGENCY' as const,
+              timestamp: Date.now(),
+            },
+          ],
+        };
+      }
+
+      // Randomize MAGI votes every 5 ticks during CONTACT
+      let magiUpdates = {};
+      if (sim.phase === 'CONTACT' && newTotalElapsed % 5 === 0) {
+        const newVotes = {
+          melchior: Math.random() > 0.5,
+          balthasar: Math.random() > 0.5,
+          casper: Math.random() > 0.5,
+        };
+        magiUpdates = {
+          magiVotes: newVotes,
+          magiStatus: eva_computeMagiStatus(newVotes),
+        };
+      }
+
+      // Phase transition
+      if (newPhaseTimeRemaining <= 0) {
+        const nextPhase = eva_nextPhase(sim.phase);
+        if (nextPhase === null) {
+          // End of RESOLUTION with no outcome -> WIN
+          return {
+            simulation: {
+              ...sim,
+              angelHp: newAngelHp,
+              nervIntegrity: newNervIntegrity,
+              totalElapsed: newTotalElapsed,
+              phaseTimeRemaining: 0,
+              outcome: 'WIN',
+              status: 'COMPLETE',
+              phase: 'IDLE',
+            },
+            angelDetected: false,
+            emergencyLevel: 'NORMAL' as const,
+            systemAlerts: [
+              {
+                id: generateAlertId(),
+                message: '[VICTORY] Angel neutralized - all clear',
+                level: 'INFO' as const,
+                timestamp: Date.now(),
+              },
+            ],
+            ...magiUpdates,
+          };
+        }
+
+        return {
+          simulation: {
+            ...sim,
+            angelHp: newAngelHp,
+            nervIntegrity: newNervIntegrity,
+            totalElapsed: newTotalElapsed,
+            phase: nextPhase,
+            phaseTimeRemaining: PHASE_DURATIONS[nextPhase],
+          },
+          emergencyLevel: eva_phaseToEmergencyLevel(nextPhase),
+          systemAlerts: [
+            ...state.systemAlerts,
+            {
+              id: generateAlertId(),
+              message: eva_phaseAlertMessage(nextPhase),
+              level: eva_phaseAlertLevel(nextPhase),
+              timestamp: Date.now(),
+            },
+          ],
+          ...magiUpdates,
+        };
+      }
+
+      return {
+        simulation: {
+          ...sim,
+          angelHp: newAngelHp,
+          nervIntegrity: newNervIntegrity,
+          totalElapsed: newTotalElapsed,
+          phaseTimeRemaining: newPhaseTimeRemaining,
+        },
+        ...magiUpdates,
+      };
     }),
 }));

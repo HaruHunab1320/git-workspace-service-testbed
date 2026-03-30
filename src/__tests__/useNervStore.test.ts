@@ -1,4 +1,15 @@
 import { useNervStore } from '../store/useNervStore';
+import { PHASE_DURATIONS } from '../systems/simulation';
+
+const INITIAL_SIMULATION = {
+  phase: 'IDLE' as const,
+  status: 'STOPPED' as const,
+  outcome: 'PENDING' as const,
+  phaseTimeRemaining: 0,
+  totalElapsed: 0,
+  angelHp: 100,
+  nervIntegrity: 100,
+};
 
 /**
  * Integration tests for the useNervStore Zustand store.
@@ -17,6 +28,7 @@ describe('useNervStore', () => {
       systemAlerts: [],
       evaPositions: [],
       angelDetected: false,
+      simulation: { ...INITIAL_SIMULATION },
     });
   });
 
@@ -183,6 +195,116 @@ describe('useNervStore', () => {
       expect(state.angelDetected).toBe(false);
       expect(state.emergencyLevel).toBe('NORMAL');
       expect(state.systemAlerts).toHaveLength(0);
+    });
+  });
+
+  describe('simulation actions', () => {
+    it('startSimulation sets correct initial simulation state and triggers angel detection', () => {
+      useNervStore.getState().startSimulation();
+      const state = useNervStore.getState();
+      expect(state.simulation.status).toBe('RUNNING');
+      expect(state.simulation.phase).toBe('DETECTION');
+      expect(state.simulation.phaseTimeRemaining).toBe(PHASE_DURATIONS.DETECTION);
+      expect(state.simulation.outcome).toBe('PENDING');
+      expect(state.simulation.angelHp).toBe(100);
+      expect(state.simulation.nervIntegrity).toBe(100);
+      expect(state.simulation.totalElapsed).toBe(0);
+      expect(state.angelDetected).toBe(true);
+      expect(state.emergencyLevel).toBe('EMERGENCY');
+      expect(state.systemAlerts.length).toBeGreaterThanOrEqual(1);
+      expect(state.systemAlerts[0].message).toContain('PATTERN BLUE');
+    });
+
+    it('pauseSimulation / resumeSimulation toggle status correctly', () => {
+      useNervStore.getState().startSimulation();
+      useNervStore.getState().pauseSimulation();
+      expect(useNervStore.getState().simulation.status).toBe('PAUSED');
+
+      useNervStore.getState().resumeSimulation();
+      expect(useNervStore.getState().simulation.status).toBe('RUNNING');
+    });
+
+    it('resetSimulation returns to initial state and clears emergency', () => {
+      useNervStore.getState().startSimulation();
+      useNervStore.getState().resetSimulation();
+      const state = useNervStore.getState();
+      expect(state.simulation.phase).toBe('IDLE');
+      expect(state.simulation.status).toBe('STOPPED');
+      expect(state.simulation.outcome).toBe('PENDING');
+      expect(state.simulation.angelHp).toBe(100);
+      expect(state.simulation.nervIntegrity).toBe(100);
+      expect(state.angelDetected).toBe(false);
+      expect(state.emergencyLevel).toBe('NORMAL');
+      expect(state.systemAlerts).toHaveLength(0);
+    });
+
+    it('tickSimulation decrements phaseTimeRemaining and increments totalElapsed', () => {
+      useNervStore.getState().startSimulation();
+      const beforeTime = useNervStore.getState().simulation.phaseTimeRemaining;
+      useNervStore.getState().tickSimulation();
+      const state = useNervStore.getState();
+      expect(state.simulation.phaseTimeRemaining).toBe(beforeTime - 1);
+      expect(state.simulation.totalElapsed).toBe(1);
+    });
+
+    it('tickSimulation auto-advances phase when timer hits 0', () => {
+      useNervStore.getState().startSimulation();
+      // Set phase time to 1 so next tick triggers transition
+      useNervStore.setState({
+        simulation: {
+          ...useNervStore.getState().simulation,
+          phaseTimeRemaining: 1,
+        },
+      });
+      useNervStore.getState().tickSimulation();
+      const state = useNervStore.getState();
+      expect(state.simulation.phase).toBe('APPROACH');
+      expect(state.simulation.phaseTimeRemaining).toBe(PHASE_DURATIONS.APPROACH);
+    });
+
+    it('tickSimulation is no-op when paused', () => {
+      useNervStore.getState().startSimulation();
+      useNervStore.getState().pauseSimulation();
+      const beforeElapsed = useNervStore.getState().simulation.totalElapsed;
+      useNervStore.getState().tickSimulation();
+      expect(useNervStore.getState().simulation.totalElapsed).toBe(beforeElapsed);
+    });
+
+    it('tickSimulation sets outcome WIN and status COMPLETE when angel HP reaches 0', () => {
+      useNervStore.getState().startSimulation();
+      // Put in CONTACT phase with very low angel HP
+      useNervStore.setState({
+        simulation: {
+          ...useNervStore.getState().simulation,
+          phase: 'CONTACT',
+          phaseTimeRemaining: 10,
+          angelHp: 1,
+        },
+        syncRatios: { 'pilot-01': 100 },
+      });
+      useNervStore.getState().tickSimulation();
+      const state = useNervStore.getState();
+      expect(state.simulation.outcome).toBe('WIN');
+      expect(state.simulation.status).toBe('COMPLETE');
+    });
+
+    it('tickSimulation sets outcome LOSE and status COMPLETE when NERV integrity reaches 0', () => {
+      useNervStore.getState().startSimulation();
+      // Put in CONTACT phase with very low NERV integrity
+      useNervStore.setState({
+        simulation: {
+          ...useNervStore.getState().simulation,
+          phase: 'CONTACT',
+          phaseTimeRemaining: 10,
+          nervIntegrity: 1,
+          angelHp: 100,
+        },
+        syncRatios: { 'pilot-01': 0 }, // no damage to angel
+      });
+      useNervStore.getState().tickSimulation();
+      const state = useNervStore.getState();
+      expect(state.simulation.outcome).toBe('LOSE');
+      expect(state.simulation.status).toBe('COMPLETE');
     });
   });
 });
