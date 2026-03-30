@@ -43,40 +43,40 @@ export function eva_phaseToEmergencyLevel(phase: SimulationPhase): EmergencyLeve
 export function eva_simulationTick(params: {
   phase: SimulationPhase;
   angelHp: number;
-  nervIntegrity: number;
+  nervDefense: number;
   avgSyncRatio: number;
   magiStatus: MagiStatus;
 }): {
   angelHpDelta: number;
-  nervIntegrityDelta: number;
+  nervDefenseDelta: number;
 } {
   const { phase, avgSyncRatio, magiStatus } = params;
 
   switch (phase) {
     case 'DETECTION':
-      return { angelHpDelta: 0, nervIntegrityDelta: 0 };
+      return { angelHpDelta: 0, nervDefenseDelta: 0 };
 
     case 'APPROACH':
-      return { angelHpDelta: 0, nervIntegrityDelta: -0.5 };
+      return { angelHpDelta: 0, nervDefenseDelta: -0.5 };
 
     case 'CONTACT': {
       const angelDamage = -(avgSyncRatio / 100) * 3;
       const nervDamage = magiStatus === 'AGREE' ? -1 : -2;
-      return { angelHpDelta: angelDamage, nervIntegrityDelta: nervDamage };
+      return { angelHpDelta: angelDamage, nervDefenseDelta: nervDamage };
     }
 
     case 'RESOLUTION':
-      return { angelHpDelta: -1, nervIntegrityDelta: -0.5 };
+      return { angelHpDelta: -1, nervDefenseDelta: -0.5 };
 
     default:
-      return { angelHpDelta: 0, nervIntegrityDelta: 0 };
+      return { angelHpDelta: 0, nervDefenseDelta: 0 };
   }
 }
 
-/** Determine outcome: WIN if angelHp <= 0, LOSE if nervIntegrity <= 0, else PENDING */
-export function eva_checkOutcome(angelHp: number, nervIntegrity: number): SimulationOutcome {
-  if (angelHp <= 0) return 'WIN';
-  if (nervIntegrity <= 0) return 'LOSE';
+/** Determine outcome: VICTORY if angelHp <= 0, DEFEAT if nervDefense <= 0, else PENDING */
+export function eva_checkOutcome(angelHp: number, nervDefense: number): SimulationOutcome {
+  if (angelHp <= 0) return 'VICTORY';
+  if (nervDefense <= 0) return 'DEFEAT';
   return 'PENDING';
 }
 

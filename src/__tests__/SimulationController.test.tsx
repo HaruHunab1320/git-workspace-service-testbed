@@ -1,119 +1,209 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { SimulationController } from '../components/SimulationController';
+import SimulationController from '../components/SimulationController';
 import { useNervStore } from '../store/useNervStore';
+import { eva_initialSimulationState } from '../simulation/engine';
 
-const INITIAL_SIMULATION = {
-  phase: 'IDLE' as const,
-  status: 'STOPPED' as const,
-  outcome: 'PENDING' as const,
-  phaseTimeRemaining: 0,
-  totalElapsed: 0,
-  angelHp: 100,
-  nervIntegrity: 100,
+jest.mock('../store/useNervStore');
+const mockUseNervStore = useNervStore as unknown as jest.Mock;
+
+const defaultState: Record<string, unknown> = {
+  emergencyLevel: 'NORMAL',
+  syncRatio: 100,
+  syncRatios: {},
+  magiStatus: 'DISAGREE',
+  magiVotes: { melchior: false, balthasar: false, casper: false },
+  evaPositions: [],
+  systemAlerts: [],
+  angelDetected: false,
+  simulation: eva_initialSimulationState(),
+  setEmergencyLevel: jest.fn(),
+  setSyncRatio: jest.fn(),
+  setSyncRatios: jest.fn(),
+  updatePilotSyncRatio: jest.fn(),
+  setMagiVotes: jest.fn(),
+  randomizeMagiVotes: jest.fn(),
+  addSystemAlert: jest.fn(),
+  clearSystemAlerts: jest.fn(),
+  updateEvaPosition: jest.fn(),
+  removeEvaPosition: jest.fn(),
+  triggerAngelDetected: jest.fn(),
+  resetEmergency: jest.fn(),
+  startSimulation: jest.fn(),
+  pauseSimulation: jest.fn(),
+  resumeSimulation: jest.fn(),
+  resetSimulation: jest.fn(),
+  advancePhase: jest.fn(),
+  tickSimulation: jest.fn(),
+  damageAngel: jest.fn(),
+  damageNerv: jest.fn(),
+  resolveSimulation: jest.fn(),
 };
 
+function mockStore(overrides: Partial<typeof defaultState> = {}) {
+  const state = { ...defaultState, ...overrides };
+  mockUseNervStore.mockImplementation((selector?: (s: Record<string, unknown>) => unknown) =>
+    selector ? selector(state) : state,
+  );
+}
+
 describe('SimulationController', () => {
-  beforeEach(() => {
-    useNervStore.setState({
-      emergencyLevel: 'NORMAL',
-      syncRatio: 100,
-      syncRatios: {},
-      magiVotes: { melchior: false, balthasar: false, casper: false },
-      magiStatus: 'DISAGREE',
-      systemAlerts: [],
-      evaPositions: [],
-      angelDetected: false,
-      simulation: { ...INITIAL_SIMULATION },
-    });
+  afterEach(() => {
+    jest.resetAllMocks();
   });
 
-  it('renders initial IDLE state with START button', () => {
+  it('renders in IDLE/standby state with START button visible', () => {
+    mockStore();
     render(<SimulationController />);
-    expect(screen.getByText('ANGEL ATTACK SIMULATOR')).toBeInTheDocument();
-    expect(screen.getByText('START')).toBeInTheDocument();
-    expect(screen.getByText('RESET')).toBeInTheDocument();
+    expect(screen.getByTestId('simulation-controller')).toBeInTheDocument();
+    expect(screen.getByTestId('simulation-phase')).toHaveTextContent('STANDBY');
+    expect(screen.getByTestId('simulation-btn-start')).toBeInTheDocument();
   });
 
-  it('shows PENDING outcome initially', () => {
+  it('START button calls startSimulation', () => {
+    mockStore();
     render(<SimulationController />);
-    expect(screen.getByText('PENDING')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('simulation-btn-start'));
+    expect(defaultState.startSimulation).toHaveBeenCalledTimes(1);
   });
 
-  it('clicking START calls startSimulation', () => {
-    render(<SimulationController />);
-    fireEvent.click(screen.getByText('START'));
-    const state = useNervStore.getState();
-    expect(state.simulation.status).toBe('RUNNING');
-    expect(state.simulation.phase).toBe('DETECTION');
-    expect(state.angelDetected).toBe(true);
-  });
-
-  it('shows PAUSE button when running', () => {
-    render(<SimulationController />);
-    fireEvent.click(screen.getByText('START'));
-    expect(screen.getByText('PAUSE')).toBeInTheDocument();
-  });
-
-  it('clicking PAUSE sets status to PAUSED', () => {
-    render(<SimulationController />);
-    fireEvent.click(screen.getByText('START'));
-    fireEvent.click(screen.getByText('PAUSE'));
-    expect(useNervStore.getState().simulation.status).toBe('PAUSED');
-  });
-
-  it('shows RESUME button when paused', () => {
-    render(<SimulationController />);
-    fireEvent.click(screen.getByText('START'));
-    fireEvent.click(screen.getByText('PAUSE'));
-    expect(screen.getByText('RESUME')).toBeInTheDocument();
-  });
-
-  it('clicking RESET returns to initial state', () => {
-    render(<SimulationController />);
-    fireEvent.click(screen.getByText('START'));
-    fireEvent.click(screen.getByText('RESET'));
-    const state = useNervStore.getState();
-    expect(state.simulation.status).toBe('STOPPED');
-    expect(state.simulation.phase).toBe('IDLE');
-    expect(state.angelDetected).toBe(false);
-    expect(state.emergencyLevel).toBe('NORMAL');
-  });
-
-  it('displays HP bars', () => {
-    render(<SimulationController />);
-    expect(screen.getByTestId('angel-hp-bar')).toBeInTheDocument();
-    expect(screen.getByTestId('nerv-integrity-bar')).toBeInTheDocument();
-  });
-
-  it('shows WIN outcome with correct styling', () => {
-    useNervStore.setState({
+  it('shows angel name and phase when simulation running', () => {
+    mockStore({
       simulation: {
-        ...INITIAL_SIMULATION,
-        status: 'COMPLETE',
-        outcome: 'WIN',
-        angelHp: 0,
+        ...eva_initialSimulationState(),
+        phase: 'DETECTION',
+        currentAngelName: 'SACHIEL',
+        phaseTimeRemaining: 8,
       },
     });
     render(<SimulationController />);
-    const winText = screen.getByText('WIN');
-    expect(winText).toBeInTheDocument();
-    expect(winText.style.color).toBe('rgb(0, 255, 0)');
+    expect(screen.getByTestId('simulation-phase')).toHaveTextContent('DETECTION');
+    expect(screen.getByTestId('simulation-angel-name')).toHaveTextContent('TARGET: SACHIEL');
   });
 
-  it('shows LOSE outcome with correct styling', () => {
-    useNervStore.setState({
+  it('timer displays correct phaseTimeRemaining', () => {
+    mockStore({
       simulation: {
-        ...INITIAL_SIMULATION,
-        status: 'COMPLETE',
-        outcome: 'LOSE',
-        nervIntegrity: 0,
+        ...eva_initialSimulationState(),
+        phase: 'APPROACH',
+        currentAngelName: 'RAMIEL',
+        phaseTimeRemaining: 12,
       },
     });
     render(<SimulationController />);
-    const loseText = screen.getByText('LOSE');
-    expect(loseText).toBeInTheDocument();
-    expect(loseText.style.color).toBe('rgb(255, 0, 0)');
+    expect(screen.getByTestId('simulation-timer')).toHaveTextContent('12s');
+  });
+
+  it('PAUSE button appears during active simulation and calls pauseSimulation', () => {
+    mockStore({
+      simulation: {
+        ...eva_initialSimulationState(),
+        phase: 'CONTACT',
+        currentAngelName: 'ZERUEL',
+        phaseTimeRemaining: 15,
+      },
+    });
+    render(<SimulationController />);
+    const btn = screen.getByTestId('simulation-btn-pause');
+    expect(btn).toHaveTextContent('PAUSE');
+    fireEvent.click(btn);
+    expect(defaultState.pauseSimulation).toHaveBeenCalledTimes(1);
+  });
+
+  it('RESUME button appears when paused and calls resumeSimulation', () => {
+    mockStore({
+      simulation: {
+        ...eva_initialSimulationState(),
+        phase: 'CONTACT',
+        isPaused: true,
+        currentAngelName: 'ZERUEL',
+        phaseTimeRemaining: 10,
+      },
+    });
+    render(<SimulationController />);
+    const btn = screen.getByTestId('simulation-btn-pause');
+    expect(btn).toHaveTextContent('RESUME');
+    fireEvent.click(btn);
+    expect(defaultState.resumeSimulation).toHaveBeenCalledTimes(1);
+  });
+
+  it('RESET button calls resetSimulation', () => {
+    mockStore({
+      simulation: {
+        ...eva_initialSimulationState(),
+        phase: 'DETECTION',
+        currentAngelName: 'SACHIEL',
+        phaseTimeRemaining: 5,
+      },
+    });
+    render(<SimulationController />);
+    fireEvent.click(screen.getByTestId('simulation-btn-reset'));
+    expect(defaultState.resetSimulation).toHaveBeenCalledTimes(1);
+  });
+
+  it('health bars reflect angelHp and nervDefense values', () => {
+    mockStore({
+      simulation: {
+        ...eva_initialSimulationState(),
+        phase: 'CONTACT',
+        currentAngelName: 'ISRAFEL',
+        phaseTimeRemaining: 10,
+        angelHp: 65,
+        nervDefense: 40,
+      },
+    });
+    render(<SimulationController />);
+    expect(screen.getByTestId('simulation-angel-hp')).toHaveTextContent('65%');
+    expect(screen.getByTestId('simulation-nerv-defense')).toHaveTextContent('40%');
+  });
+
+  it('displays VICTORY outcome with correct styling', () => {
+    mockStore({
+      simulation: {
+        ...eva_initialSimulationState(),
+        outcome: 'VICTORY',
+      },
+    });
+    render(<SimulationController />);
+    const outcome = screen.getByTestId('simulation-outcome');
+    expect(outcome).toHaveTextContent('ANGEL NEUTRALIZED');
+    expect(outcome.style.color).toBe('rgb(57, 255, 20)');
+  });
+
+  it('displays DEFEAT outcome with correct styling', () => {
+    mockStore({
+      simulation: {
+        ...eva_initialSimulationState(),
+        outcome: 'DEFEAT',
+      },
+    });
+    render(<SimulationController />);
+    const outcome = screen.getByTestId('simulation-outcome');
+    expect(outcome).toHaveTextContent('DEFENSE BREACH');
+    expect(outcome.style.color).toBe('rgb(255, 51, 0)');
+  });
+
+  it('phase badge shows correct color per phase', () => {
+    const phases = [
+      { phase: 'DETECTION', expectedBg: 'rgb(57, 255, 20)' },
+      { phase: 'APPROACH', expectedBg: 'rgb(255, 153, 0)' },
+      { phase: 'CONTACT', expectedBg: 'rgb(255, 51, 0)' },
+      { phase: 'RESOLUTION', expectedBg: 'rgb(255, 215, 0)' },
+    ] as const;
+
+    for (const { phase, expectedBg } of phases) {
+      mockStore({
+        simulation: {
+          ...eva_initialSimulationState(),
+          phase,
+          currentAngelName: 'SACHIEL',
+          phaseTimeRemaining: 5,
+        },
+      });
+      const { unmount } = render(<SimulationController />);
+      const badge = screen.getByTestId('simulation-phase');
+      expect(badge.style.backgroundColor).toBe(expectedBg);
+      unmount();
+    }
   });
 });

@@ -61,20 +61,20 @@ export type SimulationPhase = 'IDLE' | 'DETECTION' | 'APPROACH' | 'CONTACT' | 'R
 /** Simulation run status */
 export type SimulationStatus = 'STOPPED' | 'RUNNING' | 'PAUSED' | 'COMPLETE';
 
-/** Final outcome of a simulation */
-export type SimulationOutcome = 'PENDING' | 'WIN' | 'LOSE';
+/** Simulation outcome */
+export type SimulationOutcome = 'PENDING' | 'VICTORY' | 'DEFEAT';
 
 /** Full simulation state */
 export interface SimulationState {
   phase: SimulationPhase;
-  status: SimulationStatus;
   outcome: SimulationOutcome;
-  /** Seconds remaining in current phase */
+  isPaused: boolean;
   phaseTimeRemaining: number;
   /** Total seconds elapsed since simulation start */
   totalElapsed: number;
-  /** Angel HP 0-100, reaching 0 = WIN */
+  /** Seconds elapsed in the current phase */
+  phaseElapsed: number;
   angelHp: number;
-  /** NERV integrity 0-100, reaching 0 = LOSE */
-  nervIntegrity: number;
+  nervDefense: number;
+  currentAngelName: string;
 }
