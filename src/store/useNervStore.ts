@@ -284,6 +284,7 @@ export const useNervStore = create<NervState>((set) => ({
           outcome: 'PENDING' as const,
           isPaused: false,
           phaseTimeRemaining: PHASE_DURATIONS.DETECTION,
+          totalElapsed: 0,
           phaseElapsed: 0,
           angelHp: eva_scaledAngelHp(tier),
           nervDefense: 100,
@@ -295,13 +296,13 @@ export const useNervStore = create<NervState>((set) => ({
         systemAlerts: [
           ...state.systemAlerts,
           {
-            id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+            id: generateAlertId(),
             message: eva_phaseAlertMessage('DETECTION', angelName),
             level: 'EMERGENCY' as const,
             timestamp: Date.now(),
           },
           {
-            id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}-at`,
+            id: generateAlertId(),
             message: `AT FIELD DETECTED — STRENGTH ${Math.round(eva_initialATFieldState(tier).strength)}% — DIFFICULTY: ${tier}`,
             level: 'WARNING' as const,
             timestamp: Date.now(),
@@ -352,7 +353,7 @@ export const useNervStore = create<NervState>((set) => ({
           systemAlerts: [
             ...(outcome === 'VICTORY' ? [] : state.systemAlerts),
             {
-              id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+              id: generateAlertId(),
               message: alertMsg,
               level: alertLevel,
               timestamp: Date.now(),
@@ -374,7 +375,7 @@ export const useNervStore = create<NervState>((set) => ({
         systemAlerts: [
           ...state.systemAlerts,
           {
-            id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+            id: generateAlertId(),
             message: eva_phaseAlertMessage(nextPhase, state.simulation.currentAngelName),
             level: emergencyLevel === 'EMERGENCY' ? ('EMERGENCY' as const) : ('WARNING' as const),
             timestamp: Date.now(),
@@ -390,6 +391,7 @@ export const useNervStore = create<NervState>((set) => ({
     const sim = state.simulation;
     const newTimeRemaining = sim.phaseTimeRemaining - 1;
     const newElapsed = sim.phaseElapsed + 1;
+    const newTotalElapsed = sim.totalElapsed + 1;
     const tier = state.performanceRecord.difficultyTier;
 
     if (sim.phase === 'CONTACT') {
@@ -401,7 +403,7 @@ export const useNervStore = create<NervState>((set) => ({
       const alerts = [...state.systemAlerts];
       if (sim.atField.isActive && !updatedATField.isActive) {
         alerts.push({
-          id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}-at-down`,
+          id: generateAlertId(),
           message: 'AT FIELD NEUTRALIZED — ANGEL CORE EXPOSED',
           level: 'CRITICAL' as const,
           timestamp: Date.now(),
@@ -427,6 +429,7 @@ export const useNervStore = create<NervState>((set) => ({
           ...sim,
           phaseTimeRemaining: newTimeRemaining,
           phaseElapsed: newElapsed,
+          totalElapsed: newTotalElapsed,
           angelHp: newAngelHp,
           nervDefense: newNervDefense,
           atField: updatedATField,
@@ -445,6 +448,7 @@ export const useNervStore = create<NervState>((set) => ({
         ...sim,
         phaseTimeRemaining: newTimeRemaining,
         phaseElapsed: newElapsed,
+        totalElapsed: newTotalElapsed,
       },
     });
 
@@ -483,7 +487,7 @@ export const useNervStore = create<NervState>((set) => ({
       const alerts: SystemAlert[] = [
         ...state.systemAlerts,
         {
-          id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+          id: generateAlertId(),
           message: alertMsg,
           level: alertLevel,
           timestamp: Date.now(),
@@ -493,7 +497,7 @@ export const useNervStore = create<NervState>((set) => ({
       // Notify if difficulty changed
       if (updatedRecord.difficultyTier !== state.performanceRecord.difficultyTier) {
         alerts.push({
-          id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}-diff`,
+          id: generateAlertId(),
           message: `MAGI ANALYSIS COMPLETE — THREAT LEVEL ADJUSTED TO ${updatedRecord.difficultyTier}`,
           level: 'WARNING' as const,
           timestamp: Date.now(),

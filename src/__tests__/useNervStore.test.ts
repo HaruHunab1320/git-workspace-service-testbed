@@ -198,6 +198,7 @@ describe('useNervStore', () => {
       expect(state.simulation.angelHp).toBe(100);
       expect(state.simulation.nervDefense).toBe(100);
       expect(state.simulation.outcome).toBe('PENDING');
+      expect(state.simulation.totalElapsed).toBe(0);
     });
 
     it('sets angelDetected true and emergencyLevel to EMERGENCY', () => {
@@ -220,11 +221,13 @@ describe('useNervStore', () => {
   });
 
   describe('simulation — tickSimulation', () => {
-    it('decrements phaseTimeRemaining', () => {
+    it('decrements phaseTimeRemaining and increments totalElapsed', () => {
       useNervStore.getState().startSimulation();
       const before = useNervStore.getState().simulation.phaseTimeRemaining;
       useNervStore.getState().tickSimulation();
-      expect(useNervStore.getState().simulation.phaseTimeRemaining).toBe(before - 1);
+      const state = useNervStore.getState();
+      expect(state.simulation.phaseTimeRemaining).toBe(before - 1);
+      expect(state.simulation.totalElapsed).toBe(1);
     });
 
     it('is a no-op when paused', () => {
@@ -310,6 +313,7 @@ describe('useNervStore', () => {
       expect(state.simulation.angelHp).toBe(100);
       expect(state.simulation.nervDefense).toBe(100);
       expect(state.simulation.currentAngelName).toBe('');
+      expect(state.simulation.totalElapsed).toBe(0);
       expect(state.angelDetected).toBe(false);
       expect(state.emergencyLevel).toBe('NORMAL');
       expect(state.systemAlerts).toHaveLength(0);
