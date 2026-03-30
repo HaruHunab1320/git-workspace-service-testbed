@@ -15,6 +15,9 @@ import type {
   HexCoordinate,
   SimulationState,
   SimulationOutcome,
+  PilotStatus,
+  PilotRecord,
+  EvaUnitId,
 } from '../types/nerv.d';
 import {
   eva_initialSimulationState,
@@ -26,7 +29,7 @@ import {
 } from '../simulation/engine';
 
 // Re-export all types so consumers can import from either location
-export type { EmergencyLevel, MagiStatus, MagiSubSystem, MagiVotes, SystemAlert, SyncRatios, EvaPosition, HexCoordinate, SimulationState, SimulationOutcome };
+export type { EmergencyLevel, MagiStatus, MagiSubSystem, MagiVotes, SystemAlert, SyncRatios, EvaPosition, HexCoordinate, SimulationState, SimulationOutcome, PilotStatus, PilotRecord, EvaUnitId };
 
 /** Full shape of the NERV global state including data and actions */
 export interface NervState {
@@ -38,6 +41,8 @@ export interface NervState {
   systemAlerts: SystemAlert[];
   evaPositions: EvaPosition[];
   angelDetected: boolean;
+  simulation: SimulationState;
+  pilots: PilotRecord[];
 
   /** Set the facility emergency level */
   setEmergencyLevel: (level: EmergencyLevel) => void;
@@ -70,8 +75,6 @@ export interface NervState {
   /** Reset all emergency state back to NORMAL */
   resetEmergency: () => void;
 
-  /** Angel attack simulation state */
-  simulation: SimulationState;
   /** Start a new angel attack simulation */
   startSimulation: () => void;
   /** Pause the running simulation */
@@ -90,6 +93,17 @@ export interface NervState {
   damageNerv: (amount: number) => void;
   /** Resolve simulation with outcome */
   resolveSimulation: (outcome: SimulationOutcome) => void;
+
+  /** Add a new pilot */
+  addPilot: (pilot: PilotRecord) => void;
+  /** Remove a pilot by ID */
+  removePilot: (pilotId: string) => void;
+  /** Update a pilot's status */
+  setPilotStatus: (pilotId: string, status: PilotStatus) => void;
+  /** Assign an EVA unit to a pilot */
+  assignEvaUnit: (pilotId: string, evaUnitId: EvaUnitId | null) => void;
+  /** Update a pilot's sync ratio */
+  setPilotSyncRatio: (pilotId: string, ratio: number) => void;
 }
 
 /**
@@ -142,6 +156,7 @@ export const useNervStore = create<NervState>((set) => ({
   systemAlerts: [],
   evaPositions: [],
   angelDetected: false,
+  pilots: [],
 
   setEmergencyLevel: (level) => set({ emergencyLevel: level }),
 
@@ -438,6 +453,50 @@ export const useNervStore = create<NervState>((set) => ({
             timestamp: Date.now(),
           },
         ],
+      };
+    }),
+
+  addPilot: (pilot) =>
+    set((state) => {
+      if (state.pilots.some((p) => p.id === pilot.id)) return state;
+      return {
+        pilots: [...state.pilots, pilot],
+        syncRatios: { ...state.syncRatios, [pilot.id]: pilot.syncRatio },
+      };
+    }),
+
+  removePilot: (pilotId) =>
+    set((state) => {
+      const newRatios = { ...state.syncRatios };
+      delete newRatios[pilotId];
+      return {
+        pilots: state.pilots.filter((p) => p.id !== pilotId),
+        syncRatios: newRatios,
+      };
+    }),
+
+  setPilotStatus: (pilotId, status) =>
+    set((state) => ({
+      pilots: state.pilots.map((p) =>
+        p.id === pilotId ? { ...p, status } : p,
+      ),
+    })),
+
+  assignEvaUnit: (pilotId, evaUnitId) =>
+    set((state) => ({
+      pilots: state.pilots.map((p) =>
+        p.id === pilotId ? { ...p, evaUnitId } : p,
+      ),
+    })),
+
+  setPilotSyncRatio: (pilotId, ratio) =>
+    set((state) => {
+      const clamped = eva_calculateSyncRatio(ratio);
+      return {
+        pilots: state.pilots.map((p) =>
+          p.id === pilotId ? { ...p, syncRatio: clamped } : p,
+        ),
+        syncRatios: { ...state.syncRatios, [pilotId]: clamped },
       };
     }),
 }));
