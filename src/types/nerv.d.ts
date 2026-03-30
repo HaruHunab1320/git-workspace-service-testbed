@@ -41,6 +41,37 @@ export interface Pilot {
   status: 'ACTIVE' | 'INACTIVE' | 'BERSERK';
 }
 
+/** Simulation combat phases */
+export type SimulationPhase = 'IDLE' | 'DETECTION' | 'APPROACH' | 'CONTACT' | 'RESOLUTION';
+
+/** Simulation run status */
+export type SimulationStatus = 'STOPPED' | 'RUNNING' | 'PAUSED' | 'VICTORY' | 'DEFEAT';
+
+/** Simulation state slice */
+export interface SimulationState {
+  phase: SimulationPhase;
+  status: SimulationStatus;
+  phaseTimeRemainingMs: number;
+  totalElapsedMs: number;
+  angelHp: number;
+  nervDamage: number;
+}
+
+/** Pilot status for panel management */
+export type PilotStatus = 'ACTIVE' | 'INACTIVE' | 'BERSERK';
+
+/** EVA unit identifiers */
+export type EvaUnitId = 'EVA-00' | 'EVA-01' | 'EVA-02' | 'EVA-03';
+
+/** Pilot record with EVA assignment */
+export interface PilotRecord {
+  id: string;
+  name: string;
+  status: PilotStatus;
+  evaUnitId: EvaUnitId | null;
+  syncRatio: number;
+}
+
 /** Hex coordinate on the GeoFront grid (numeric struct for type safety) */
 export interface HexCoordinate {
   row: number;
