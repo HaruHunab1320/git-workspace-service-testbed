@@ -44,17 +44,19 @@ export interface Pilot {
 /** Simulation combat phases */
 export type SimulationPhase = 'IDLE' | 'DETECTION' | 'APPROACH' | 'CONTACT' | 'RESOLUTION';
 
-/** Simulation run status */
-export type SimulationStatus = 'STOPPED' | 'RUNNING' | 'PAUSED' | 'VICTORY' | 'DEFEAT';
+/** Simulation outcome */
+export type SimulationOutcome = 'PENDING' | 'VICTORY' | 'DEFEAT';
 
-/** Simulation state slice */
+/** Full simulation state */
 export interface SimulationState {
   phase: SimulationPhase;
-  status: SimulationStatus;
-  phaseTimeRemainingMs: number;
-  totalElapsedMs: number;
+  outcome: SimulationOutcome;
+  isPaused: boolean;
+  phaseTimeRemaining: number;
+  phaseElapsed: number;
   angelHp: number;
-  nervDamage: number;
+  nervDefense: number;
+  currentAngelName: string;
 }
 
 /** Pilot status for panel management */

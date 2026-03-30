@@ -1,216 +1,263 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNervStore } from '../store/useNervStore';
-import { SimulationEngine } from '../simulation/SimulationEngine';
+import { PHASE_DURATIONS } from '../simulation/engine';
+import type { SimulationPhase } from '../types/nerv.d';
 
 const NERV_RED = '#FF3300';
 const WARNING_ORANGE = '#FF9900';
 const DEEP_BLACK = '#050505';
-const NOMINAL_GREEN = '#33FF33';
+const NOMINAL_GREEN = '#39FF14';
 
-function formatTime(ms: number): string {
-  const totalSec = Math.floor(ms / 1000);
-  const min = String(Math.floor(totalSec / 60)).padStart(2, '0');
-  const sec = String(totalSec % 60).padStart(2, '0');
-  return `${min}:${sec}`;
+function phaseColor(phase: SimulationPhase): string {
+  switch (phase) {
+    case 'DETECTION':
+      return NOMINAL_GREEN;
+    case 'APPROACH':
+      return WARNING_ORANGE;
+    case 'CONTACT':
+      return NERV_RED;
+    case 'RESOLUTION':
+      return '#FFD700';
+    default:
+      return WARNING_ORANGE;
+  }
 }
 
-function hpBarColor(hp: number): string {
-  if (hp > 66) return NOMINAL_GREEN;
-  if (hp > 33) return '#FFFF00';
-  return NERV_RED;
-}
-
-function dmgBarColor(dmg: number): string {
-  if (dmg < 33) return NOMINAL_GREEN;
-  if (dmg < 66) return WARNING_ORANGE;
-  return NERV_RED;
-}
-
-const SimulationController: React.FC = () => {
-  const { phase, status, phaseTimeRemainingMs, totalElapsedMs, angelHp, nervDamage } =
-    useNervStore((s) => s.simulation);
-  const emergencyLevel = useNervStore((s) => s.emergencyLevel);
-
-  const engineRef = useRef<SimulationEngine | null>(null);
+export default function SimulationController() {
+  const simulation = useNervStore((s) => s.simulation);
+  const startSimulation = useNervStore((s) => s.startSimulation);
+  const pauseSimulation = useNervStore((s) => s.pauseSimulation);
+  const resumeSimulation = useNervStore((s) => s.resumeSimulation);
+  const resetSimulation = useNervStore((s) => s.resetSimulation);
+  const tickSimulation = useNervStore((s) => s.tickSimulation);
 
   useEffect(() => {
-    engineRef.current = new SimulationEngine();
-    return () => engineRef.current?.destroy();
-  }, []);
+    if (simulation.phase === 'IDLE' || simulation.isPaused) return;
+    const id = setInterval(() => tickSimulation(), 1000);
+    return () => clearInterval(id);
+  }, [simulation.phase, simulation.isPaused, tickSimulation]);
 
-  const handleStart = () => {
-    if (status === 'PAUSED') engineRef.current?.resume();
-    else engineRef.current?.start();
-  };
-
-  const handlePause = () => engineRef.current?.pause();
-  const handleReset = () => engineRef.current?.reset();
-
-  const startEnabled = status === 'STOPPED' || status === 'DEFEAT' || status === 'VICTORY';
-  const pauseEnabled = status === 'RUNNING';
-  const resumeEnabled = status === 'PAUSED';
-  const resetEnabled = status !== 'STOPPED';
-
-  const currentPhaseConfig: Record<string, number> = {
-    DETECTION: 10_000,
-    APPROACH: 15_000,
-    CONTACT: 15_000,
-    RESOLUTION: 10_000,
-  };
-  const phaseDuration = currentPhaseConfig[phase] ?? 0;
+  const isRunning = simulation.phase !== 'IDLE';
+  const hasRun = simulation.outcome !== 'PENDING' || isRunning;
+  const totalDuration = PHASE_DURATIONS[simulation.phase] || 1;
+  const timerPercent = isRunning ? (simulation.phaseTimeRemaining / totalDuration) * 100 : 0;
 
   return (
     <div
       data-testid="simulation-controller"
       style={{
         backgroundColor: DEEP_BLACK,
-        border: `1px solid ${NERV_RED}`,
         fontFamily: "'Share Tech Mono', monospace",
-        color: NERV_RED,
+        border: `1px solid ${isRunning ? NERV_RED : WARNING_ORANGE}`,
         padding: '1rem',
         display: 'flex',
         flexDirection: 'column',
         gap: '0.75rem',
       }}
     >
-      <div style={{ fontSize: '0.875rem', fontWeight: 'bold', letterSpacing: '0.15em' }}>
-        ANGEL ATTACK SIMULATION
+      {/* Header */}
+      <div
+        style={{
+          color: WARNING_ORANGE,
+          fontSize: '0.75rem',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          borderBottom: `1px solid ${WARNING_ORANGE}40`,
+          paddingBottom: '0.5rem',
+        }}
+      >
+        [NERV] ANGEL ATTACK SIMULATION
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-        <span data-testid="sim-status">STATUS: {status}</span>
+      {/* Phase indicator */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <span style={{ color: WARNING_ORANGE, fontSize: '0.625rem', letterSpacing: '0.1em' }}>
+          PHASE:
+        </span>
         <span
-          data-testid="sim-phase"
+          data-testid="simulation-phase"
           style={{
-            animation:
-              emergencyLevel === 'EMERGENCY' ? 'phase-pulse 0.8s ease-in-out infinite' : 'none',
+            backgroundColor: isRunning ? phaseColor(simulation.phase) : `${WARNING_ORANGE}30`,
+            color: isRunning ? DEEP_BLACK : WARNING_ORANGE,
+            fontSize: '0.625rem',
+            fontWeight: 'bold',
+            letterSpacing: '0.1em',
+            padding: '0.15rem 0.5rem',
           }}
         >
-          PHASE: {phase}
+          {isRunning ? simulation.phase : 'STANDBY'}
         </span>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: WARNING_ORANGE }}>
-        <span>ELAPSED: {formatTime(totalElapsedMs)}</span>
-        <span>
-          PHASE: {formatTime(phaseDuration - phaseTimeRemainingMs)} / {formatTime(phaseDuration)}
-        </span>
-      </div>
-
-      {/* Angel HP bar */}
-      <div>
-        <div style={{ fontSize: '0.65rem', color: WARNING_ORANGE, marginBottom: '0.25rem' }}>
-          ANGEL
-        </div>
-        <div style={{ position: 'relative', height: 16, backgroundColor: '#111', border: `1px solid ${WARNING_ORANGE}33` }}>
-          <div
-            data-testid="angel-hp-bar"
-            style={{
-              height: '100%',
-              width: `${angelHp}%`,
-              backgroundColor: hpBarColor(angelHp),
-              transition: 'width 400ms, background-color 400ms',
-            }}
-          />
-        </div>
-        <div style={{ fontSize: '0.65rem', color: WARNING_ORANGE, textAlign: 'right' }}>
-          HP: {Math.round(angelHp)}%
-        </div>
-      </div>
-
-      {/* NERV Damage bar */}
-      <div>
-        <div style={{ fontSize: '0.65rem', color: WARNING_ORANGE, marginBottom: '0.25rem' }}>
-          NERV
-        </div>
-        <div style={{ position: 'relative', height: 16, backgroundColor: '#111', border: `1px solid ${WARNING_ORANGE}33` }}>
-          <div
-            data-testid="nerv-dmg-bar"
-            style={{
-              height: '100%',
-              width: `${nervDamage}%`,
-              backgroundColor: dmgBarColor(nervDamage),
-              transition: 'width 400ms, background-color 400ms',
-            }}
-          />
-        </div>
-        <div style={{ fontSize: '0.65rem', color: WARNING_ORANGE, textAlign: 'right' }}>
-          DMG: {Math.round(nervDamage)}%
-        </div>
-      </div>
-
-      {/* Victory / Defeat indicator */}
-      {status === 'VICTORY' && (
-        <div data-testid="victory-indicator" style={{ color: NOMINAL_GREEN, textAlign: 'center', fontWeight: 'bold', letterSpacing: '0.2em' }}>
-          VICTORY - ANGEL NEUTRALIZED
+      {/* Angel name */}
+      {isRunning && (
+        <div
+          data-testid="simulation-angel-name"
+          style={{ color: NERV_RED, fontSize: '0.875rem', letterSpacing: '0.15em' }}
+        >
+          TARGET: {simulation.currentAngelName}
         </div>
       )}
-      {status === 'DEFEAT' && (
-        <div data-testid="defeat-indicator" style={{ color: NERV_RED, textAlign: 'center', fontWeight: 'bold', letterSpacing: '0.2em' }}>
-          DEFEAT - GEOFRONT BREACH
+
+      {/* Timer bar */}
+      {isRunning && (
+        <div data-testid="simulation-timer" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: WARNING_ORANGE, fontSize: '0.625rem' }}>TIME REMAINING</span>
+            <span style={{ color: WARNING_ORANGE, fontSize: '0.625rem' }}>
+              {simulation.phaseTimeRemaining}s
+            </span>
+          </div>
+          <div
+            style={{
+              height: 6,
+              backgroundColor: `${WARNING_ORANGE}20`,
+              border: `1px solid ${WARNING_ORANGE}40`,
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                width: `${timerPercent}%`,
+                backgroundColor: phaseColor(simulation.phase),
+                transition: 'width 0.3s',
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Health bars */}
+      {isRunning && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {/* Angel HP */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+              <span style={{ color: NERV_RED, fontSize: '0.625rem', letterSpacing: '0.1em' }}>
+                ANGEL INTEGRITY
+              </span>
+              <span data-testid="simulation-angel-hp" style={{ color: NERV_RED, fontSize: '0.625rem' }}>
+                {Math.round(simulation.angelHp)}%
+              </span>
+            </div>
+            <div style={{ height: 8, backgroundColor: `${NERV_RED}20`, border: `1px solid ${NERV_RED}40` }}>
+              <div
+                style={{
+                  height: '100%',
+                  width: `${simulation.angelHp}%`,
+                  backgroundColor: NERV_RED,
+                  transition: 'width 0.3s',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* NERV Defense */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+              <span style={{ color: NOMINAL_GREEN, fontSize: '0.625rem', letterSpacing: '0.1em' }}>
+                NERV DEFENSE
+              </span>
+              <span data-testid="simulation-nerv-defense" style={{ color: NOMINAL_GREEN, fontSize: '0.625rem' }}>
+                {Math.round(simulation.nervDefense)}%
+              </span>
+            </div>
+            <div style={{ height: 8, backgroundColor: `${NOMINAL_GREEN}20`, border: `1px solid ${NOMINAL_GREEN}40` }}>
+              <div
+                style={{
+                  height: '100%',
+                  width: `${simulation.nervDefense}%`,
+                  backgroundColor: NOMINAL_GREEN,
+                  transition: 'width 0.3s',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Outcome display */}
+      {simulation.outcome !== 'PENDING' && (
+        <div
+          data-testid="simulation-outcome"
+          style={{
+            textAlign: 'center',
+            padding: '0.5rem',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            letterSpacing: '0.2em',
+            color: simulation.outcome === 'VICTORY' ? NOMINAL_GREEN : NERV_RED,
+            backgroundColor:
+              simulation.outcome === 'VICTORY' ? `${NOMINAL_GREEN}15` : `${NERV_RED}15`,
+            border: `1px solid ${simulation.outcome === 'VICTORY' ? NOMINAL_GREEN : NERV_RED}`,
+          }}
+        >
+          {simulation.outcome === 'VICTORY' ? 'ANGEL NEUTRALIZED' : 'DEFENSE BREACH'}
         </div>
       )}
 
       {/* Control buttons */}
-      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-        <button
-          data-testid="btn-start"
-          onClick={handleStart}
-          disabled={!startEnabled && !resumeEnabled}
-          style={{
-            border: `1px solid ${WARNING_ORANGE}`,
-            backgroundColor: 'transparent',
-            color: WARNING_ORANGE,
-            fontFamily: "'Share Tech Mono', monospace",
-            padding: '0.4rem 1rem',
-            cursor: startEnabled || resumeEnabled ? 'pointer' : 'default',
-            opacity: startEnabled || resumeEnabled ? 1 : 0.3,
-          }}
-        >
-          {status === 'PAUSED' ? '\u25B6 RESUME' : '\u25B6 START'}
-        </button>
-        <button
-          data-testid="btn-pause"
-          onClick={handlePause}
-          disabled={!pauseEnabled}
-          style={{
-            border: `1px solid ${WARNING_ORANGE}`,
-            backgroundColor: 'transparent',
-            color: WARNING_ORANGE,
-            fontFamily: "'Share Tech Mono', monospace",
-            padding: '0.4rem 1rem',
-            cursor: pauseEnabled ? 'pointer' : 'default',
-            opacity: pauseEnabled ? 1 : 0.3,
-          }}
-        >
-          \u23F8 PAUSE
-        </button>
-        <button
-          data-testid="btn-reset"
-          onClick={handleReset}
-          disabled={!resetEnabled}
-          style={{
-            border: `1px solid ${WARNING_ORANGE}`,
-            backgroundColor: 'transparent',
-            color: WARNING_ORANGE,
-            fontFamily: "'Share Tech Mono', monospace",
-            padding: '0.4rem 1rem',
-            cursor: resetEnabled ? 'pointer' : 'default',
-            opacity: resetEnabled ? 1 : 0.3,
-          }}
-        >
-          \u27F2 RESET
-        </button>
-      </div>
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
+        {!isRunning && (
+          <button
+            data-testid="simulation-btn-start"
+            onClick={startSimulation}
+            style={{
+              flex: 1,
+              backgroundColor: 'transparent',
+              border: `1px solid ${NOMINAL_GREEN}`,
+              color: NOMINAL_GREEN,
+              fontSize: '0.75rem',
+              letterSpacing: '0.15em',
+              padding: '0.4rem 0.75rem',
+              cursor: 'pointer',
+              fontFamily: "'Share Tech Mono', monospace",
+            }}
+          >
+            START
+          </button>
+        )}
 
-      <style>{`
-        @keyframes phase-pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-      `}</style>
+        {isRunning && (
+          <button
+            data-testid="simulation-btn-pause"
+            onClick={simulation.isPaused ? resumeSimulation : pauseSimulation}
+            style={{
+              flex: 1,
+              backgroundColor: 'transparent',
+              border: `1px solid ${WARNING_ORANGE}`,
+              color: WARNING_ORANGE,
+              fontSize: '0.75rem',
+              letterSpacing: '0.15em',
+              padding: '0.4rem 0.75rem',
+              cursor: 'pointer',
+              fontFamily: "'Share Tech Mono', monospace",
+            }}
+          >
+            {simulation.isPaused ? 'RESUME' : 'PAUSE'}
+          </button>
+        )}
+
+        {hasRun && (
+          <button
+            data-testid="simulation-btn-reset"
+            onClick={resetSimulation}
+            style={{
+              flex: 1,
+              backgroundColor: 'transparent',
+              border: `1px solid ${NERV_RED}`,
+              color: NERV_RED,
+              fontSize: '0.75rem',
+              letterSpacing: '0.15em',
+              padding: '0.4rem 0.75rem',
+              cursor: 'pointer',
+              fontFamily: "'Share Tech Mono', monospace",
+            }}
+          >
+            RESET
+          </button>
+        )}
+      </div>
     </div>
   );
-};
-
-export default SimulationController;
+}
