@@ -41,21 +41,7 @@ export interface Pilot {
   status: 'ACTIVE' | 'INACTIVE' | 'BERSERK';
 }
 
-/** Hex coordinate on the GeoFront grid (numeric struct for type safety) */
-export interface HexCoordinate {
-  row: number;
-  col: number;
-}
-
-/** Real-time EVA unit position on the GeoFront hex grid */
-export interface EvaPosition {
-  pilotId: string;
-  unitId: string;
-  hexCoordinate: HexCoordinate;
-  timestamp: number;
-}
-
-/** Angel attack simulation phase */
+/** Simulation combat phases */
 export type SimulationPhase = 'IDLE' | 'DETECTION' | 'APPROACH' | 'CONTACT' | 'RESOLUTION';
 
 /** Simulation outcome */
@@ -71,4 +57,33 @@ export interface SimulationState {
   angelHp: number;
   nervDefense: number;
   currentAngelName: string;
+}
+
+/** Pilot status for panel management */
+export type PilotStatus = 'ACTIVE' | 'INACTIVE' | 'BERSERK';
+
+/** EVA unit identifiers */
+export type EvaUnitId = 'EVA-00' | 'EVA-01' | 'EVA-02' | 'EVA-03';
+
+/** Pilot record with EVA assignment */
+export interface PilotRecord {
+  id: string;
+  name: string;
+  status: PilotStatus;
+  evaUnitId: EvaUnitId | null;
+  syncRatio: number;
+}
+
+/** Hex coordinate on the GeoFront grid (numeric struct for type safety) */
+export interface HexCoordinate {
+  row: number;
+  col: number;
+}
+
+/** Real-time EVA unit position on the GeoFront hex grid */
+export interface EvaPosition {
+  pilotId: string;
+  unitId: string;
+  hexCoordinate: HexCoordinate;
+  timestamp: number;
 }
