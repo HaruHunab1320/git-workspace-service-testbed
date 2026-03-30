@@ -25,7 +25,9 @@ import {
   eva_nextPhase,
   eva_computeCombatDamage,
   eva_phaseAlertMessage,
+  eva_fluctuateSyncRatio,
   PHASE_DURATIONS,
+  PHASE_DAMAGE_MULTIPLIERS,
 } from '../simulation/engine';
 
 // Re-export all types so consumers can import from either location
@@ -364,21 +366,42 @@ export const useNervStore = create<NervState>((set) => ({
     const newTimeRemaining = sim.phaseTimeRemaining - 1;
     const newElapsed = sim.phaseElapsed + 1;
 
-    if (sim.phase === 'CONTACT') {
-      const { angelDamage, nervDamage } = eva_computeCombatDamage(state.syncRatios);
+    // Determine whether this phase deals combat damage
+    const phaseMult = PHASE_DAMAGE_MULTIPLIERS[sim.phase];
+    const isCombatPhase = phaseMult.angel > 0 || phaseMult.nerv > 0;
+
+    if (isCombatPhase) {
+      // Fluctuate sync ratios for active/berserk pilots
+      const pilots = state.pilots;
+      const newSyncRatios = { ...state.syncRatios };
+      for (const pilot of pilots) {
+        if (pilot.status === 'ACTIVE' || pilot.status === 'BERSERK') {
+          const current = newSyncRatios[pilot.id] ?? pilot.syncRatio;
+          newSyncRatios[pilot.id] = eva_fluctuateSyncRatio(current);
+        }
+      }
+
+      const magiAgreed = state.magiStatus === 'AGREE';
+      const { angelDamage, nervDamage } = eva_computeCombatDamage(
+        newSyncRatios,
+        { phase: sim.phase, magiAgreed },
+      );
       const newAngelHp = Math.max(0, sim.angelHp - angelDamage);
       const newNervDefense = Math.max(0, sim.nervDefense - nervDamage);
 
       if (newAngelHp <= 0) {
+        set({ syncRatios: newSyncRatios });
         state.resolveSimulation('VICTORY');
         return;
       }
       if (newNervDefense <= 0) {
+        set({ syncRatios: newSyncRatios });
         state.resolveSimulation('DEFEAT');
         return;
       }
 
       set({
+        syncRatios: newSyncRatios,
         simulation: {
           ...sim,
           phaseTimeRemaining: newTimeRemaining,
