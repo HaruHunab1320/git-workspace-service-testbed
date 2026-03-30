@@ -90,9 +90,9 @@ describe('useNervStore', () => {
       expect(useNervStore.getState().magiStatus).toBe('AGREE');
     });
 
-    it('computes CONFLICT when only 1/3 votes true', () => {
+    it('resolves 1/3 vote via tie-break to DISAGREE (majority outweighs lone approver)', () => {
       useNervStore.getState().setMagiVotes({ melchior: true, balthasar: false, casper: false });
-      expect(useNervStore.getState().magiStatus).toBe('CONFLICT');
+      expect(useNervStore.getState().magiStatus).toBe('DISAGREE');
     });
 
     it('computes DISAGREE when 0/3 vote true', () => {
