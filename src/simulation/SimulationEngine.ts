@@ -43,7 +43,7 @@ export class SimulationEngine {
   private phaseElapsedMs = 0;
   private totalElapsedMs = 0;
   private angelHp = 100;
-  private nervDamage = 0;
+  private nervDefense = 100;
 
   private get store() {
     return useNervStore.getState();
@@ -56,17 +56,21 @@ export class SimulationEngine {
     this.phaseElapsedMs = 0;
     this.totalElapsedMs = 0;
     this.angelHp = 100;
-    this.nervDamage = 0;
+    this.nervDefense = 100;
 
     this.store.triggerAngelDetected();
     this.enterPhase(0);
 
-    this.store.updateSimulation({
-      status: 'RUNNING',
-      angelHp: this.angelHp,
-      nervDamage: this.nervDamage,
-      totalElapsedMs: 0,
-    });
+    useNervStore.setState((state) => ({
+      simulation: {
+        ...state.simulation,
+        outcome: 'PENDING',
+        isPaused: false,
+        angelHp: this.angelHp,
+        nervDefense: this.nervDefense,
+        totalElapsed: 0,
+      },
+    }));
 
     this.intervalId = setInterval(() => this.tick(), TICK_INTERVAL_MS);
   }
@@ -75,12 +79,12 @@ export class SimulationEngine {
     if (this.intervalId === null) return;
     clearInterval(this.intervalId);
     this.intervalId = null;
-    this.store.updateSimulation({ status: 'PAUSED' });
+    this.store.pauseSimulation();
   }
 
   resume(): void {
     if (this.intervalId !== null) return;
-    this.store.updateSimulation({ status: 'RUNNING' });
+    this.store.resumeSimulation();
     this.intervalId = setInterval(() => this.tick(), TICK_INTERVAL_MS);
   }
 
@@ -93,7 +97,7 @@ export class SimulationEngine {
     this.phaseElapsedMs = 0;
     this.totalElapsedMs = 0;
     this.angelHp = 100;
-    this.nervDamage = 0;
+    this.nervDefense = 100;
 
     this.store.resetSimulation();
 
@@ -123,16 +127,21 @@ export class SimulationEngine {
 
     // Check if we won or lost during combat effects
     const simState = this.store.simulation;
-    if (simState.status === 'VICTORY' || simState.status === 'DEFEAT') return;
+    if (simState.outcome === 'VICTORY' || simState.outcome === 'DEFEAT') return;
 
     const remaining = Math.max(0, config.durationMs - this.phaseElapsedMs);
+    const remainingSec = Math.ceil(remaining / 1000);
+    const totalElapsedSec = Math.floor(this.totalElapsedMs / 1000);
 
-    this.store.updateSimulation({
-      phaseTimeRemainingMs: remaining,
-      totalElapsedMs: this.totalElapsedMs,
-      angelHp: this.angelHp,
-      nervDamage: this.nervDamage,
-    });
+    useNervStore.setState((state) => ({
+      simulation: {
+        ...state.simulation,
+        phaseTimeRemaining: remainingSec,
+        totalElapsed: totalElapsedSec,
+        angelHp: this.angelHp,
+        nervDefense: this.nervDefense,
+      },
+    }));
 
     if (this.phaseElapsedMs >= config.durationMs) {
       this.advancePhase();
@@ -168,20 +177,20 @@ export class SimulationEngine {
         break;
       case 'APPROACH':
         this.angelHp -= 0.5 * syncFactor * magiMultiplier;
-        this.nervDamage += 0.3;
+        this.nervDefense -= 0.3;
         break;
       case 'CONTACT':
         this.angelHp -= 1.5 * syncFactor * magiMultiplier;
-        this.nervDamage += 0.8;
+        this.nervDefense -= 0.8;
         break;
       case 'RESOLUTION':
         this.angelHp -= 2.0 * syncFactor * magiMultiplier;
-        this.nervDamage += 1.2;
+        this.nervDefense -= 1.2;
         break;
     }
 
     this.angelHp = Math.max(0, Math.min(100, this.angelHp));
-    this.nervDamage = Math.max(0, Math.min(100, this.nervDamage));
+    this.nervDefense = Math.max(0, Math.min(100, this.nervDefense));
   }
 
   private advancePhase(): void {
@@ -198,10 +207,14 @@ export class SimulationEngine {
     this.store.addSystemAlert({ message: config.alert, level: 'CRITICAL' });
     this.store.randomizeMagiVotes();
 
-    this.store.updateSimulation({
-      phase: config.phase,
-      phaseTimeRemainingMs: config.durationMs,
-    });
+    useNervStore.setState((state) => ({
+      simulation: {
+        ...state.simulation,
+        phase: config.phase,
+        phaseTimeRemaining: Math.ceil(config.durationMs / 1000),
+        phaseElapsed: 0,
+      },
+    }));
   }
 
   private enterPhase(index: number): void {
@@ -212,10 +225,14 @@ export class SimulationEngine {
     this.store.addSystemAlert({ message: config.alert, level: 'CRITICAL' });
     this.store.randomizeMagiVotes();
 
-    this.store.updateSimulation({
-      phase: config.phase,
-      phaseTimeRemainingMs: config.durationMs,
-    });
+    useNervStore.setState((state) => ({
+      simulation: {
+        ...state.simulation,
+        phase: config.phase,
+        phaseTimeRemaining: Math.ceil(config.durationMs / 1000),
+        phaseElapsed: 0,
+      },
+    }));
   }
 
   private checkWinLose(forceResolve = false): void {
@@ -230,7 +247,7 @@ export class SimulationEngine {
       return;
     }
 
-    if (this.nervDamage >= 100) {
+    if (this.nervDefense <= 0) {
       this.endSimulation('DEFEAT');
       this.store.addSystemAlert({
         message: '[SYSTEM] CRITICAL FAILURE \u2014 GEOFRONT BREACH',
@@ -258,16 +275,20 @@ export class SimulationEngine {
     }
   }
 
-  private endSimulation(status: 'VICTORY' | 'DEFEAT'): void {
+  private endSimulation(outcome: 'VICTORY' | 'DEFEAT'): void {
     if (this.intervalId !== null) {
       clearInterval(this.intervalId);
       this.intervalId = null;
     }
-    this.store.updateSimulation({
-      status,
-      phase: 'IDLE',
-      angelHp: this.angelHp,
-      nervDamage: this.nervDamage,
-    });
+    useNervStore.setState((state) => ({
+      simulation: {
+        ...state.simulation,
+        outcome,
+        phase: 'IDLE' as const,
+        isPaused: false,
+        angelHp: this.angelHp,
+        nervDefense: this.nervDefense,
+      },
+    }));
   }
 }

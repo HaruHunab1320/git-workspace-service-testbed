@@ -72,7 +72,7 @@ describe('simulation pure logic', () => {
   describe('eva_simulationTick', () => {
     const baseParams = {
       angelHp: 100,
-      nervIntegrity: 100,
+      nervDefense: 100,
       avgSyncRatio: 80,
       magiStatus: 'DISAGREE' as const,
     };
@@ -80,19 +80,19 @@ describe('simulation pure logic', () => {
     it('returns no damage during DETECTION', () => {
       const result = eva_simulationTick({ ...baseParams, phase: 'DETECTION' });
       expect(result.angelHpDelta).toBe(0);
-      expect(result.nervIntegrityDelta).toBe(0);
+      expect(result.nervDefenseDelta).toBe(0);
     });
 
     it('reduces NERV integrity during APPROACH', () => {
       const result = eva_simulationTick({ ...baseParams, phase: 'APPROACH' });
       expect(result.angelHpDelta).toBe(0);
-      expect(result.nervIntegrityDelta).toBe(-0.5);
+      expect(result.nervDefenseDelta).toBe(-0.5);
     });
 
     it('deals angel damage based on sync ratio during CONTACT', () => {
       const result = eva_simulationTick({ ...baseParams, phase: 'CONTACT' });
       expect(result.angelHpDelta).toBeCloseTo(-(80 / 100) * 3);
-      expect(result.nervIntegrityDelta).toBe(-2);
+      expect(result.nervDefenseDelta).toBe(-2);
     });
 
     it('reduces NERV damage during CONTACT when MAGI AGREE', () => {
@@ -101,45 +101,45 @@ describe('simulation pure logic', () => {
         phase: 'CONTACT',
         magiStatus: 'AGREE',
       });
-      expect(result.nervIntegrityDelta).toBe(-1);
+      expect(result.nervDefenseDelta).toBe(-1);
     });
 
     it('deals damage during RESOLUTION', () => {
       const result = eva_simulationTick({ ...baseParams, phase: 'RESOLUTION' });
       expect(result.angelHpDelta).toBe(-1);
-      expect(result.nervIntegrityDelta).toBe(-0.5);
+      expect(result.nervDefenseDelta).toBe(-0.5);
     });
 
     it('returns no damage for IDLE', () => {
       const result = eva_simulationTick({ ...baseParams, phase: 'IDLE' });
       expect(result.angelHpDelta).toBe(0);
-      expect(result.nervIntegrityDelta).toBe(0);
+      expect(result.nervDefenseDelta).toBe(0);
     });
   });
 
   describe('eva_checkOutcome', () => {
-    it('returns WIN when angelHp is 0', () => {
-      expect(eva_checkOutcome(0, 50)).toBe('WIN');
+    it('returns VICTORY when angelHp is 0', () => {
+      expect(eva_checkOutcome(0, 50)).toBe('VICTORY');
     });
 
-    it('returns WIN when angelHp is negative', () => {
-      expect(eva_checkOutcome(-5, 50)).toBe('WIN');
+    it('returns VICTORY when angelHp is negative', () => {
+      expect(eva_checkOutcome(-5, 50)).toBe('VICTORY');
     });
 
-    it('returns LOSE when nervIntegrity is 0', () => {
-      expect(eva_checkOutcome(50, 0)).toBe('LOSE');
+    it('returns DEFEAT when nervDefense is 0', () => {
+      expect(eva_checkOutcome(50, 0)).toBe('DEFEAT');
     });
 
-    it('returns LOSE when nervIntegrity is negative', () => {
-      expect(eva_checkOutcome(50, -10)).toBe('LOSE');
+    it('returns DEFEAT when nervDefense is negative', () => {
+      expect(eva_checkOutcome(50, -10)).toBe('DEFEAT');
     });
 
     it('returns PENDING when both are positive', () => {
       expect(eva_checkOutcome(50, 50)).toBe('PENDING');
     });
 
-    it('returns WIN when both are 0 (angel dies first check)', () => {
-      expect(eva_checkOutcome(0, 0)).toBe('WIN');
+    it('returns VICTORY when both are 0 (angel dies first check)', () => {
+      expect(eva_checkOutcome(0, 0)).toBe('VICTORY');
     });
   });
 
