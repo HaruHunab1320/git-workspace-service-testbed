@@ -54,3 +54,21 @@ export interface EvaPosition {
   hexCoordinate: HexCoordinate;
   timestamp: number;
 }
+
+/** Angel attack simulation phase */
+export type SimulationPhase = 'IDLE' | 'DETECTION' | 'APPROACH' | 'CONTACT' | 'RESOLUTION';
+
+/** Simulation outcome */
+export type SimulationOutcome = 'PENDING' | 'VICTORY' | 'DEFEAT';
+
+/** Full simulation state */
+export interface SimulationState {
+  phase: SimulationPhase;
+  outcome: SimulationOutcome;
+  isPaused: boolean;
+  phaseTimeRemaining: number;
+  phaseElapsed: number;
+  angelHp: number;
+  nervDefense: number;
+  currentAngelName: string;
+}

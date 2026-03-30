@@ -1,4 +1,5 @@
 import { useNervStore } from '../store/useNervStore';
+import { eva_initialSimulationState, ANGEL_NAMES } from '../simulation/engine';
 
 /**
  * Integration tests for the useNervStore Zustand store.
@@ -17,6 +18,7 @@ describe('useNervStore', () => {
       systemAlerts: [],
       evaPositions: [],
       angelDetected: false,
+      simulation: eva_initialSimulationState(),
     });
   });
 
@@ -180,6 +182,134 @@ describe('useNervStore', () => {
       useNervStore.getState().triggerAngelDetected();
       useNervStore.getState().resetEmergency();
       const state = useNervStore.getState();
+      expect(state.angelDetected).toBe(false);
+      expect(state.emergencyLevel).toBe('NORMAL');
+      expect(state.systemAlerts).toHaveLength(0);
+    });
+  });
+
+  describe('simulation — startSimulation', () => {
+    it('sets phase to DETECTION and picks an angel name', () => {
+      useNervStore.getState().startSimulation();
+      const state = useNervStore.getState();
+      expect(state.simulation.phase).toBe('DETECTION');
+      expect(ANGEL_NAMES).toContain(state.simulation.currentAngelName);
+      expect(state.simulation.phaseTimeRemaining).toBe(10);
+      expect(state.simulation.angelHp).toBe(100);
+      expect(state.simulation.nervDefense).toBe(100);
+      expect(state.simulation.outcome).toBe('PENDING');
+    });
+
+    it('sets angelDetected true and emergencyLevel to EMERGENCY', () => {
+      useNervStore.getState().startSimulation();
+      const state = useNervStore.getState();
+      expect(state.angelDetected).toBe(true);
+      expect(state.emergencyLevel).toBe('EMERGENCY');
+      expect(state.systemAlerts.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('simulation — pause/resume', () => {
+    it('pauseSimulation / resumeSimulation toggle isPaused', () => {
+      useNervStore.getState().startSimulation();
+      useNervStore.getState().pauseSimulation();
+      expect(useNervStore.getState().simulation.isPaused).toBe(true);
+      useNervStore.getState().resumeSimulation();
+      expect(useNervStore.getState().simulation.isPaused).toBe(false);
+    });
+  });
+
+  describe('simulation — tickSimulation', () => {
+    it('decrements phaseTimeRemaining', () => {
+      useNervStore.getState().startSimulation();
+      const before = useNervStore.getState().simulation.phaseTimeRemaining;
+      useNervStore.getState().tickSimulation();
+      expect(useNervStore.getState().simulation.phaseTimeRemaining).toBe(before - 1);
+    });
+
+    it('is a no-op when paused', () => {
+      useNervStore.getState().startSimulation();
+      useNervStore.getState().pauseSimulation();
+      const before = useNervStore.getState().simulation.phaseTimeRemaining;
+      useNervStore.getState().tickSimulation();
+      expect(useNervStore.getState().simulation.phaseTimeRemaining).toBe(before);
+    });
+
+    it('during CONTACT, modifies angelHp and nervDefense', () => {
+      useNervStore.getState().startSimulation();
+      // Force into CONTACT phase
+      useNervStore.setState((s) => ({
+        simulation: {
+          ...s.simulation,
+          phase: 'CONTACT' as const,
+          phaseTimeRemaining: 20,
+          phaseElapsed: 0,
+        },
+        syncRatios: { 'pilot-01': 80 },
+      }));
+      useNervStore.getState().tickSimulation();
+      const sim = useNervStore.getState().simulation;
+      expect(sim.angelHp).toBeLessThan(100);
+      expect(sim.nervDefense).toBeLessThan(100);
+    });
+  });
+
+  describe('simulation — advancePhase', () => {
+    it('transitions through correct phase order', () => {
+      useNervStore.getState().startSimulation();
+      expect(useNervStore.getState().simulation.phase).toBe('DETECTION');
+
+      useNervStore.getState().advancePhase();
+      expect(useNervStore.getState().simulation.phase).toBe('APPROACH');
+
+      useNervStore.getState().advancePhase();
+      expect(useNervStore.getState().simulation.phase).toBe('CONTACT');
+
+      useNervStore.getState().advancePhase();
+      expect(useNervStore.getState().simulation.phase).toBe('RESOLUTION');
+    });
+
+    it('adds system alert on each transition', () => {
+      useNervStore.getState().startSimulation();
+      const alertsBefore = useNervStore.getState().systemAlerts.length;
+      useNervStore.getState().advancePhase();
+      expect(useNervStore.getState().systemAlerts.length).toBe(alertsBefore + 1);
+    });
+  });
+
+  describe('simulation — resolveSimulation', () => {
+    it('VICTORY resets emergency state and adds success alert', () => {
+      useNervStore.getState().startSimulation();
+      useNervStore.getState().resolveSimulation('VICTORY');
+      const state = useNervStore.getState();
+      expect(state.simulation.outcome).toBe('VICTORY');
+      expect(state.simulation.phase).toBe('IDLE');
+      expect(state.angelDetected).toBe(false);
+      expect(state.emergencyLevel).toBe('NORMAL');
+      expect(state.systemAlerts.some((a) => a.message.includes('ANGEL NEUTRALIZED'))).toBe(true);
+    });
+
+    it('DEFEAT keeps emergency and adds failure alert', () => {
+      useNervStore.getState().startSimulation();
+      useNervStore.getState().resolveSimulation('DEFEAT');
+      const state = useNervStore.getState();
+      expect(state.simulation.outcome).toBe('DEFEAT');
+      expect(state.simulation.phase).toBe('IDLE');
+      expect(state.emergencyLevel).toBe('EMERGENCY');
+      expect(state.systemAlerts.some((a) => a.message.includes('EVACUATION ORDER'))).toBe(true);
+    });
+  });
+
+  describe('simulation — resetSimulation', () => {
+    it('returns everything to initial state', () => {
+      useNervStore.getState().startSimulation();
+      useNervStore.getState().resetSimulation();
+      const state = useNervStore.getState();
+      expect(state.simulation.phase).toBe('IDLE');
+      expect(state.simulation.outcome).toBe('PENDING');
+      expect(state.simulation.angelHp).toBe(100);
+      expect(state.simulation.nervDefense).toBe(100);
+      expect(state.simulation.currentAngelName).toBe('');
       expect(state.angelDetected).toBe(false);
       expect(state.emergencyLevel).toBe('NORMAL');
       expect(state.systemAlerts).toHaveLength(0);
