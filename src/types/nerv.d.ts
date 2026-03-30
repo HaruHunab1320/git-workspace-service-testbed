@@ -41,7 +41,7 @@ export interface Pilot {
   status: 'ACTIVE' | 'INACTIVE' | 'BERSERK';
 }
 
-/** Simulation combat phases */
+/** Angel attack simulation phases in order */
 export type SimulationPhase = 'IDLE' | 'DETECTION' | 'APPROACH' | 'CONTACT' | 'RESOLUTION';
 
 /** Simulation outcome */
@@ -53,6 +53,9 @@ export interface SimulationState {
   outcome: SimulationOutcome;
   isPaused: boolean;
   phaseTimeRemaining: number;
+  /** Total seconds elapsed since simulation start */
+  totalElapsed: number;
+  /** Seconds elapsed in the current phase */
   phaseElapsed: number;
   angelHp: number;
   nervDefense: number;

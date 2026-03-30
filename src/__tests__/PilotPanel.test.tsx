@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PilotPanel from '../components/PilotPanel';
 import { useNervStore } from '../store/useNervStore';
+import type { PilotRecord } from '../types/nerv.d';
 
 jest.mock('../store/useNervStore');
 const mockUseNervStore = useNervStore as unknown as jest.Mock;
@@ -14,7 +15,7 @@ const mockAssignEvaUnit = jest.fn();
 const mockSetPilotSyncRatio = jest.fn();
 
 const defaultState = {
-  pilots: [],
+  pilots: [] as PilotRecord[],
   syncRatios: {} as Record<string, number>,
   addPilot: mockAddPilot,
   removePilot: mockRemovePilot,

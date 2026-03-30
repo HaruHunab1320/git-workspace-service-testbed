@@ -264,6 +264,7 @@ export const useNervStore = create<NervState>((set) => ({
           outcome: 'PENDING' as const,
           isPaused: false,
           phaseTimeRemaining: PHASE_DURATIONS.DETECTION,
+          totalElapsed: 0,
           phaseElapsed: 0,
           angelHp: 100,
           nervDefense: 100,
@@ -274,7 +275,7 @@ export const useNervStore = create<NervState>((set) => ({
         systemAlerts: [
           ...state.systemAlerts,
           {
-            id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+            id: generateAlertId(),
             message: eva_phaseAlertMessage('DETECTION', angelName),
             level: 'EMERGENCY' as const,
             timestamp: Date.now(),
@@ -325,7 +326,7 @@ export const useNervStore = create<NervState>((set) => ({
           systemAlerts: [
             ...(outcome === 'VICTORY' ? [] : state.systemAlerts),
             {
-              id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+              id: generateAlertId(),
               message: alertMsg,
               level: alertLevel,
               timestamp: Date.now(),
@@ -347,7 +348,7 @@ export const useNervStore = create<NervState>((set) => ({
         systemAlerts: [
           ...state.systemAlerts,
           {
-            id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+            id: generateAlertId(),
             message: eva_phaseAlertMessage(nextPhase, state.simulation.currentAngelName),
             level: emergencyLevel === 'EMERGENCY' ? ('EMERGENCY' as const) : ('WARNING' as const),
             timestamp: Date.now(),
@@ -363,6 +364,7 @@ export const useNervStore = create<NervState>((set) => ({
     const sim = state.simulation;
     const newTimeRemaining = sim.phaseTimeRemaining - 1;
     const newElapsed = sim.phaseElapsed + 1;
+    const newTotalElapsed = sim.totalElapsed + 1;
 
     if (sim.phase === 'CONTACT') {
       const { angelDamage, nervDamage } = eva_computeCombatDamage(state.syncRatios);
@@ -383,6 +385,7 @@ export const useNervStore = create<NervState>((set) => ({
           ...sim,
           phaseTimeRemaining: newTimeRemaining,
           phaseElapsed: newElapsed,
+          totalElapsed: newTotalElapsed,
           angelHp: newAngelHp,
           nervDefense: newNervDefense,
         },
@@ -399,6 +402,7 @@ export const useNervStore = create<NervState>((set) => ({
         ...sim,
         phaseTimeRemaining: newTimeRemaining,
         phaseElapsed: newElapsed,
+        totalElapsed: newTotalElapsed,
       },
     });
 
@@ -443,7 +447,7 @@ export const useNervStore = create<NervState>((set) => ({
         systemAlerts: [
           ...state.systemAlerts,
           {
-            id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+            id: generateAlertId(),
             message: alertMsg,
             level: alertLevel,
             timestamp: Date.now(),

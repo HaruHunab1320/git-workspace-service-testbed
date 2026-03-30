@@ -67,6 +67,7 @@ export function eva_initialSimulationState(): SimulationState {
     outcome: 'PENDING',
     isPaused: false,
     phaseTimeRemaining: 0,
+    totalElapsed: 0,
     phaseElapsed: 0,
     angelHp: 100,
     nervDefense: 100,
