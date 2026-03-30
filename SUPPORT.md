@@ -2,7 +2,7 @@
 
 ## Getting Help
 
-If you need help with this project, please open a [GitHub Issue](../../issues/new) on this repository.
+If you need help with this project, please open a GitHub Issue on this repository.
 
 When opening an issue, include:
 
@@ -18,4 +18,4 @@ If you discover a security vulnerability, please open a GitHub Issue with the la
 
 ## Feature Requests
 
-To request a new feature, use the [Feature Request](../../issues/new?template=feature_request.md) issue template.
+To request a new feature, open a new issue and select the **Feature Request** template.
