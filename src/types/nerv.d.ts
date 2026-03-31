@@ -41,6 +41,34 @@ export interface Pilot {
   status: 'ACTIVE' | 'INACTIVE' | 'BERSERK';
 }
 
+/** AT Field status for angel defense */
+export interface ATFieldState {
+  /** AT Field strength (0–100). Damage is absorbed while > 0 */
+  strength: number;
+  /** Whether the AT Field is currently active */
+  isActive: boolean;
+  /** Cumulative erosion applied by EVA units this engagement */
+  erosionApplied: number;
+}
+
+/** Difficulty tier for dynamic scaling */
+export type DifficultyTier = 'EASY' | 'NORMAL' | 'HARD' | 'EXTREME';
+
+/** Tracks player performance for difficulty scaling */
+export interface PerformanceRecord {
+  wins: number;
+  losses: number;
+  currentStreak: number;
+  difficultyTier: DifficultyTier;
+}
+
+/** MAGI tie-break priority weights per subsystem */
+export interface MagiTieBreakWeights {
+  melchior: number;
+  balthasar: number;
+  casper: number;
+}
+
 /** Angel attack simulation phases in order */
 export type SimulationPhase = 'IDLE' | 'DETECTION' | 'APPROACH' | 'CONTACT' | 'RESOLUTION';
 
@@ -60,6 +88,7 @@ export interface SimulationState {
   angelHp: number;
   nervDefense: number;
   currentAngelName: string;
+  atField: ATFieldState;
 }
 
 /** Pilot status for panel management */

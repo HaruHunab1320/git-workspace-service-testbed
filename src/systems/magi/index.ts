@@ -1,5 +1,6 @@
 import { useNervStore } from '../../store/useNervStore';
 import type { MagiVotes } from '../../store/useNervStore';
+import { eva_resolveMagiTieBreak, DEFAULT_MAGI_TIEBREAK_WEIGHTS } from '../../simulation/engine';
 
 /**
  * MAGI sub-system identifiers corresponding to the three
@@ -40,13 +41,21 @@ export function getMagiApproval(subSystem: 'melchior' | 'balthasar' | 'casper'):
 }
 
 /**
- * Compute MAGI consensus from a set of votes.
- * Requires a 2/3 majority for approval.
+ * Compute MAGI consensus from a set of votes using tie-break logic.
+ * In case of a 1/3 CONFLICT, the weighted priority system resolves the tie.
  *
  * @param votes - The three MAGI sub-system votes.
- * @returns `true` if 2 or more votes are APPROVE.
+ * @returns `true` if consensus resolves to AGREE.
  */
 export function eva_computeConsensus(votes: MagiVotes): boolean {
-  const approveCount = [votes.melchior, votes.balthasar, votes.casper].filter(Boolean).length;
-  return approveCount >= 2;
+  let weights = DEFAULT_MAGI_TIEBREAK_WEIGHTS;
+  try {
+    const state = useNervStore.getState();
+    if (state?.magiTieBreakWeights) {
+      weights = state.magiTieBreakWeights;
+    }
+  } catch {
+    // Store may not be initialized in test environments
+  }
+  return eva_resolveMagiTieBreak(votes, weights) === 'AGREE';
 }

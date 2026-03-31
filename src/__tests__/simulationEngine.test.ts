@@ -3,13 +3,28 @@ import {
   PHASE_DURATIONS,
   PHASE_ORDER,
   PHASE_DAMAGE_MULTIPLIERS,
+  AT_FIELD_BASE_STRENGTH,
+  AT_FIELD_EROSION_SYNC_THRESHOLD,
+  AT_FIELD_DAMAGE_ABSORPTION,
+  DIFFICULTY_MULTIPLIERS,
+  STREAK_THRESHOLD,
+  DEFAULT_MAGI_TIEBREAK_WEIGHTS,
   eva_nextPhase,
   eva_pickAngel,
   eva_computeCombatDamage,
   eva_phaseAlertMessage,
   eva_initialSimulationState,
   eva_fluctuateSyncRatio,
+  eva_computeATFieldErosion,
+  eva_tickATField,
+  eva_initialATFieldState,
+  eva_resolveMagiTieBreak,
+  eva_computeDifficultyTier,
+  eva_updatePerformanceRecord,
+  eva_initialPerformanceRecord,
+  eva_scaledAngelHp,
 } from '../simulation/engine';
+import type { ATFieldState, PerformanceRecord, MagiVotes } from '../types/nerv.d';
 import { useNervStore, eva_computeMagiStatus, eva_calculateSyncRatio } from '../store/useNervStore';
 import { SimulationEngine } from '../simulation/SimulationEngine';
 import { eva_magiVote, getMagiApproval, eva_computeConsensus, MAGI_LABELS } from '../systems/magi/index';
@@ -143,6 +158,41 @@ describe('simulation engine utilities', () => {
       }
       expect(contactTotal / iterations).toBeGreaterThan(approachTotal / iterations);
     });
+
+    it('reduces angel damage when AT Field is active', () => {
+      const activeField: ATFieldState = { strength: 50, isActive: true, erosionApplied: 0 };
+      let withField = 0;
+      let withoutField = 0;
+      const iterations = 200;
+      for (let i = 0; i < iterations; i++) {
+        withField += eva_computeCombatDamage({ p1: 80 }, { phase: 'CONTACT', atField: activeField }).angelDamage;
+        withoutField += eva_computeCombatDamage({ p1: 80 }, { phase: 'CONTACT' }).angelDamage;
+      }
+      expect(withField / iterations).toBeLessThan(withoutField / iterations);
+    });
+
+    it('does not reduce angel damage when AT Field is down', () => {
+      const downField: ATFieldState = { strength: 0, isActive: false, erosionApplied: 80 };
+      let withField = 0;
+      let withoutField = 0;
+      const iterations = 200;
+      for (let i = 0; i < iterations; i++) {
+        withField += eva_computeCombatDamage({ p1: 80 }, { phase: 'CONTACT', atField: downField }).angelDamage;
+        withoutField += eva_computeCombatDamage({ p1: 80 }, { phase: 'CONTACT' }).angelDamage;
+      }
+      // Should be approximately equal (both without AT Field absorption)
+      expect(Math.abs(withField / iterations - withoutField / iterations)).toBeLessThan(1);
+    });
+
+    it('scales NERV damage by difficulty', () => {
+      const results: number[] = [];
+      for (let i = 0; i < 50; i++) {
+        const result = eva_computeCombatDamage({}, { phase: 'CONTACT', difficultyTier: 'EXTREME' });
+        results.push(result.nervDamage);
+      }
+      const avg = results.reduce((a, b) => a + b, 0) / results.length;
+      expect(avg).toBeGreaterThan(0);
+    });
   });
 
   describe('PHASE_DAMAGE_MULTIPLIERS', () => {
@@ -170,7 +220,6 @@ describe('simulation engine utilities', () => {
     });
 
     it('clamps at lower boundary', () => {
-      // With input 0, output should still be >= 0
       for (let i = 0; i < 50; i++) {
         expect(eva_fluctuateSyncRatio(0)).toBeGreaterThanOrEqual(0);
       }
@@ -240,16 +289,22 @@ describe('simulation engine utilities', () => {
   });
 
   describe('eva_initialSimulationState', () => {
-    it('returns correct defaults', () => {
+    it('returns correct defaults including AT Field', () => {
       const state = eva_initialSimulationState();
       expect(state.phase).toBe('IDLE');
       expect(state.outcome).toBe('PENDING');
       expect(state.isPaused).toBe(false);
       expect(state.phaseTimeRemaining).toBe(0);
       expect(state.phaseElapsed).toBe(0);
+      expect(state.totalElapsed).toBe(0);
       expect(state.angelHp).toBe(100);
       expect(state.nervDefense).toBe(100);
       expect(state.currentAngelName).toBe('');
+      expect(state.atField).toEqual({
+        strength: 0,
+        isActive: false,
+        erosionApplied: 0,
+      });
     });
 
     it('returns a fresh object each call (no shared references)', () => {
@@ -257,6 +312,262 @@ describe('simulation engine utilities', () => {
       const b = eva_initialSimulationState();
       expect(a).toEqual(b);
       expect(a).not.toBe(b);
+    });
+  });
+});
+
+// ── AT Field Mechanics ──────────────────────────────────────────────────────
+
+describe('AT Field mechanics', () => {
+  describe('eva_computeATFieldErosion', () => {
+    it('returns 0 when no pilots have sync ratios', () => {
+      expect(eva_computeATFieldErosion({})).toBe(0);
+    });
+
+    it('returns 0 when all pilots are below threshold', () => {
+      expect(eva_computeATFieldErosion({
+        'p1': AT_FIELD_EROSION_SYNC_THRESHOLD - 1,
+        'p2': 10,
+      })).toBe(0);
+    });
+
+    it('computes erosion from pilots above threshold', () => {
+      const erosion = eva_computeATFieldErosion({ 'p1': 80, 'p2': 60 });
+      expect(erosion).toBeCloseTo(11.2);
+    });
+
+    it('excludes pilots below threshold from erosion', () => {
+      const erosion = eva_computeATFieldErosion({ 'p1': 80, 'p2': 10 });
+      expect(erosion).toBeCloseTo(6.4);
+    });
+  });
+
+  describe('eva_tickATField', () => {
+    it('reduces strength by erosion amount', () => {
+      const field: ATFieldState = { strength: 50, isActive: true, erosionApplied: 0 };
+      const result = eva_tickATField(field, 10);
+      expect(result.strength).toBe(40);
+      expect(result.isActive).toBe(true);
+      expect(result.erosionApplied).toBe(10);
+    });
+
+    it('deactivates when strength reaches 0', () => {
+      const field: ATFieldState = { strength: 5, isActive: true, erosionApplied: 75 };
+      const result = eva_tickATField(field, 10);
+      expect(result.strength).toBe(0);
+      expect(result.isActive).toBe(false);
+      expect(result.erosionApplied).toBe(85);
+    });
+
+    it('does not erode inactive fields', () => {
+      const field: ATFieldState = { strength: 0, isActive: false, erosionApplied: 80 };
+      const result = eva_tickATField(field, 10);
+      expect(result).toEqual(field);
+    });
+
+    it('accumulates erosion across ticks', () => {
+      let field: ATFieldState = { strength: 30, isActive: true, erosionApplied: 0 };
+      field = eva_tickATField(field, 10);
+      field = eva_tickATField(field, 10);
+      field = eva_tickATField(field, 10);
+      expect(field.strength).toBe(0);
+      expect(field.isActive).toBe(false);
+      expect(field.erosionApplied).toBe(30);
+    });
+  });
+
+  describe('eva_initialATFieldState', () => {
+    it('creates AT Field with base strength at NORMAL difficulty', () => {
+      const field = eva_initialATFieldState('NORMAL');
+      expect(field.strength).toBe(AT_FIELD_BASE_STRENGTH);
+      expect(field.isActive).toBe(true);
+      expect(field.erosionApplied).toBe(0);
+    });
+
+    it('scales strength by difficulty tier', () => {
+      const easy = eva_initialATFieldState('EASY');
+      const hard = eva_initialATFieldState('HARD');
+      const extreme = eva_initialATFieldState('EXTREME');
+
+      expect(easy.strength).toBeLessThan(AT_FIELD_BASE_STRENGTH);
+      expect(hard.strength).toBeGreaterThan(AT_FIELD_BASE_STRENGTH);
+      expect(extreme.strength).toBeGreaterThan(hard.strength);
+    });
+
+    it('defaults to NORMAL when no tier specified', () => {
+      const field = eva_initialATFieldState();
+      expect(field.strength).toBe(AT_FIELD_BASE_STRENGTH);
+    });
+  });
+});
+
+// ── MAGI Tie-Break Logic ────────────────────────────────────────────────────
+
+describe('MAGI tie-break logic', () => {
+  describe('eva_resolveMagiTieBreak', () => {
+    it('returns AGREE for 3/3 unanimous approval', () => {
+      const votes: MagiVotes = { melchior: true, balthasar: true, casper: true };
+      expect(eva_resolveMagiTieBreak(votes)).toBe('AGREE');
+    });
+
+    it('returns AGREE for 2/3 majority', () => {
+      expect(eva_resolveMagiTieBreak({ melchior: true, balthasar: true, casper: false })).toBe('AGREE');
+      expect(eva_resolveMagiTieBreak({ melchior: true, balthasar: false, casper: true })).toBe('AGREE');
+      expect(eva_resolveMagiTieBreak({ melchior: false, balthasar: true, casper: true })).toBe('AGREE');
+    });
+
+    it('returns DISAGREE for 0/3 unanimous rejection', () => {
+      const votes: MagiVotes = { melchior: false, balthasar: false, casper: false };
+      expect(eva_resolveMagiTieBreak(votes)).toBe('DISAGREE');
+    });
+
+    it('resolves 1/3 CONFLICT — melchior cannot override alone with default weights', () => {
+      const votes: MagiVotes = { melchior: true, balthasar: false, casper: false };
+      expect(eva_resolveMagiTieBreak(votes)).toBe('DISAGREE');
+    });
+
+    it('resolves 1/3 CONFLICT — lower weight cannot override', () => {
+      const votes: MagiVotes = { melchior: false, balthasar: true, casper: false };
+      expect(eva_resolveMagiTieBreak(votes)).toBe('DISAGREE');
+    });
+
+    it('uses custom weights to allow override', () => {
+      const weights = { melchior: 10, balthasar: 1, casper: 2 };
+      const votes: MagiVotes = { melchior: true, balthasar: false, casper: false };
+      expect(eva_resolveMagiTieBreak(votes, weights)).toBe('AGREE');
+    });
+
+    it('custom weights — lone approver with lower weight still loses', () => {
+      const weights = { melchior: 10, balthasar: 1, casper: 2 };
+      const votes: MagiVotes = { melchior: false, balthasar: true, casper: false };
+      expect(eva_resolveMagiTieBreak(votes, weights)).toBe('DISAGREE');
+    });
+  });
+});
+
+// ── Dynamic Difficulty Scaling ──────────────────────────────────────────────
+
+describe('dynamic difficulty scaling', () => {
+  describe('eva_initialPerformanceRecord', () => {
+    it('returns default NORMAL difficulty record', () => {
+      const record = eva_initialPerformanceRecord();
+      expect(record).toEqual({
+        wins: 0,
+        losses: 0,
+        currentStreak: 0,
+        difficultyTier: 'NORMAL',
+      });
+    });
+  });
+
+  describe('eva_updatePerformanceRecord', () => {
+    it('tracks wins and increments streak', () => {
+      let record = eva_initialPerformanceRecord();
+      record = eva_updatePerformanceRecord(record, 'VICTORY');
+      expect(record.wins).toBe(1);
+      expect(record.losses).toBe(0);
+      expect(record.currentStreak).toBe(1);
+    });
+
+    it('tracks losses and decrements streak', () => {
+      let record = eva_initialPerformanceRecord();
+      record = eva_updatePerformanceRecord(record, 'DEFEAT');
+      expect(record.wins).toBe(0);
+      expect(record.losses).toBe(1);
+      expect(record.currentStreak).toBe(-1);
+    });
+
+    it('resets streak direction on outcome change', () => {
+      let record = eva_initialPerformanceRecord();
+      record = eva_updatePerformanceRecord(record, 'VICTORY');
+      record = eva_updatePerformanceRecord(record, 'VICTORY');
+      expect(record.currentStreak).toBe(2);
+
+      record = eva_updatePerformanceRecord(record, 'DEFEAT');
+      expect(record.currentStreak).toBe(-1);
+    });
+
+    it('increases difficulty after win streak threshold', () => {
+      let record = eva_initialPerformanceRecord();
+      for (let i = 0; i < STREAK_THRESHOLD; i++) {
+        record = eva_updatePerformanceRecord(record, 'VICTORY');
+      }
+      expect(record.difficultyTier).toBe('HARD');
+    });
+
+    it('decreases difficulty after loss streak threshold', () => {
+      let record = eva_initialPerformanceRecord();
+      for (let i = 0; i < STREAK_THRESHOLD; i++) {
+        record = eva_updatePerformanceRecord(record, 'DEFEAT');
+      }
+      expect(record.difficultyTier).toBe('EASY');
+    });
+
+    it('caps difficulty at EXTREME', () => {
+      let record: PerformanceRecord = {
+        wins: 10,
+        losses: 0,
+        currentStreak: STREAK_THRESHOLD - 1,
+        difficultyTier: 'EXTREME',
+      };
+      record = eva_updatePerformanceRecord(record, 'VICTORY');
+      expect(record.difficultyTier).toBe('EXTREME');
+    });
+
+    it('caps difficulty at EASY', () => {
+      let record: PerformanceRecord = {
+        wins: 0,
+        losses: 10,
+        currentStreak: -(STREAK_THRESHOLD - 1),
+        difficultyTier: 'EASY',
+      };
+      record = eva_updatePerformanceRecord(record, 'DEFEAT');
+      expect(record.difficultyTier).toBe('EASY');
+    });
+  });
+
+  describe('eva_computeDifficultyTier', () => {
+    it('stays at current tier with no streak', () => {
+      const record: PerformanceRecord = {
+        wins: 5, losses: 5, currentStreak: 0, difficultyTier: 'NORMAL',
+      };
+      expect(eva_computeDifficultyTier(record)).toBe('NORMAL');
+    });
+
+    it('increases tier on positive streak at threshold', () => {
+      const record: PerformanceRecord = {
+        wins: 5, losses: 0, currentStreak: STREAK_THRESHOLD, difficultyTier: 'NORMAL',
+      };
+      expect(eva_computeDifficultyTier(record)).toBe('HARD');
+    });
+
+    it('decreases tier on negative streak at threshold', () => {
+      const record: PerformanceRecord = {
+        wins: 0, losses: 5, currentStreak: -STREAK_THRESHOLD, difficultyTier: 'NORMAL',
+      };
+      expect(eva_computeDifficultyTier(record)).toBe('EASY');
+    });
+  });
+
+  describe('eva_scaledAngelHp', () => {
+    it('returns 100 for NORMAL', () => {
+      expect(eva_scaledAngelHp('NORMAL')).toBe(100);
+    });
+
+    it('returns lower HP for EASY', () => {
+      expect(eva_scaledAngelHp('EASY')).toBe(70);
+    });
+
+    it('returns higher HP for HARD', () => {
+      expect(eva_scaledAngelHp('HARD')).toBe(130);
+    });
+
+    it('returns highest HP for EXTREME', () => {
+      expect(eva_scaledAngelHp('EXTREME')).toBe(160);
+    });
+
+    it('defaults to NORMAL when no tier specified', () => {
+      expect(eva_scaledAngelHp()).toBe(100);
     });
   });
 });
@@ -289,7 +600,7 @@ describe('store simulation integration', () => {
       }
       expect(useNervStore.getState().simulation.phase).toBe('APPROACH');
 
-      // Tick through APPROACH (damage happens — reset HP to prevent early end)
+      // Tick through APPROACH (damage happens — reset HP each tick to prevent early end)
       for (let i = 0; i < PHASE_DURATIONS.APPROACH; i++) {
         useNervStore.getState().tickSimulation();
         const cur = useNervStore.getState().simulation;
@@ -393,6 +704,7 @@ describe('store simulation integration', () => {
           phaseTimeRemaining: 20,
           angelHp: 1,
           nervDefense: 100,
+          atField: { strength: 0, isActive: false, erosionApplied: 0 },
         },
         syncRatios: { 'p1': 100 },
       }));
@@ -423,7 +735,6 @@ describe('store simulation integration', () => {
 
   describe('MAGI multiplier in combat', () => {
     it('MAGI AGREE increases angel damage during combat ticks', () => {
-      // Test with MAGI AGREE
       let totalDamageWithMagi = 0;
       let totalDamageWithout = 0;
       const runs = 30;
@@ -439,6 +750,7 @@ describe('store simulation integration', () => {
             phaseTimeRemaining: 20,
             angelHp: 100,
             nervDefense: 100,
+            atField: { strength: 0, isActive: false, erosionApplied: 0 },
           },
           syncRatios: { 'p1': 80 },
         }));
@@ -457,6 +769,7 @@ describe('store simulation integration', () => {
             phaseTimeRemaining: 20,
             angelHp: 100,
             nervDefense: 100,
+            atField: { strength: 0, isActive: false, erosionApplied: 0 },
           },
           syncRatios: { 'p1': 80 },
         }));
@@ -1047,6 +1360,7 @@ describe('SimulationEngine class', () => {
           phaseTimeRemaining: 20,
           angelHp: 1,
           nervDefense: 100,
+          atField: { strength: 0, isActive: false, erosionApplied: 0 },
         },
         syncRatios: { p1: 100 },
       }));

@@ -18,6 +18,10 @@ import type {
   PilotStatus,
   PilotRecord,
   EvaUnitId,
+  PerformanceRecord,
+  DifficultyTier,
+  ATFieldState,
+  MagiTieBreakWeights,
 } from '../types/nerv.d';
 import {
   eva_initialSimulationState,
@@ -25,13 +29,20 @@ import {
   eva_nextPhase,
   eva_computeCombatDamage,
   eva_phaseAlertMessage,
+  eva_computeATFieldErosion,
+  eva_tickATField,
+  eva_initialATFieldState,
+  eva_initialPerformanceRecord,
+  eva_updatePerformanceRecord,
+  eva_scaledAngelHp,
+  eva_resolveMagiTieBreak,
   eva_fluctuateSyncRatio,
   PHASE_DURATIONS,
   PHASE_DAMAGE_MULTIPLIERS,
 } from '../simulation/engine';
 
 // Re-export all types so consumers can import from either location
-export type { EmergencyLevel, MagiStatus, MagiSubSystem, MagiVotes, SystemAlert, SyncRatios, EvaPosition, HexCoordinate, SimulationState, SimulationOutcome, PilotStatus, PilotRecord, EvaUnitId };
+export type { EmergencyLevel, MagiStatus, MagiSubSystem, MagiVotes, SystemAlert, SyncRatios, EvaPosition, HexCoordinate, SimulationState, SimulationOutcome, PilotStatus, PilotRecord, EvaUnitId, PerformanceRecord, DifficultyTier, ATFieldState, MagiTieBreakWeights };
 
 /** Full shape of the NERV global state including data and actions */
 export interface NervState {
@@ -45,6 +56,8 @@ export interface NervState {
   angelDetected: boolean;
   simulation: SimulationState;
   pilots: PilotRecord[];
+  performanceRecord: PerformanceRecord;
+  magiTieBreakWeights: MagiTieBreakWeights;
 
   /** Set the facility emergency level */
   setEmergencyLevel: (level: EmergencyLevel) => void;
@@ -95,6 +108,10 @@ export interface NervState {
   damageNerv: (amount: number) => void;
   /** Resolve simulation with outcome */
   resolveSimulation: (outcome: SimulationOutcome) => void;
+  /** Reset performance record and difficulty */
+  resetPerformanceRecord: () => void;
+  /** Set MAGI tie-break priority weights */
+  setMagiTieBreakWeights: (weights: MagiTieBreakWeights) => void;
 
   /** Add a new pilot */
   addPilot: (pilot: PilotRecord) => void;
@@ -159,6 +176,8 @@ export const useNervStore = create<NervState>((set) => ({
   evaPositions: [],
   angelDetected: false,
   pilots: [],
+  performanceRecord: eva_initialPerformanceRecord(),
+  magiTieBreakWeights: { melchior: 3, balthasar: 1, casper: 2 },
 
   setEmergencyLevel: (level) => set({ emergencyLevel: level }),
 
@@ -181,14 +200,14 @@ export const useNervStore = create<NervState>((set) => ({
       const newVotes = { ...state.magiVotes, ...votes };
       return {
         magiVotes: newVotes,
-        magiStatus: eva_computeMagiStatus(newVotes),
+        magiStatus: eva_resolveMagiTieBreak(newVotes, state.magiTieBreakWeights),
       };
     }),
 
   setMagiStatus: (status) => set({ magiStatus: status }),
 
   randomizeMagiVotes: () =>
-    set(() => {
+    set((state) => {
       const newVotes: MagiVotes = {
         melchior: Math.random() > 0.5,
         balthasar: Math.random() > 0.5,
@@ -196,7 +215,7 @@ export const useNervStore = create<NervState>((set) => ({
       };
       return {
         magiVotes: newVotes,
-        magiStatus: eva_computeMagiStatus(newVotes),
+        magiStatus: eva_resolveMagiTieBreak(newVotes, state.magiTieBreakWeights),
       };
     }),
 
@@ -260,6 +279,7 @@ export const useNervStore = create<NervState>((set) => ({
   startSimulation: () =>
     set((state) => {
       const angelName = eva_pickAngel();
+      const tier = state.performanceRecord.difficultyTier;
       return {
         simulation: {
           phase: 'DETECTION' as const,
@@ -268,9 +288,10 @@ export const useNervStore = create<NervState>((set) => ({
           phaseTimeRemaining: PHASE_DURATIONS.DETECTION,
           totalElapsed: 0,
           phaseElapsed: 0,
-          angelHp: 100,
+          angelHp: eva_scaledAngelHp(tier),
           nervDefense: 100,
           currentAngelName: angelName,
+          atField: eva_initialATFieldState(tier),
         },
         angelDetected: true,
         emergencyLevel: 'EMERGENCY' as const,
@@ -280,6 +301,12 @@ export const useNervStore = create<NervState>((set) => ({
             id: generateAlertId(),
             message: eva_phaseAlertMessage('DETECTION', angelName),
             level: 'EMERGENCY' as const,
+            timestamp: Date.now(),
+          },
+          {
+            id: generateAlertId(),
+            message: `AT FIELD DETECTED — STRENGTH ${Math.round(eva_initialATFieldState(tier).strength)}% — DIFFICULTY: ${tier}`,
+            level: 'WARNING' as const,
             timestamp: Date.now(),
           },
         ],
@@ -367,6 +394,7 @@ export const useNervStore = create<NervState>((set) => ({
     const newTimeRemaining = sim.phaseTimeRemaining - 1;
     const newElapsed = sim.phaseElapsed + 1;
     const newTotalElapsed = sim.totalElapsed + 1;
+    const tier = state.performanceRecord.difficultyTier;
 
     // Determine whether this phase deals combat damage
     const phaseMult = PHASE_DAMAGE_MULTIPLIERS[sim.phase];
@@ -383,10 +411,25 @@ export const useNervStore = create<NervState>((set) => ({
         }
       }
 
+      // Erode AT Field each tick during combat
+      const erosion = eva_computeATFieldErosion(newSyncRatios);
+      const updatedATField = eva_tickATField(sim.atField, erosion);
+
+      // AT Field state change alerts
+      const alerts = [...state.systemAlerts];
+      if (sim.atField.isActive && !updatedATField.isActive) {
+        alerts.push({
+          id: generateAlertId(),
+          message: 'AT FIELD NEUTRALIZED — ANGEL CORE EXPOSED',
+          level: 'CRITICAL' as const,
+          timestamp: Date.now(),
+        });
+      }
+
       const magiAgreed = state.magiStatus === 'AGREE';
       const { angelDamage, nervDamage } = eva_computeCombatDamage(
         newSyncRatios,
-        { phase: sim.phase, magiAgreed },
+        { phase: sim.phase, magiAgreed, atField: updatedATField, difficultyTier: tier },
       );
       const newAngelHp = Math.max(0, sim.angelHp - angelDamage);
       const newNervDefense = Math.max(0, sim.nervDefense - nervDamage);
@@ -411,7 +454,9 @@ export const useNervStore = create<NervState>((set) => ({
           totalElapsed: newTotalElapsed,
           angelHp: newAngelHp,
           nervDefense: newNervDefense,
+          atField: updatedATField,
         },
+        systemAlerts: alerts,
       });
 
       if (newTimeRemaining <= 0) {
@@ -452,11 +497,35 @@ export const useNervStore = create<NervState>((set) => ({
 
   resolveSimulation: (outcome) =>
     set((state) => {
+      const updatedRecord = (outcome === 'VICTORY' || outcome === 'DEFEAT')
+        ? eva_updatePerformanceRecord(state.performanceRecord, outcome)
+        : state.performanceRecord;
       const alertMsg =
         outcome === 'VICTORY'
           ? 'ANGEL NEUTRALIZED — PATTERN BLUE CLEARED'
           : 'NERV DEFENSE COMPROMISED — EVACUATION ORDER ISSUED';
       const alertLevel = outcome === 'VICTORY' ? ('INFO' as const) : ('EMERGENCY' as const);
+
+      const alerts: SystemAlert[] = [
+        ...state.systemAlerts,
+        {
+          id: generateAlertId(),
+          message: alertMsg,
+          level: alertLevel,
+          timestamp: Date.now(),
+        },
+      ];
+
+      // Notify if difficulty changed
+      if (updatedRecord.difficultyTier !== state.performanceRecord.difficultyTier) {
+        alerts.push({
+          id: generateAlertId(),
+          message: `MAGI ANALYSIS COMPLETE — THREAT LEVEL ADJUSTED TO ${updatedRecord.difficultyTier}`,
+          level: 'WARNING' as const,
+          timestamp: Date.now(),
+        });
+      }
+
       return {
         simulation: {
           ...state.simulation,
@@ -464,20 +533,22 @@ export const useNervStore = create<NervState>((set) => ({
           outcome,
           isPaused: false,
         },
+        performanceRecord: updatedRecord,
         ...(outcome === 'VICTORY'
           ? { angelDetected: false, emergencyLevel: 'NORMAL' as const }
           : {}),
-        systemAlerts: [
-          ...state.systemAlerts,
-          {
-            id: generateAlertId(),
-            message: alertMsg,
-            level: alertLevel,
-            timestamp: Date.now(),
-          },
-        ],
+        systemAlerts: alerts,
       };
     }),
+
+  resetPerformanceRecord: () =>
+    set({ performanceRecord: eva_initialPerformanceRecord() }),
+
+  setMagiTieBreakWeights: (weights) =>
+    set((state) => ({
+      magiTieBreakWeights: weights,
+      magiStatus: eva_resolveMagiTieBreak(state.magiVotes, weights),
+    })),
 
   addPilot: (pilot) =>
     set((state) => {
