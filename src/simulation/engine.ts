@@ -71,6 +71,17 @@ export const DEFAULT_MAGI_TIEBREAK_WEIGHTS: MagiTieBreakWeights = {
   casper: 2,    // WOMAN — moderate combat authority
 };
 
+// ── Per-phase damage multipliers ────────────────────────────────────────────
+
+/** Per-phase damage multipliers for angel and NERV damage */
+export const PHASE_DAMAGE_MULTIPLIERS: Record<SimulationPhase, { angel: number; nerv: number }> = {
+  IDLE: { angel: 0, nerv: 0 },
+  DETECTION: { angel: 0, nerv: 0 },
+  APPROACH: { angel: 0.5, nerv: 0.3 },
+  CONTACT: { angel: 1.5, nerv: 0.8 },
+  RESOLUTION: { angel: 2.0, nerv: 1.2 },
+};
+
 // ── Phase Logic ─────────────────────────────────────────────────────────────
 
 export function eva_nextPhase(current: SimulationPhase): SimulationPhase | null {
@@ -87,25 +98,35 @@ export function eva_pickAngel(): string {
 
 export function eva_computeCombatDamage(
   syncRatios: SyncRatios,
-  atField?: ATFieldState,
-  difficultyTier?: DifficultyTier,
+  options?: { phase?: SimulationPhase; magiAgreed?: boolean; atField?: ATFieldState; difficultyTier?: DifficultyTier },
 ): {
   angelDamage: number;
   nervDamage: number;
 } {
-  const tier = difficultyTier ?? 'NORMAL';
-  const multipliers = DIFFICULTY_MULTIPLIERS[tier];
+  const phase = options?.phase ?? 'CONTACT';
+  const multipliers = PHASE_DAMAGE_MULTIPLIERS[phase];
+  const tier = options?.difficultyTier ?? 'NORMAL';
+  const diffMultipliers = DIFFICULTY_MULTIPLIERS[tier];
+
+  // No damage during non-combat phases
+  if (multipliers.angel === 0 && multipliers.nerv === 0) {
+    return { angelDamage: 0, nervDamage: 0 };
+  }
 
   const values = Object.values(syncRatios);
   const avg = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 50;
-  let angelDamage = avg / 20 + Math.random() * 2;
+  const syncFactor = avg / 100;
+  const magiMultiplier = options?.magiAgreed ? 1.5 : 1.0;
+
+  let angelDamage = multipliers.angel * syncFactor * magiMultiplier + Math.random() * 2;
 
   // AT Field absorbs a fraction of damage to the angel while active
+  const atField = options?.atField;
   if (atField && atField.isActive && atField.strength > 0) {
     angelDamage *= (1 - AT_FIELD_DAMAGE_ABSORPTION);
   }
 
-  const nervDamage = (1 + Math.random() * 4) * multipliers.nervDamage;
+  const nervDamage = (multipliers.nerv + Math.random() * 4) * diffMultipliers.nervDamage;
   return { angelDamage, nervDamage };
 }
 
@@ -244,6 +265,15 @@ export function eva_initialPerformanceRecord(): PerformanceRecord {
 export function eva_scaledAngelHp(difficultyTier?: DifficultyTier): number {
   const tier = difficultyTier ?? 'NORMAL';
   return Math.round(100 * DIFFICULTY_MULTIPLIERS[tier].angelHp);
+}
+
+/**
+ * Apply random fluctuation to a sync ratio value.
+ * @returns The new sync ratio, clamped to 0–100.
+ */
+export function eva_fluctuateSyncRatio(current: number): number {
+  const delta = (Math.random() - 0.5) * 4;
+  return Math.max(0, Math.min(100, current + delta));
 }
 
 // ── Alert Messages ──────────────────────────────────────────────────────────

@@ -36,7 +36,9 @@ import {
   eva_updatePerformanceRecord,
   eva_scaledAngelHp,
   eva_resolveMagiTieBreak,
+  eva_fluctuateSyncRatio,
   PHASE_DURATIONS,
+  PHASE_DAMAGE_MULTIPLIERS,
 } from '../simulation/engine';
 
 // Re-export all types so consumers can import from either location
@@ -394,9 +396,23 @@ export const useNervStore = create<NervState>((set) => ({
     const newTotalElapsed = sim.totalElapsed + 1;
     const tier = state.performanceRecord.difficultyTier;
 
-    if (sim.phase === 'CONTACT') {
-      // Erode AT Field each tick
-      const erosion = eva_computeATFieldErosion(state.syncRatios);
+    // Determine whether this phase deals combat damage
+    const phaseMult = PHASE_DAMAGE_MULTIPLIERS[sim.phase];
+    const isCombatPhase = phaseMult.angel > 0 || phaseMult.nerv > 0;
+
+    if (isCombatPhase) {
+      // Fluctuate sync ratios for active/berserk pilots
+      const pilots = state.pilots;
+      const newSyncRatios = { ...state.syncRatios };
+      for (const pilot of pilots) {
+        if (pilot.status === 'ACTIVE' || pilot.status === 'BERSERK') {
+          const current = newSyncRatios[pilot.id] ?? pilot.syncRatio;
+          newSyncRatios[pilot.id] = eva_fluctuateSyncRatio(current);
+        }
+      }
+
+      // Erode AT Field each tick during combat
+      const erosion = eva_computeATFieldErosion(newSyncRatios);
       const updatedATField = eva_tickATField(sim.atField, erosion);
 
       // AT Field state change alerts
@@ -410,21 +426,27 @@ export const useNervStore = create<NervState>((set) => ({
         });
       }
 
-      // Compute combat damage (AT Field reduces angel damage)
-      const { angelDamage, nervDamage } = eva_computeCombatDamage(state.syncRatios, updatedATField, tier);
+      const magiAgreed = state.magiStatus === 'AGREE';
+      const { angelDamage, nervDamage } = eva_computeCombatDamage(
+        newSyncRatios,
+        { phase: sim.phase, magiAgreed, atField: updatedATField, difficultyTier: tier },
+      );
       const newAngelHp = Math.max(0, sim.angelHp - angelDamage);
       const newNervDefense = Math.max(0, sim.nervDefense - nervDamage);
 
       if (newAngelHp <= 0) {
+        set({ syncRatios: newSyncRatios });
         state.resolveSimulation('VICTORY');
         return;
       }
       if (newNervDefense <= 0) {
+        set({ syncRatios: newSyncRatios });
         state.resolveSimulation('DEFEAT');
         return;
       }
 
       set({
+        syncRatios: newSyncRatios,
         simulation: {
           ...sim,
           phaseTimeRemaining: newTimeRemaining,
